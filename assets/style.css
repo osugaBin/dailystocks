@@ -30,6 +30,21 @@ a{color:var(--accent)}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
 .badge.news{background:#dcfce7;color:#15803d}
+.badge.data{background:#e0f2fe;color:#0369a1}
+.badge.model{background:#fef9c3;color:#a16207}
+/* tabs */
+.tabs{display:flex;gap:10px;margin:20px 0 18px;flex-wrap:wrap}
+.tab{flex:1;min-width:130px;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 8px;cursor:pointer;text-align:center;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.tab .t{display:block;font-size:1rem;font-weight:600;color:var(--ink)}
+.tab .count{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+.tab.active{background:#1a3a6b;border-color:#1a3a6b}
+.tab.active .t{color:#fff}
+.tab.active .count{color:#cbd5e1}
+section[hidden]{display:none!important}
+.empty{color:var(--muted);background:var(--card);border:1px dashed var(--line);
+  border-radius:10px;padding:28px;text-align:center;font-size:.9rem}
 .card h2{font-size:1.12rem;margin:0 0 6px}
 .card p.excerpt{margin:0;color:#4b5563;font-size:.92rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}

@@ -19,7 +19,8 @@ STOCKS = os.path.join(HOME, "workspace", "stocks")
 SITE = os.path.join(HOME, "workspace", "dailystocks")
 CUSTOM_DIR = os.path.join(SITE, "custom")
 
-TYPE_LABEL = {"morning": "早盘", "evening": "晚间", "custom": "其他"}
+TYPE_LABEL = {"morning": "早盘", "evening": "晚间", "custom": "其他",
+             "data": "数据掘金", "model": "金融建模"}
 TYPE_ORDER = {"morning": 0, "evening": 1}  # 同一天：晚间(20:00)比早盘(09:00)新
 
 CSS = """/* dailystocks site */
@@ -54,6 +55,21 @@ a{color:var(--accent)}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
 .badge.news{background:#dcfce7;color:#15803d}
+.badge.data{background:#e0f2fe;color:#0369a1}
+.badge.model{background:#fef9c3;color:#a16207}
+/* tabs */
+.tabs{display:flex;gap:10px;margin:20px 0 18px;flex-wrap:wrap}
+.tab{flex:1;min-width:130px;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 8px;cursor:pointer;text-align:center;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.tab .t{display:block;font-size:1rem;font-weight:600;color:var(--ink)}
+.tab .count{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+.tab.active{background:#1a3a6b;border-color:#1a3a6b}
+.tab.active .t{color:#fff}
+.tab.active .count{color:#cbd5e1}
+section[hidden]{display:none!important}
+.empty{color:var(--muted);background:var(--card);border:1px dashed var(--line);
+  border-radius:10px;padding:28px;text-align:center;font-size:.9rem}
 .card h2{font-size:1.12rem;margin:0 0 6px}
 .card p.excerpt{margin:0;color:#4b5563;font-size:.92rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
@@ -107,9 +123,24 @@ INDEX_TMPL = """<!DOCTYPE html>
 <h1>DrX Daily · 每日市场洞察</h1>
 <p>数据驱动 · 行情复盘 · 金融建模</p>
 </header>
-{sections}
+{content}
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
 </div>
+<script>
+(function(){
+  var tabs=document.querySelectorAll('.tab');
+  function show(name){
+    tabs.forEach(function(b){b.classList.toggle('active',b.dataset.tab===name)});
+    ['daily','data','model'].forEach(function(n){
+      document.getElementById('tab-'+n).hidden=(n!==name);
+    });
+    try{history.replaceState(null,'','#'+name)}catch(e){}
+  }
+  tabs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.tab)})});
+  var h=(location.hash||'').replace('#','');
+  if(h==='data'||h==='model') show(h);
+})();
+</script>
 </body>
 </html>
 """
@@ -128,11 +159,11 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="{root}assets/style.css">
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← 全部报告</a></p>
+<p class="back"><a href="{root}index.html">← 全部报告</a></p>
 <p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
 {body}
 <p class="meta">{meta_line}</p>
@@ -270,16 +301,21 @@ def extract_html_title(text):
     return ""
 
 
+CUSTOM_DIRS = {"数据掘金": "data", "金融建模": "model"}  # custom/ 子目录 -> tab id
+TAB_LABELS = {"daily": "每日报告", "data": "数据掘金", "model": "金融建模"}
+
+
 def collect_custom():
-    items = []  # (date, name, ext, src_path)
-    if not os.path.isdir(CUSTOM_DIR):
-        return items
-    for fname in sorted(os.listdir(CUSTOM_DIR)):
-        m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|pdf|html)$", fname)
-        if m:
-            items.append((m.group(1), m.group(2), m.group(3),
-                          os.path.join(CUSTOM_DIR, fname)))
-    items.sort(key=lambda x: x[0], reverse=True)
+    items = []  # (tab_id, subdir, date, name, ext, src_path)
+    for subdir, tab_id in CUSTOM_DIRS.items():
+        d = os.path.join(CUSTOM_DIR, subdir)
+        if not os.path.isdir(d):
+            continue
+        for fname in sorted(os.listdir(d), reverse=True):
+            m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|html)$", fname)
+            if m:
+                items.append((tab_id, subdir, m.group(1), m.group(2),
+                              m.group(3), os.path.join(d, fname)))
     return items
 
 
@@ -328,7 +364,8 @@ def build():
                          f" · 类型：{TYPE_LABEL[rtype]}")
         body = md_to_html(body_md)
         page = PAGE_TMPL.format(
-            title=htmlmod.escape(title), body=body, meta_line=meta_line)
+            title=htmlmod.escape(title), body=body, meta_line=meta_line,
+            root="../")
         with open(os.path.join(SITE, "reports", slug + ".html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -337,8 +374,8 @@ def build():
             excerpt, data_date, news_cfg["note"] if news_cfg else ""))
         print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
 
-    custom_cards = []
-    for date, name, ext, src in collect_custom():
+    tab_cards = {"data": [], "model": []}
+    for tab_id, subdir, date, name, ext, src in collect_custom():
         if ext == "md":
             text = open(src, encoding="utf-8").read()
             title = extract_h1(text)
@@ -347,41 +384,58 @@ def build():
             body = md_to_html(text)
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
-                meta_line=f"发布日期：{date} · 类型：其他报告")
-            with open(os.path.join(CUSTOM_DIR, slug + ".html"), "w",
+                meta_line=f"发布日期：{date} · 类型：{TAB_LABELS[tab_id]}",
+                root="../../")
+            with open(os.path.join(CUSTOM_DIR, subdir, slug + ".html"), "w",
                       encoding="utf-8") as f:
                 f.write(page)
-            href = f"custom/{slug}.html"
-            print(f"page: custom/{slug}.html  <- {os.path.basename(src)}")
-        elif ext == "html":
+            href = f"custom/{subdir}/{slug}.html"
+            print(f"page: custom/{subdir}/{slug}.html"
+                  f"  <- {os.path.basename(src)}")
+        else:  # html：自带样式，原样上架
             text = open(src, encoding="utf-8").read()
             title = extract_html_title(text) or name
-            href = f"custom/{os.path.basename(src)}"
+            excerpt = ""
+            href = f"custom/{subdir}/{os.path.basename(src)}"
             print(f"file: {href}")
-            custom_cards.append(card(href, "custom", date, title, "", date))
-        else:  # pdf（保留能力，默认不在仓库放 PDF）
-            title, excerpt = name, ""
-            href = f"custom/{os.path.basename(src)}"
-            print(f"file: {href}")
-            custom_cards.append(card(href, "custom", date, title, excerpt, date))
+        tab_cards[tab_id].append(
+            card(href, tab_id, date, title, excerpt, date))
 
-    sections = [
-        f'<h2 class="section-title">每日报告</h2>\n'
-        f'<p class="section-hint">早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析'
-        f' — 定时任务自动更新，共 {len(daily_cards)} 期</p>\n'
-        + "\n".join(daily_cards),
-    ]
-    if custom_cards:
-        sections.append(
-            f'<h2 class="section-title">其他报告</h2>\n'
-            f'<p class="section-hint">手动添加：把 .md / .pdf 按 '
-            f'<code>YYYY-MM-DD-标题</code> 命名放入 custom/ 目录，重新构建即上架</p>\n'
-            + "\n".join(custom_cards))
+    panels = {
+        "daily": ("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析"
+                  " — 定时任务自动更新", daily_cards),
+        "data": ("量化分析与数据挖掘 — 把 .md / .html 按 "
+                 "<code>YYYY-MM-DD-标题</code> 命名放入 custom/数据掘金/ 重新构建",
+                 tab_cards["data"]),
+        "model": ("金融建模相关报告 — 把 .md / .html 按 "
+                  "<code>YYYY-MM-DD-标题</code> 命名放入 custom/金融建模/ 重新构建",
+                  tab_cards["model"]),
+    }
+    order = ["daily", "data", "model"]
+    tabbar = ['<div class="tabs" role="tablist">']
+    for tid in order:
+        n = len(panels[tid][1])
+        active = " active" if tid == "daily" else ""
+        tabbar.append(
+            f'<button class="tab{active}" data-tab="{tid}" role="tab">'
+            f'<span class="t">{TAB_LABELS[tid]}</span>'
+            f'<span class="count">{n} 篇</span></button>')
+    tabbar.append("</div>")
+    parts = ["\n".join(tabbar)]
+    for tid in order:
+        hint, cards = panels[tid]
+        inner = "\n".join(cards) if cards else '<p class="empty">暂无内容</p>'
+        hid = "" if tid == "daily" else " hidden"
+        parts.append(
+            f'<section id="tab-{tid}"{hid}>\n'
+            f'<p class="section-hint">{hint}</p>\n{inner}\n</section>')
+    content = "\n".join(parts)
 
     with open(os.path.join(SITE, "index.html"), "w",
               encoding="utf-8") as f:
-        f.write(INDEX_TMPL.format(sections="\n".join(sections)))
-    print(f"index: {len(daily_cards)} daily + {len(custom_cards)} custom")
+        f.write(INDEX_TMPL.replace("{content}", content))
+    print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
+          f" + {len(tab_cards['model'])} model")
 
 
 if __name__ == "__main__":
