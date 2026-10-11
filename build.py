@@ -98,14 +98,14 @@ INDEX_TMPL = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>每日市场报告</title>
+<title>DrX Daily · 每日市场洞察</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <div class="wrap">
 <header class="site-head">
-<h1>每日市场报告</h1>
-<p>按发布时间倒序排列</p>
+<h1>DrX Daily · 每日市场洞察</h1>
+<p>数据驱动 · 行情复盘 · 金融建模</p>
 </header>
 {sections}
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
@@ -127,7 +127,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} · 每日市场报告</title>
+<title>{title} · DrX Daily</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -170,14 +170,20 @@ NEWS_EDITION = {
     ("evening", "2026-10-10"): {
         "keep": ["新闻汇总", "关注"],
         "note": "A股休市，本期为新闻版：数据分析见 2026-10-09 晚间报告。",
+        "summary": "10月9日A股深V反转收红、成交1.9万亿；中央印发新质生产力意见；"
+                   "OpenAI营收不及预期拖累半导体，黄金原油齐涨。",
     },
     ("evening", "2026-10-11"): {
         "keep": ["新闻汇总", "关注"],
         "note": "A股休市，本期为新闻版：数据分析见 2026-10-09 晚间报告。",
+        "summary": "证监会座谈释放稳市信号、公募新规征求意见；沙特机场遇袭，"
+                   "布伦特原油大涨超5%逼近105美元；美联储纪要现加息分歧。",
     },
     ("morning", "2026-10-11"): {
         "drop": ["隔夜美股关键指标"],
         "note": "美股休市，本期为新闻版：数据指标见 2026-10-10 早盘报告。",
+        "summary": "美股周五普涨反弹，光通信领涨；沙特机场遇袭油价冲高，人民币走强；"
+                   "下周一A股或温和高开，光模块链领涨。",
     },
 }
 
@@ -292,7 +298,7 @@ def build():
             note = news_cfg["note"]
             body_md = ("# " + title + "\n\n> " + note + "\n\n"
                        + news_edition_body(text, news_cfg))
-            excerpt = note
+            excerpt = news_cfg["summary"]
             meta_line = (f"发布日期：{pub_date} · 类型：{TYPE_LABEL[rtype]}"
                          f" · 本期为新闻版")
         else:
