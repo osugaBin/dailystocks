@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>配对交易最优策略：GBM框架下的闭式解与市场应用前景 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>配对交易最优策略：GBM框架下的闭式解与市场应用前景</h1>
+<p>配对交易是最经典的市场中性策略之一。这篇2017年发表于 JOTA 的论文（Tie, Zhang &amp; Zhang）去掉了传统配对交易对"均值回归"的依赖，直接在几何布朗运动（GBM）下求出最优买卖阈值的闭式解。本文解读论文核心结论，并探讨它在A股等实际市场中的落地前景。</p>
+<blockquote>
+<p>原文：Tie, Zhang &amp; Zhang, "An Optimal Strategy for Pairs Trading Under Geometric Brownian Motions", <em>Journal of Optimization Theory and Applications</em> (2017).
+<a href="Pairs_Trading.pdf">论文原文 PDF 下载</a></p>
+</blockquote>
+<h2>一、论文讲了什么</h2>
+<p>配对交易的核心动作很简单：选两只股票，持续跟踪它们的相对强弱；当价差扩大到一定程度，<strong>做空强势股、做多弱势股</strong>，赌两者相对强弱反转。1980年代由摩根士丹利 Tartaglia 量化团队发扬光大，最大的优点是<strong>市场中性</strong>——涨跌市都能赚钱。</p>
+<p>传统配对交易模型通常假设<strong>价差服从均值回归</strong>，这带来一个严重限制：可选的股票对基本只能是同行业高度相关的股票，选股池很窄。这篇论文的突破在于：<strong>去掉均值回归假设，允许股价服从一般的几何布朗运动</strong>，用动态规划 + HJB 方程求最优交易时机，并得到了<strong>闭式解</strong>。</p>
+<h2>二、核心结论：两条阈值线</h2>
+<p>设两只股票价格为 X¹、X²，记价格比 y = X²/X¹。论文把第一象限划分成三个区域：</p>
+<ul>
+<li><strong>y ≥ k₂：开仓</strong>——买入组合（做多 S¹、做空 S²）</li>
+<li><strong>y ≤ k₁：平仓</strong>——卖出 S¹、买回 S²</li>
+<li><strong>k₁ &lt; y &lt; k₂：持有不动</strong></li>
+</ul>
+<p>k₁、k₂ 由两只股票的收益率 μ、波动率 σ、贴现率 ρ、交易成本 K <strong>闭式决定</strong>（解一组代数方程，不用数值优化）。论文用 Target（TGT）/ Walmart（WMT）1985–1999 年数据校准参数，得到 k₁ = 1.039、k₂ = 1.282，并在 2000–2014 年做样本外回测。</p>
+<p>论文数值实验给出的参数直觉：</p>
+<ul>
+<li>S¹ 预期收益 μ₁ 越高 → 阈值整体下移，开仓机会更多</li>
+<li>波动率越大 → 买卖区间都收缩（风险高，少动手）</li>
+<li>两只股票相关性越高 → 开仓和平仓区间都扩大</li>
+<li>交易成本 K 越大 → 区间收缩，交易更谨慎</li>
+<li>贴现率 ρ 越大（越想要快钱）→ k₂ 下移、持有期缩短</li>
+</ul>
+<h2>三、结合市场的应用前景</h2>
+<h3>1. A股落地的现实约束</h3>
+<ul>
+<li><strong>融券端</strong>："做空强势股"这条腿在A股较难直接复制——券源有限、融券成本高。可行的变体：用 <strong>ETF 或股指期货</strong>代替个股做空端，或只做多头配对（做多相对弱势、卖出相对强势的现有多头）。</li>
+<li><strong>T+1</strong>：日内级别的反转信号无法当日平仓，策略更适合日线及以上周期。</li>
+<li><strong>涨跌停与停牌</strong>：极端行情下价差可能跳过阈值，实盘执行要留缓冲，不能机械挂单。</li>
+</ul>
+<h3>2. 可以直接借用的框架</h3>
+<ul>
+<li><strong>阈值即纪律</strong>：k₁/k₂ 把"什么时候进出"变成了可计算的数。即使不用论文的精确公式，"价格比突破阈值才动手"这条纪律本身就有价值，能管住追涨杀跌的手。</li>
+<li><strong>参数滚动校准</strong>：用滚动窗口估计 μ、σ，定期重算 k₁、k₂，让阈值随市场状态自适应，而不是一套参数用到老。</li>
+<li><strong>组合扩展</strong>：论文是一对股票；实际可扩展为一篮子配对——ETF vs 成分股、AH股、期货跨期、行业龙头 vs 行业ETF，逻辑相通。</li>
+</ul>
+<h3>3. 与现有量化实践的结合</h3>
+<ul>
+<li>均值回归类策略（OU过程、协整配对）要求先找到"会回归"的配对；GBM框架<strong>不要求回归假设</strong>，选股池大得多（跨行业也可以），代价是最优性更依赖参数估计质量。</li>
+<li>适合作为<strong>市场中性底仓</strong>：在组合里配一小部分配对交易仓位，对冲 beta、赚相对价值的钱，尤其在震荡市里平滑净值。</li>
+<li>高频化：把日线阈值逻辑搬到分钟线，框架不变，但要重新估计参数并计入冲击成本——K 设小了阈值会过于激进。</li>
+</ul>
+<h3>4. 风险提示</h3>
+<ul>
+<li>模型假设两只股票永远按 GBM 走；<strong>结构性变化</strong>（如一家公司基本面质变、行业逻辑证伪）会让"相对价值"本身漂移，阈值失效。配对需要定期做基本面复核。</li>
+<li>论文回测（TGT-WMT）是美股长牛样本；A股波动更大、制度不同，不可直接套用参数。</li>
+<li>交易成本 K 的设定对阈值很敏感，实盘前务必按真实费率（含滑点、融券成本、冲击成本）重算。</li>
+</ul>
+<h2>附：论文原文下载</h2>
+<p><a href="Pairs_Trading.pdf">Pairs_Trading.pdf（2MB）</a></p>
+<p class="meta">发布日期：2026-10-12 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
