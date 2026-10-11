@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>统计套利配对交易策略：Krauss (2015) 综述解读与展望 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>统计套利配对交易策略：Krauss (2015) 综述解读与展望</h1>
+<p>这是配对交易领域引用最广的综述之一。Krauss (2015) 系统梳理了90余篇文献，把配对交易研究分成<strong>五大流派</strong>：距离法、协整法、时间序列法、随机控制法、其他方法，并逐一评估其优劣。本文做详细解读，最后给出结合市场的展望。</p>
+<blockquote>
+<p>原文：Krauss, C. (2015), "Statistical arbitrage pairs trading strategies: Review and outlook", IWQW Discussion Papers No. 09/2015.
+<a href="https://hdl.handle.net/10419/116783">EconStor 官方原文链接</a>（出版方要求从官方渠道获取，本文不附PDF）</p>
+</blockquote>
+<h2>一、五大流派总览</h2>
+<p>配对交易两步走：<strong>形成期</strong>找历史同动的证券对 → <strong>交易期</strong>价差扩大时做空强者、做多弱者，赌均值回归。可扩展为准多元（一只对一篮子）、全多元（一篮子对一篮子），统称统计套利。</p>
+<table>
+<thead>
+<tr>
+<th>流派</th>
+<th>核心思想</th>
+<th>代表文献</th>
+<th>年化收益（论文报告）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>距离法</td>
+<td>价格距离选配对，2σ触发</td>
+<td>Gatev et al. (2006)</td>
+<td>11%</td>
+</tr>
+<tr>
+<td>协整法</td>
+<td>协整检验找平稳价差</td>
+<td>Caldeira &amp; Moura (2013)</td>
+<td>16%（巴西）</td>
+</tr>
+<tr>
+<td>时间序列法</td>
+<td>价差建模为均值回归过程，求最优阈值</td>
+<td>Cummins &amp; Bucca (2012)</td>
+<td>18%（能源期货）</td>
+</tr>
+<tr>
+<td>随机控制法</td>
+<td>HJB求最优仓位，不只做多空对</td>
+<td>Jurek &amp; Yang (2007)</td>
+<td>28%–43%</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>机器学习、Copula、PCA</td>
+<td>Avellaneda &amp; Lee (2010)</td>
+<td>Sharpe 1.44</td>
+</tr>
+</tbody>
+</table>
+<p>（注：各论文收益计算口径不一，不可直接比较；下文详述。）</p>
+<h2>二、距离法：最经典，也最受质疑</h2>
+<p><strong>GGR (2006)</strong> 是开山之作：12个月形成期，用欧氏平方距离（SSD）选出价格走势最接近的20对；6个月交易期，价差偏离超2倍历史标准差开仓、回归平仓。1962–2002美股年化超额收益<strong>11%</strong>，且不能被反转/动量因子解释——这让它成为经得起时间考验的少数异象之一。</p>
+<p>但Krauss给了尖锐的批评。记 $SSD_{ij} = \sum_t (P_{it}-P_{jt})^2$，可分解为：</p>
+<p>$$
+SSD_{ij} = V(P_{it}-P_{jt}) + \bar{S}^2
+$$</p>
+<p>即<strong>价差方差</strong> + <strong>价差均值平方</strong>。理性投资者的目标是最大化"交易次数 × 单次利润"，需要的是<strong>高方差 + 强均值回归</strong>的价差。而SSD最小化恰恰倾向于选出<strong>低方差</strong>的配对——排名第一的"理想配对"（SSD=0）价差恒为零，一分钱不赚。这与盈利目标是冲突的。</p>
+<p>更糟的是，GGR根本没做协整检验，高相关可能是伪相关。Do &amp; Faff证实<strong>32%的配对最终不收敛</strong>，计入交易成本后策略基本不赚钱，且收益随时间递减。</p>
+<p><strong>改进方向</strong>：</p>
+<ul>
+<li>Do &amp; Faff (2010/2012)：限制同行业配对 + 用零交叉次数代理均值回归强度，成本后勉强盈利。</li>
+<li>Chen et al. (2012)：改用收益率Pearson相关 + <strong>准多元</strong>（一只股票对50只最高相关股票的等权组合），月收益1.7%，近两倍于GGR——组合的信息含量更高，偏离更可能是个股特质冲击。</li>
+<li><strong>收益来源</strong>：非知情交易冲击（流动性补偿，Andrade）、信息扩散速度差异导致的lead-lag（Engelberg；Jacobs &amp; Weber发现高分心日开仓的配对更易收敛）。</li>
+<li><strong>高频</strong>：Bowen et al. (2010) 用60分钟K线做富时100，年化20%，但15bp成本 + 延迟1小时执行 → 收益归零。<strong>成本是高频配对的生死线</strong>。</li>
+</ul>
+<h2>三、协整法：更严谨的均衡关系</h2>
+<p>距离法靠"看起来像"，协整法靠"统计上是一个均衡"。Engle-Granger或Johansen检验找出平稳价差，再交易。</p>
+<ul>
+<li><strong>Vidyamurthy (2004)</strong>：最被引用的理论框架。用APT因子载荷相似度预选（因子载荷成比例的股票对更可能协整），用零交叉频率检验可交易性。但他提出的"最优阈值"优化方法是错的——把价差序列打乱重排数次数，丢失了时间顺序。</li>
+<li><strong>期货价差是最佳试验场</strong>：crack spread（原油-成品油）年化15%+（Girma &amp; Paulson），soy crush、spark spread都成功，<strong>金银价差失败</strong>。规律很清楚：<strong>有基本面/产业链支撑的协整才可靠</strong>。</li>
+<li><strong>Caldeira &amp; Moura (2013)</strong>：巴西50只成分股1225个组合，每年约90对通过协整检验，取样本内Sharpe最高的20对交易4个月，成本后显著盈利，且通过了White reality check。</li>
+<li><strong>Huck &amp; Afawubo (2015)</strong>：同一样本下协整法显著优于距离法——协整配对的价差波动率近两倍，再次印证"要波动不要贴合"。</li>
+<li><strong>警示</strong>：1225对配对做5%显著性检验，期望产生61对假阳性。必须控制familywise error rate（如Cummins &amp; Bucca的做法），否则排名里一半是噪音。</li>
+<li><strong>多元</strong>：指数跟踪（Dunis &amp; Ho）、Galenko et al. (2012) 多元协整统计套利（理论漂亮，但实证有数据挖掘之嫌）。</li>
+</ul>
+<h2>四、时间序列法：不管选股，只管最优买卖点</h2>
+<p>这一派假设配对已经选好，专注于<strong>交易信号的最优化</strong>。</p>
+<ul>
+<li><strong>Elliott et al. (2005)</strong>：状态空间模型，价差 = OU过程 + 观测噪声，用Kalman/EM估计。好处是<strong>期望持有期、期望收益都可算</strong>；坏处是模型太刚性，只适用于return parity证券（如双重上市公司）。</li>
+<li><strong>OU过程的标准形式</strong>：$dx_t = \kappa(\theta - x_t)dt + \sigma dW_t$，$\kappa$ 为均值回归速度。</li>
+<li><strong>Bertram (2010)</strong>：为OU价差推导<strong>最优进出阈值闭式解</strong>。定义交易周期收益 $r(a;m;c) = m - a - c$（$a$ 进场、$m$ 出场、$c$ 成本），用renewal theory得单位时间期望收益和Sharpe，优化求阈值。Cummins &amp; Bucca (2012) 在861个能源期货价差上实证：<strong>日收益0.07%–0.55%，Sharpe常大于2</strong>，且严格控制了数据挖掘偏差。</li>
+<li>批评：高斯OU vs 金融数据的尖峰肥尾，始终是硬伤；但换来的是解析解和高频可算性。</li>
+<li>其他：Markov区制切换、renko/kagi、TAR-GARCH，都是在往"更贴近真实数据"方向走。</li>
+</ul>
+<h2>五、随机控制法：仓位也是决策变量</h2>
+<p>前几派都在回答"何时买卖"，这一派回答"<strong>买卖多少</strong>"。</p>
+<ul>
+<li><strong>Jurek &amp; Yang (2007)</strong>：OU价差 + HJB，在CRRA/Epstein-Zin效用下求最优仓位。最优仓位 = <strong>短视需求</strong>（当前错位幅度）+ <strong>跨期对冲需求</strong>（对冲状态变量风险）。还发现"稳定区域"：区域外要降仓，避免财富负效应。</li>
+<li><strong>Liu &amp; Timmermann (2013)</strong>：协整框架 + <strong>允许非delta中性</strong>——最优时<strong>两条腿可以同时做多</strong>（或只持有一条腿），与传统配对的多空对完全相反。中国银行股实证：非约束策略显著优于标准套利。</li>
+<li>最优平仓问题：Ekstrom、Larsson、<strong>Song &amp; Zhang (2013)</strong> 等。注：上一篇解读的 Tie-Zhang-Zhang (2017) 正是这一脉的延续——GBM下求最优阈值闭式解。</li>
+</ul>
+<h2>六、其他：机器学习、Copula、PCA</h2>
+<ul>
+<li><strong>Huck (2009/2010)</strong>：Elman神经网络预测一周收益 + ELECTRE III多准则排序，买top5、卖bottom5，周超额0.8%、预测准确率54%。但<strong>有生存偏差</strong>，且MCDM的增量价值可疑——理性投资者直接按预测排序买卖就行。</li>
+<li><strong>Copula</strong>：用条件概率找尾部机会。优点是刻画非正态依赖（偏态、肥尾），缺点是<strong>丢失时间结构</strong>——这是未来改进的主攻方向（GARCH滤波、时变copula）。</li>
+<li><strong>Avellaneda &amp; Lee (2010)</strong>：PCA分解系统/特质收益，特质部分按OU交易，<strong>年化Sharpe 1.44</strong>（1997–2007）。但数据挖掘控制不足是硬伤。</li>
+</ul>
+<h2>七、论文的展望（Krauss原文第7节精要）</h2>
+<ul>
+<li><strong>距离法</strong>：改进选择指标（要波动、不要贴合；叠加协整过滤）；跨市场验证共同因子。</li>
+<li><strong>协整法</strong>：控制多重检验；大样本实证；Vidyamurthy的启发式值得真正跑一次数据。</li>
+<li><strong>时间序列法</strong>：<strong>与选股方法结合</strong>——好的配对选择 + 好的交易信号，这是论文最看好的组合方向。</li>
+<li><strong>随机控制法</strong>：大规模实证；终极形态是<strong>三阶段组合</strong>：协整选股 → 时间序列定信号 → 随机控制定仓位。</li>
+<li><strong>其他</strong>：集成学习、时变copula、渐近PCA。</li>
+</ul>
+<h2>八、我的展望：结合市场</h2>
+<p><strong>1. A股的特殊性</strong></p>
+<ul>
+<li>融券难 → 距离法/协整法的做空腿天然受限，这是A股做配对的第一道坎。</li>
+<li>但<strong>期货价差是富矿</strong>：股指跨期、商品裂解价差、AH股，都是协整法的天然试验场，且没有融券问题。</li>
+<li>T+1之下，阈值要放宽、持有期要拉长，Bertram的最优阈值框架可以直接拿来重算。</li>
+</ul>
+<p><strong>2. 三阶段组合最有实战价值</strong></p>
+<p>Krauss展望的"协整选股 + 时间序列定信号 + 随机控制定仓位"，正是国内量化私募多策略框架的思路。单用任何一派都不够：选股不行则信号无意义，信号不行则好配对也赚不到钱，仓位不行则波动扛不住。</p>
+<p><strong>3. 机器学习是增量，不是替代</strong></p>
+<p>Huck的教训很实在：预测+排序框架有价值，但生存偏差、过拟合是生死线。更扎实的方向是Copula + GARCH滤波、集成学习，而不是更复杂的黑箱。</p>
+<p><strong>4. 收益递减是常态，alpha来源必须讲清楚</strong></p>
+<p>GGR的11% → Do &amp; Faff的7% → 计入成本后归零。任何配对策略上线前都要回答三个问题：你的alpha来源是什么（流动性补偿？信息扩散？）？容量多大？成本吃掉多少？答不上来就是纸上谈兵。</p>
+<p><strong>5. 与上一篇的呼应</strong></p>
+<p>上一篇解读的 Tie-Zhang-Zhang (2017)，正是Krauss综述出版后"随机控制法"方向的一个具体答案——在GBM（而非OU）假设下求出最优阈值闭式解。两篇连起来看，能看到这个领域从"经验规则"到"最优控制"的方法论升级。</p>
+<h2>附：原文链接</h2>
+<p><a href="https://hdl.handle.net/10419/116783">EconStor 官方页面</a>（按出版方要求，请从官方渠道获取原文）</p>
+<p class="meta">发布日期：2026-10-12 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
