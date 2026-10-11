@@ -29,6 +29,7 @@ a{color:var(--accent)}
 .badge.evening{background:#fef3e2;color:#b45309}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
+.badge.news{background:#dcfce7;color:#15803d}
 .card h2{font-size:1.12rem;margin:0 0 6px}
 .card p.excerpt{margin:0;color:#4b5563;font-size:.92rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
@@ -49,10 +50,20 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
   padding:6px 14px;font-size:.85rem;cursor:pointer;color:var(--accent)}
 .actions button:hover{border-color:var(--accent)}
+@page{size:A4;margin:18mm 15mm}
 @media print{
   .back,.actions,footer.site-foot{display:none!important}
-  body{font-size:11pt}
-  .wrap{max-width:none;padding:0 4px}
-  a{color:#111;text-decoration:none}
+  body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
+  .wrap{max-width:none;margin:0;padding:0}
+  h1{font-size:17pt;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{font-size:13pt;color:#1a3a6b;border-left:4px solid #2a6cb6;padding-left:10px;margin-top:1.4em}
+  h3{font-size:11pt;color:#2a6cb6}
+  table{display:table;font-size:8.2pt;border-collapse:collapse;width:100%;margin:.6em 0;overflow:visible}
+  th,td{border:1px solid #999;padding:4px 6px;white-space:normal;text-align:left}
+  th{background:#eef2f7}
+  blockquote{border-left:3px solid #2a6cb6;background:#f2f6fb;padding:8px 12px;color:#444;font-size:9.5pt}
+  a{color:#1a3a6b;text-decoration:none}
+  .meta{color:#666;font-size:9pt}
+  .badge{font-size:8pt}
 }
 @media(max-width:600px){body{font-size:15px}.wrap{padding:16px 14px 48px}}

@@ -53,6 +53,7 @@ a{color:var(--accent)}
 .badge.evening{background:#fef3e2;color:#b45309}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
+.badge.news{background:#dcfce7;color:#15803d}
 .card h2{font-size:1.12rem;margin:0 0 6px}
 .card p.excerpt{margin:0;color:#4b5563;font-size:.92rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
@@ -73,11 +74,21 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
   padding:6px 14px;font-size:.85rem;cursor:pointer;color:var(--accent)}
 .actions button:hover{border-color:var(--accent)}
+@page{size:A4;margin:18mm 15mm}
 @media print{
   .back,.actions,footer.site-foot{display:none!important}
-  body{font-size:11pt}
-  .wrap{max-width:none;padding:0 4px}
-  a{color:#111;text-decoration:none}
+  body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
+  .wrap{max-width:none;margin:0;padding:0}
+  h1{font-size:17pt;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{font-size:13pt;color:#1a3a6b;border-left:4px solid #2a6cb6;padding-left:10px;margin-top:1.4em}
+  h3{font-size:11pt;color:#2a6cb6}
+  table{display:table;font-size:8.2pt;border-collapse:collapse;width:100%;margin:.6em 0;overflow:visible}
+  th,td{border:1px solid #999;padding:4px 6px;white-space:normal;text-align:left}
+  th{background:#eef2f7}
+  blockquote{border-left:3px solid #2a6cb6;background:#f2f6fb;padding:8px 12px;color:#444;font-size:9.5pt}
+  a{color:#1a3a6b;text-decoration:none}
+  .meta{color:#666;font-size:9pt}
+  .badge{font-size:8pt}
 }
 @media(max-width:600px){body{font-size:15px}.wrap{padding:16px 14px 48px}}
 """
@@ -104,10 +115,10 @@ INDEX_TMPL = """<!DOCTYPE html>
 """
 
 CARD_TMPL = """<a class="card" href="{href}">
-<div class="badges"><span class="badge {rtype}">{type_label}</span><span class="badge date">{pub_date} 发布</span></div>
+<div class="badges">{badges}</div>
 <h2>{title}</h2>
 {excerpt_html}
-<div class="meta">数据基准 {data_date}</div>
+<div class="meta">{meta}</div>
 </a>
 """
 
@@ -124,7 +135,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <p class="back"><a href="../index.html">← 全部报告</a></p>
 <p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
 {body}
-<p class="meta">发布日期：{pub_date} · 数据基准：{data_date} · 类型：{type_label}</p>
+<p class="meta">{meta_line}</p>
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
 </div>
 </body>
@@ -147,6 +158,48 @@ def extract_data_date(h1):
     if m:
         return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
     return ""
+
+
+def clean_title(h1):
+    """去掉标题括号内的日期（如 “（2026年10月9日，周五）”），避免与发布日期混淆。"""
+    return re.sub(r"（[^）]*[年月日][^）]*）", "", h1).strip()
+
+
+# 历史周末补发报告：数据与上一份同类型报告重复，网站按“新闻版”展示（只留新闻/前瞻章节）
+NEWS_EDITION = {
+    ("evening", "2026-10-10"): {
+        "keep": ["新闻汇总", "关注"],
+        "note": "A股休市，本期为新闻版：数据分析见 2026-10-09 晚间报告。",
+    },
+    ("evening", "2026-10-11"): {
+        "keep": ["新闻汇总", "关注"],
+        "note": "A股休市，本期为新闻版：数据分析见 2026-10-09 晚间报告。",
+    },
+    ("morning", "2026-10-11"): {
+        "drop": ["隔夜美股关键指标"],
+        "note": "美股休市，本期为新闻版：数据指标见 2026-10-10 早盘报告。",
+    },
+}
+
+
+def news_edition_body(md_text, cfg):
+    """只保留新闻版章节，去掉重复的数据分析与文末 footer。"""
+    chunks = re.split(r"(?m)^(?=##\s)", md_text)
+    out = []
+    for ch in chunks:
+        m = re.match(r"##\s+([^\n]+)", ch)
+        if not m:
+            continue  # 丢掉开头的引用说明等前言
+        head = m.group(1)
+        if "keep" in cfg:
+            if not any(k in head for k in cfg["keep"]):
+                continue
+        elif any(k in head for k in cfg.get("drop", [])):
+            continue
+        out.append(ch.strip())
+    text = "\n\n".join(out)
+    text = re.sub(r"\n---\n[\s\S]*$", "", text).strip()  # 去掉文末 footer
+    return text
 
 
 def extract_excerpt(text, limit=120):
@@ -205,13 +258,19 @@ def collect_custom():
     return items
 
 
-def card(href, rtype, pub_date, title, excerpt, data_date):
+def card(href, rtype, pub_date, title, excerpt, data_date, news_note=""):
+    badges = (f'<span class="badge {rtype}">{TYPE_LABEL[rtype]}</span>'
+              f'<span class="badge date">{pub_date} 发布</span>')
+    if news_note:
+        badges += '<span class="badge news">新闻版</span>'
+        meta = "本期为新闻版"
+    else:
+        meta = f"数据基准 {data_date}"
     excerpt_html = (f'<p class="excerpt">{htmlmod.escape(excerpt)}</p>'
                     if excerpt else "")
     return CARD_TMPL.format(
-        href=href, rtype=rtype, type_label=TYPE_LABEL[rtype],
-        pub_date=pub_date, title=htmlmod.escape(title),
-        excerpt_html=excerpt_html, data_date=data_date)
+        href=href, badges=badges, title=htmlmod.escape(title),
+        excerpt_html=excerpt_html, meta=meta)
 
 
 def build():
@@ -224,19 +283,33 @@ def build():
     daily_cards = []
     for rtype, pub_date, src in collect_daily():
         text = open(src, encoding="utf-8").read()
-        title = extract_h1(text)
-        data_date = extract_data_date(title) or pub_date
+        h1 = extract_h1(text)
+        title = clean_title(h1)
+        data_date = extract_data_date(h1) or pub_date
         slug = f"{pub_date}-{rtype}"
-        body = md_to_html(text)
+        news_cfg = NEWS_EDITION.get((rtype, pub_date))
+        if news_cfg:
+            note = news_cfg["note"]
+            body_md = ("# " + title + "\n\n> " + note + "\n\n"
+                       + news_edition_body(text, news_cfg))
+            excerpt = note
+            meta_line = (f"发布日期：{pub_date} · 类型：{TYPE_LABEL[rtype]}"
+                         f" · 本期为新闻版")
+        else:
+            body_md = re.sub(r"^#\s+.+$", "# " + title, text,
+                             count=1, flags=re.M)
+            excerpt = extract_excerpt(text)
+            meta_line = (f"发布日期：{pub_date} · 数据基准：{data_date}"
+                         f" · 类型：{TYPE_LABEL[rtype]}")
+        body = md_to_html(body_md)
         page = PAGE_TMPL.format(
-            title=htmlmod.escape(title), body=body, pub_date=pub_date,
-            data_date=data_date, type_label=TYPE_LABEL[rtype])
+            title=htmlmod.escape(title), body=body, meta_line=meta_line)
         with open(os.path.join(SITE, "reports", slug + ".html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
         daily_cards.append(card(
             f"reports/{slug}.html", rtype, pub_date, title,
-            extract_excerpt(text), data_date))
+            excerpt, data_date, news_cfg["note"] if news_cfg else ""))
         print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
 
     custom_cards = []
@@ -248,8 +321,8 @@ def build():
             slug = f"{date}-{name}"
             body = md_to_html(text)
             page = PAGE_TMPL.format(
-                title=htmlmod.escape(title), body=body, pub_date=date,
-                data_date=date, type_label="其他报告")
+                title=htmlmod.escape(title), body=body,
+                meta_line=f"发布日期：{date} · 类型：其他报告")
             with open(os.path.join(CUSTOM_DIR, slug + ".html"), "w",
                       encoding="utf-8") as f:
                 f.write(page)
