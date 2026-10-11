@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>均值回归低买高卖：双阈值最优法则的解析解 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>均值回归低买高卖：双阈值最优法则的解析解</h1>
+<p>这是"低买高卖"问题第一次得到<strong>严格的数学 treatment</strong>：此前文献只有最优卖出（sell-side）的结果，买入端一直没有 rigorous 的分析。Zhang &amp; Zhang (2008, <em>Automatica</em>) 用动态规划 + HJB拟变分不等式证明：最优买卖策略就是<strong>两个阈值</strong>——价格跌破 $x_1$ 买入、涨超 $x_2$ 卖出；而求这两个阈值，只需求解<strong>两个拟代数方程</strong>。本文解读其核心公式与验证定理。</p>
+<blockquote>
+<p>原文：Zhang, H. and Zhang, Q. (2008), "Trading a mean-reverting asset: Buy low and sell high", <em>Automatica</em>, 44, 1511–1518.
+<a href="https://doi.org/10.1016/j.automatica.2007.11.003">DOI 官方链接</a>（按出版方要求从官方渠道获取，本文不附PDF）</p>
+</blockquote>
+<h2>一、论文讲了什么</h2>
+<p>2008年之前，关于股票交易时机选择的文献几乎全是<strong>卖出端</strong>的：Zhang (2001) 用 regime-switching GBM 求最优卖出（目标价+止损价），Guo &amp; Zhang (2005) 用光滑粘贴把最优卖出化为代数方程组。但<strong>买入端</strong>——什么时候该进场——没有严格的数学结果。</p>
+<p>这篇论文补上了这一块：<strong>买卖一起做</strong>。在均值回归价格模型下，目标是选择一列停时（买、卖、买、卖……）最大化贴现期望收益，每次交易收固定比例的<strong>滑点成本</strong> $K$。仓位只能是 flat（空仓）或 long（一股）。</p>
+<p>此前的最优卖出文献走的是另一条技术路线：Zhang (2001) 在 regime-switching GBM 下得到"目标价+止损价"双阈值，Guo &amp; Zhang (2005) 用光滑粘贴把最优卖出化为代数方程组。但这些全是<strong>卖出端</strong>——手里有货，什么时候卖。<strong>买入端</strong>难在：买入决策的价值取决于"买入后未来卖出的期权价值"，是个嵌套的最优停时问题。本文第一次把买卖两端统一在拟变分不等式框架下严格解决。</p>
+<p>核心结论很干净：</p>
+<ol>
+<li>最优策略是<strong>阈值型</strong>的：存在 $x_1 &lt; x_2$，空仓时价格跌到 $x_1$ 买入，持仓时价格涨到 $x_2$ 卖出；</li>
+<li>求 $(x_1, x_2)$ 只需求解<strong>两个拟代数方程</strong>（论文式(12)）；</li>
+<li>验证定理给出了充分条件，保证这样算出的阈值确实最优。</li>
+</ol>
+<p>这也是本栏目另一篇解读（Song, Yin &amp; Zhang 2009）的<strong>理论源头</strong>——那篇正是把这里的解析问题改用随机逼近做数值求解。</p>
+<h2>二、关键公式：从HJB到拟代数方程组</h2>
+<p><strong>1. 价格模型</strong></p>
+<p>对数价格 $X_t$ 服从 OU 过程，资产价格 $S_t = \exp(X_t)$：</p>
+<p>$$
+dX_t = a(b - X_t)dt + \sigma dW_t, \quad S_t = \exp(X_t)
+$$</p>
+<p>$a &gt; 0$ 为均值回归速度，$b$ 为均衡水平，$\sigma &gt; 0$ 为波动率。论文注记：GBM 刻画趋势市（牛/熊），均值回归刻画<strong>围绕均衡波动</strong>的市况（如60–80年代的道指箱体、能源市场）。</p>
+<p><strong>2. 价值函数</strong></p>
+<p>记 $V_0(x)$ 为空仓出发的最大期望收益，$V_1(x)$ 为持仓出发的最大期望收益：</p>
+<p>$$
+V_i(x) = \sup_{\Lambda_i} J_i(x, \Lambda_i), \quad i = 0, 1
+$$</p>
+<p>$J_i$ 为贴现收益：每次卖出得 $e^{-\rho t}S_t(1-K)$，每次买入付 $e^{-\rho t}S_t(1+K)$。</p>
+<p><strong>价值函数的相互关系</strong>：从 $\tau_1 = 0$（立即买入）这个可行策略可得：</p>
+<p>$$
+V_0(x) \ge V_1(x) - e^x(1+K), \quad V_1(x) \ge V_0(x) + e^x(1-K)
+$$</p>
+<p>即：空仓的价值至少等于"现在买入转持仓"；持仓的价值至少等于"现在卖出转空仓"。这两个不等式正是 HJB 中"行动项"的来源。Lemma 4 还给出增长性：$V_0$ 有界（空仓不持有资产，收益有限），$V_1(x) \le K_1 e^x + K_2$（持仓价值随价格指数增长）——这决定了积分表示中该舍去哪个发散项，是求解的关键。</p>
+<p><strong>3. HJB 拟变分不等式</strong></p>
+<p>记 $\mathcal{M}$ 为 $X_t$ 的无穷小生成元：</p>
+<p>$$
+\mathcal{M} = a(b-x)\frac{\partial}{\partial x} + \frac{\sigma^2}{2}\frac{\partial^2}{\partial x^2}
+$$</p>
+<p>则价值函数满足：</p>
+<p>$$
+\min\lbrace \rho v_0(x) - \mathcal{M}v_0(x),\ v_0(x) - v_1(x) + e^x(1+K) \rbrace = 0
+$$</p>
+<p>$$
+\min\lbrace \rho v_1(x) - \mathcal{M}v_1(x),\ v_1(x) - v_0(x) - e^x(1-K) \rbrace = 0
+$$</p>
+<p>直观含义：每时每刻要么<strong>等待</strong>（第一项取等，价值按 $\rho v = \mathcal{M}v$ 演化），要么<strong>行动</strong>（第二项取等，立即买卖）。$v_0$ 的等待区域是 $(x_1, \infty)$（价格不够低就继续等），$v_1$ 的等待区域是 $(-\infty, x_2)$（价格不够高就继续拿）。</p>
+<p><strong>4. 光滑粘贴 → 拟代数方程组</strong></p>
+<p>在等待区域内 $\rho v_i - \mathcal{M}v_i = 0$ 的通解可表为积分形式（含待定常数 $C_1, C_2$）。在阈值 $x_1, x_2$ 处施加<strong>光滑粘贴条件</strong>（价值函数及其一阶导数连续），得到4个方程；消去 $C_1, C_2$ 后，剩下<strong>关于 $(x_1, x_2)$ 的两个拟代数方程</strong>（论文式(12)）。这就是"把最优停时问题化为解方程组"的关键一步。</p>
+<p>几何上，光滑粘贴要求价值函数在阈值处<strong>没有 kink</strong>（一阶导数连续）。这来自最优停时的一般原理：如果有个 kink，就可以通过微调阈值严格改进收益，矛盾。所以 4 个方程（$x_1$ 处函数值+导数连续、$x_2$ 处函数值+导数连续）解 4 个未知数（$C_1, C_2, x_1, x_2$），消去 $C_1, C_2$ 即得式(12)——"拟代数"是因为方程里还带着积分，但未知数只有 $x_1, x_2$ 两个，数值求解很容易。</p>
+<p><strong>5. 验证定理（Theorem 5）的条件</strong></p>
+<p>$(x_1, x_2)$ 若满足：</p>
+<p>$$
+x_1 \le \frac{1}{a}\left(\frac{\sigma^2}{2} + ab - \rho\right) \le x_2, \quad x_2 - x_1 &gt; \log\frac{1+K}{1-K}
+$$</p>
+<p>则阈值停时 $\tau_1^<em> = \inf\lbrace t \ge 0 : X_t \le x_1 \rbrace$、$\sigma_1^</em> = \inf\lbrace t \ge \tau_1^<em> : X_t \ge x_2 \rbrace$（及后续）是最优的，且 $v_i = V_i$。第二个不等式的经济含义很直白：</em><em>买卖价差必须覆盖往返滑点成本</em>*，否则交易稳亏。</p>
+<h2>三、主要结论：数值例子与参数敏感性</h2>
+<p><strong>数值例</strong>：取 $a = 0.8$、$b = 2$、$\sigma = 0.5$、$\rho = 0.5$、$K = 0.01$，解拟代数方程组得：</p>
+<p>$$
+(x_1, x_2) = (1.331,\ 1.631)
+$$</p>
+<p>对应价格阈值 $S_1 = e^{1.331} = 3.78$（买入）、$S_2 = e^{1.631} = 5.12$（卖出）。注意两个阈值都在均衡 $b = 2$ 之下——均衡像一块磁铁，把价格往上拉，这是"低买"能成立的力学基础。</p>
+<p>论文的 Fig.3 画了 $V_0(x)$ 和 $V_1(x)$：$V_0$ 整体有界（空仓），$V_1$ 随 $x$ 指数增长（持仓）；在 $x_1$ 左侧 $V_0(x) = V_1(x) - e^x(1+K)$（立即买入无差异），在 $x_2$ 右侧 $V_1(x) = V_0(x) + e^x(1-K)$（立即卖出无差异）——图像与 HJB 的"等待/行动"分区完全对应，这是验证定理几何直观的最好注脚。</p>
+<p><strong>参数敏感性</strong>（论文 Tables 1–5，逐个参数扫描）：</p>
+<table>
+<thead>
+<tr>
+<th>参数变化</th>
+<th>$x_1$</th>
+<th>$x_2$</th>
+<th>直观解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>均衡 $b$ ↑ (1→3)</td>
+<td>0.331→2.331 ↑</td>
+<td>0.631→2.631 ↑</td>
+<td>均衡抬高，买卖线整体上移</td>
+</tr>
+<tr>
+<td>回归速度 $a$ ↑ (0.6→1.0)</td>
+<td>1.175→1.425 ↑</td>
+<td>1.375→1.725 ↑</td>
+<td>回归越快，越值得积极交易</td>
+</tr>
+<tr>
+<td>波动率 $\sigma$ ↑ (0.3→0.7)</td>
+<td>1.231→1.481 ↑</td>
+<td>1.531→1.781 ↑</td>
+<td>波幅越大，潜在利润越大</td>
+</tr>
+<tr>
+<td>贴现率 $\rho$ ↑ (0.3→0.7)</td>
+<td>1.681→1.081 ↓</td>
+<td>1.781→1.281 ↓</td>
+<td>越没耐心，阈值越收敛</td>
+</tr>
+<tr>
+<td>滑点 $K$ ↑ (0.001→0.02)</td>
+<td>1.431→1.231 微降</td>
+<td>基本不变</td>
+<td>成本越高，买入越挑剔</td>
+</tr>
+</tbody>
+</table>
+<p>规律非常干净：<strong>$b, a, \sigma$ 推高阈值（多赚钱的机会），$\rho, K$ 压低阈值（等不起、玩不起）</strong>。$V_0(1)$、$V_1(1)$ 随 $b, a, \sigma$ 单调增、随 $\rho$ 单调减，与直觉完全一致。</p>
+<p>一个反直觉的细节：$(x_1, x_2) = (1.331, 1.631)$ <strong>都在均衡 $b = 2$ 之下</strong>。为什么卖出阈值也低于均衡？因为贴现 $\rho = 0.5$ 很重——等价格涨回均衡再卖，时间成本太高，不如在 1.631 就落袋。这说明<strong>阈值位置是"均值回归拉力"与"贴现惩罚"的均衡点</strong>，不是对称地放在均衡两侧。Table 4 印证了这一点：$\rho = 0.3$ 时 $x_2 = 1.781$ 更接近 2（有耐心，可以多等一会儿）。</p>
+<h2>四、结合市场的应用前景与展望</h2>
+<h3>1. 这套框架的真正价值</h3>
+<p>它把"低买高卖"从一句口号变成了<strong>可计算的工程问题</strong>：给定 $(a, b, \sigma, \rho, K)$ 五个参数，解两个方程就得到买卖线。更重要的是<strong>验证定理</strong>——它告诉你算出来的阈值在什么条件下<em>确实</em>最优，而不是一个启发式规则。这在2008年是开创性的：买入端的严格分析此前是空白。</p>
+<h3>2. A股落地的现实约束</h3>
+<ul>
+<li><strong>参数校准是第一道坎</strong>：$a, b, \sigma$ 要用历史数据估计。OU 的精确离散化是 AR(1)：$X_{t+\Delta} = b(1-e^{-a\Delta}) + e^{-a\Delta}X_t + \varepsilon$，OLS 回归得斜率 $\phi = e^{-a\Delta}$，即 $a = -\log\phi/\Delta$，$b =$ 截距$/(1-\phi)$，$\sigma$ 从残差标准差来——这就是论文说的"least squares method"的具体做法，十行 Python 代码。但注意：A股个股的 $b$（均衡水平）漂移严重，论文假设 $b$ 为常数，实盘必须滚动估计，否则阈值很快过时。</li>
+<li><strong>均值回归标的</strong>：A股个股趋势性强，直接套用效果有限。更合适的标的：<strong>股指期货跨期价差、ETF折溢价、商品期货</strong>（论文结论部分明确提到能源市场应用）。</li>
+<li><strong>T+1 与阈值</strong>：论文是连续时间停时，A股日内触发买入后不能当日卖出。实盘应把阈值按日线离散化，或只在日线级别执行。</li>
+<li><strong>滑点 $K$</strong>：论文 $K = 1\%$；A股算上冲击成本后只会更大。按 Table 5 的规律，$K$ 增大 → $x_1$ 下移（买入更挑剔），实盘务必按真实成本重算。</li>
+</ul>
+<h3>3. 与数值方法的配合（和姊妹篇的呼应）</h3>
+<p>论文结论部分自己就指出来了：参数可以用最小二乘估计，<strong>也可以直接用随机逼近从价格里学阈值</strong>——这正是 Song, Yin &amp; Zhang (2009) 做的事。实战推荐组合拳：</p>
+<ol>
+<li>先用本篇的解析框架理解阈值对参数的敏感性（Table 1–5 就是现成的敏感性分析）；</li>
+<li>再用随机逼近在线学习阈值，跳过参数估计误差；</li>
+<li>用验证定理的不等式 $x_2 - x_1 &gt; \log\frac{1+K}{1-K}$ 做<strong> sanity check</strong>：算出的阈值如果连往返成本都覆盖不了，直接弃用。</li>
+</ol>
+<h3>4. 拟代数方程组的数值求解实操</h3>
+<p>式(12)看着吓人，实际求解并不难：</p>
+<ol>
+<li>积分核 $\eta(t)$ 与 $e^{\pm\kappa(b-x)t}$ 都是光滑函数，用 Gauss-Laguerre 或截断 + Simpson 数值积分即可；</li>
+<li>未知数只有 $(x_1, x_2)$ 两个，用二维牛顿法或 Nelder-Mead 求解；</li>
+<li>初值可取 $x_1^0 = b - \sigma$、$x_2^0 = b + \sigma$（均衡上下各一个波动率）；</li>
+<li>解出后用验证定理的不等式做检查：$x_2 - x_1 &gt; \log\frac{1+K}{1-K}$ 不满足则无可行解——直观含义是<strong>成本太高、无利可图</strong>，这本身也是个有用的诊断。</li>
+</ol>
+<p>论文的数值例就是这么算出 $(1.331, 1.631)$ 的。整个流程（估计 OU 参数 → 解方程组 → sanity check）写成脚本，一只股票几秒钟出阈值，完全可以批量跑全市场做筛选。</p>
+<h3>4. 扩展方向</h3>
+<ul>
+<li><strong>做空端</strong>：本篇仓位只能 flat/long；Kong &amp; Zhang (2010) 把框架扩展到允许 short（一股做空），阈值从2个变成4个（$b_1, b_0, s_0, s_1$），思路完全相通——A股融券受限，这个扩展更多是理论完备性。</li>
+<li><strong>大单冲击</strong>：论文结论提到 heavy buying lifts the market——大资金的买卖会移动价格，阈值要内生化冲击成本（Pemy, Yin &amp; Zhang 的方向）。散户可忽略，机构必须考虑。</li>
+<li><strong>Regime switching</strong>：$b$ 本身机制切换（牛熊市均衡不同），这是 Guo &amp; Zhang (2005) 卖出端框架的自然延伸，也是把本篇从"玩具模型"推向实盘的关键一步。</li>
+</ul>
+<h3>5. 风险提示</h3>
+<ul>
+<li>OU 假设是<strong>生死假设</strong>：趋势市中"跌破 $x_1$ 买入"会一路买套。必须配均值回归检验做开关，这一点两篇论文都强调。</li>
+<li>无限 horizon + 常数贴现是为了解析解做的简化；实盘有资金期限，$\rho$ 应反映真实资金成本。</li>
+<li>数值例的阈值对参数敏感（$b$ 从1变到3，$x_1$ 从0.33变到2.33），<strong>参数估计误差是最大的实盘风险</strong>——这也是为什么姊妹篇的模型无关方法有价值。</li>
+</ul>
+<h2>附：原文链接</h2>
+<p><a href="https://doi.org/10.1016/j.automatica.2007.11.003">DOI: 10.1016/j.automatica.2007.11.003</a>（按出版方要求从官方渠道获取，本文不附PDF）</p>
+<p class="meta">发布日期：2026-10-12 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
