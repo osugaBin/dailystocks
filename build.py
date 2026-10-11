@@ -5,8 +5,8 @@
 输出：index.html（按发布时间倒序，分"每日报告"/"其他报告"两栏）
      + reports/<date>-<morning|evening>.html + custom/* + assets/style.css
 
-手动加报告：把 .md / .pdf 按 `YYYY-MM-DD-标题` 命名放入 custom/ 目录即可，
-.md 会渲染成正文页，.pdf 直接链接原文。
+手动加报告：把 .md / .html 按 `YYYY-MM-DD-标题` 命名放入 custom/ 目录即可，
+.md 会渲染成正文页，.html 原样上架（需自带样式）。
 """
 import os
 import re
@@ -69,6 +69,16 @@ tr:nth-child(even) td{background:#fafbfc}
 blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;background:#f7f7f7;font-size:.88rem}
 ul,ol{padding-left:1.4em}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
+.actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
+.actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
+  padding:6px 14px;font-size:.85rem;cursor:pointer;color:var(--accent)}
+.actions button:hover{border-color:var(--accent)}
+@media print{
+  .back,.actions,footer.site-foot{display:none!important}
+  body{font-size:11pt}
+  .wrap{max-width:none;padding:0 4px}
+  a{color:#111;text-decoration:none}
+}
 @media(max-width:600px){body{font-size:15px}.wrap{padding:16px 14px 48px}}
 """
 
@@ -112,6 +122,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <body>
 <div class="wrap">
 <p class="back"><a href="../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
 {body}
 <p class="meta">发布日期：{pub_date} · 数据基准：{data_date} · 类型：{type_label}</p>
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
@@ -171,12 +182,22 @@ def collect_daily():
     return items
 
 
+def extract_html_title(text):
+    m = re.search(r"<title>(.*?)</title>", text, re.S | re.I)
+    if m:
+        return htmlmod.unescape(m.group(1).strip())
+    m = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S | re.I)
+    if m:
+        return htmlmod.unescape(re.sub(r"<[^>]+>", "", m.group(1)).strip())
+    return ""
+
+
 def collect_custom():
     items = []  # (date, name, ext, src_path)
     if not os.path.isdir(CUSTOM_DIR):
         return items
     for fname in sorted(os.listdir(CUSTOM_DIR)):
-        m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|pdf)$", fname)
+        m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|pdf|html)$", fname)
         if m:
             items.append((m.group(1), m.group(2), m.group(3),
                           os.path.join(CUSTOM_DIR, fname)))
@@ -234,11 +255,17 @@ def build():
                 f.write(page)
             href = f"custom/{slug}.html"
             print(f"page: custom/{slug}.html  <- {os.path.basename(src)}")
-        else:
+        elif ext == "html":
+            text = open(src, encoding="utf-8").read()
+            title = extract_html_title(text) or name
+            href = f"custom/{os.path.basename(src)}"
+            print(f"file: {href}")
+            custom_cards.append(card(href, "custom", date, title, "", date))
+        else:  # pdf（保留能力，默认不在仓库放 PDF）
             title, excerpt = name, ""
             href = f"custom/{os.path.basename(src)}"
             print(f"file: {href}")
-        custom_cards.append(card(href, "custom", date, title, excerpt, date))
+            custom_cards.append(card(href, "custom", date, title, excerpt, date))
 
     sections = [
         f'<h2 class="section-title">每日报告</h2>\n'
