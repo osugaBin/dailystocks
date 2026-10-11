@@ -3,39 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>配对交易最优策略：GBM框架下的闭式解与市场应用前景 · DrX Daily</title>
+<title>配对交易最优策略：GBM框架下的闭式解、回测与市场应用前景 · DrX Daily</title>
 <link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 <div class="wrap">
 <p class="back"><a href="../../index.html">← 全部报告</a></p>
 <p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
-<h1>配对交易最优策略：GBM框架下的闭式解与市场应用前景</h1>
-<p>配对交易是最经典的市场中性策略之一。这篇2017年发表于 JOTA 的论文（Tie, Zhang &amp; Zhang）去掉了传统配对交易对"均值回归"的依赖，直接在几何布朗运动（GBM）下求出最优买卖阈值的闭式解。本文解读论文核心结论，并探讨它在A股等实际市场中的落地前景。</p>
+<h1>配对交易最优策略：GBM框架下的闭式解、回测与市场应用前景</h1>
+<p>配对交易是最经典的市场中性策略之一。这篇2017年发表于 JOTA 的论文（Tie, Zhang &amp; Zhang）去掉了传统配对交易对"均值回归"的依赖，直接在几何布朗运动（GBM）下求出最优买卖阈值的闭式解，并用 Target / Walmart 做了15年样本外回测。本文解读论文的关键公式与实证结论，并探讨它在实际市场中的落地前景。</p>
 <blockquote>
 <p>原文：Tie, Zhang &amp; Zhang, "An Optimal Strategy for Pairs Trading Under Geometric Brownian Motions", <em>Journal of Optimization Theory and Applications</em> (2017).
 <a href="Pairs_Trading.pdf">论文原文 PDF 下载</a></p>
 </blockquote>
 <h2>一、论文讲了什么</h2>
 <p>配对交易的核心动作很简单：选两只股票，持续跟踪它们的相对强弱；当价差扩大到一定程度，<strong>做空强势股、做多弱势股</strong>，赌两者相对强弱反转。1980年代由摩根士丹利 Tartaglia 量化团队发扬光大，最大的优点是<strong>市场中性</strong>——涨跌市都能赚钱。</p>
-<p>传统配对交易模型通常假设<strong>价差服从均值回归</strong>，这带来一个严重限制：可选的股票对基本只能是同行业高度相关的股票，选股池很窄。这篇论文的突破在于：<strong>去掉均值回归假设，允许股价服从一般的几何布朗运动</strong>，用动态规划 + HJB 方程求最优交易时机，并得到了<strong>闭式解</strong>。</p>
-<h2>二、核心结论：两条阈值线</h2>
-<p>设两只股票价格为 X¹、X²，记价格比 y = X²/X¹。论文把第一象限划分成三个区域：</p>
+<p>传统配对交易模型通常假设<strong>价差服从均值回归</strong>，这带来一个严重限制：可选的股票对基本只能是同行业高度相关的股票，选股池很窄。这篇论文的突破在于：<strong>去掉均值回归假设，允许股价服从一般的几何布朗运动</strong>，用动态规划求最优交易时机，并得到了<strong>闭式解</strong>——最优策略由两条阈值线刻画，而非常数阈值。</p>
+<h2>二、关键公式：从 HJB 到两条阈值线</h2>
+<p><strong>1. 价格模型（GBM）</strong></p>
+<p>两只股票价格 X¹、X² 服从：</p>
+<p>dX¹ = X¹(μ₁dt + σ₁₁dW¹ + σ₁₂dW²)</p>
+<p>dX² = X²(μ₂dt + σ₂₁dW¹ + σ₂₂dW²)</p>
+<p>μ 为收益率，σ 为波动率，W¹、W² 为布朗运动（允许相关）。</p>
+<p><strong>2. 目标：带交易成本的最优停时序列</strong></p>
+<p>每次建仓/平仓收取固定比例成本 K（记 β_b = 1+K、β_s = 1−K）。目标是选择一列停时 τ₁ ≤ τ₂ ≤ …（买入、卖出、买入、卖出……），最大化贴现收益。空仓时在 Γ₃ 开仓，持仓时在 Γ₁ 平仓，如此往复。</p>
+<p><strong>3. HJB 方程与降维</strong></p>
+<p>记价格比 y = x₂/x₁，价值函数可降为一元函数 w(y)，HJB 方程化为：</p>
+<p>min{ ρw₀ − Lw₀ , w₀ − w₁ + β_b − β_s·y } = 0</p>
+<p>min{ ρw₁ − Lw₁ , w₁ − w₀ − β_s + β_b·y } = 0</p>
+<p>其中 L 为二阶微分算子。Euler 方程 (ρ−L)w = 0 的解形如 y^δ，δ 满足二次方程，解得：</p>
+<p>δ₁,₂ = ½(1 + (μ₁−μ₂)/λ) ± ½√[(1 + (μ₁−μ₂)/λ)² + 4(ρ−μ₁)/λ]</p>
+<p>其中 λ 为两股票相对波动率参数；当 ρ &gt; μ₁, μ₂ 时有 δ₁ &gt; 1 &gt; 0 &gt; δ₂。</p>
+<p><strong>4. 阈值 k₁、k₂（闭式解）</strong></p>
+<p>通过 smooth-fit 条件（价值函数及其一阶导数在阈值处连续），记 r = k₂/k₁，先解方程 f(r) = 0 得唯一 r₀，再代入论文(12)式即得 k₁、k₂ 的闭式表达式。最终交易规则如下图：</p>
 <ul>
-<li><strong>y ≥ k₂：开仓</strong>——买入组合（做多 S¹、做空 S²）</li>
-<li><strong>y ≤ k₁：平仓</strong>——卖出 S¹、买回 S²</li>
-<li><strong>k₁ &lt; y &lt; k₂：持有不动</strong></li>
+<li><strong>y ≥ k₂（Γ₃）：开仓</strong>——买入组合（做多 S¹、做空 S²）</li>
+<li><strong>y ≤ k₁（Γ₁）：平仓</strong>——卖出 S¹、买回 S²</li>
+<li><strong>k₁ &lt; y &lt; k₂（Γ₂）：持有不动</strong></li>
 </ul>
-<p>k₁、k₂ 由两只股票的收益率 μ、波动率 σ、贴现率 ρ、交易成本 K <strong>闭式决定</strong>（解一组代数方程，不用数值优化）。论文用 Target（TGT）/ Walmart（WMT）1985–1999 年数据校准参数，得到 k₁ = 1.039、k₂ = 1.282，并在 2000–2014 年做样本外回测。</p>
-<p>论文数值实验给出的参数直觉：</p>
+<p><img alt="三区域划分：Γ₁平仓、Γ₂持有、Γ₃开仓" src="fig2-regions.png" /></p>
+<p><em>图：论文 Fig.2。x₂ = k₁x₁ 与 x₂ = k₂x₁ 两条射线把第一象限分成三个区域：左上 Γ₃ 开仓、中间 Γ₂ 持有、右下 Γ₁ 平仓。</em></p>
+<h2>三、实证：TGT-WMT 十五年回测（关键结论）</h2>
+<p><strong>参数校准</strong>：用 Target（TGT）、Walmart（WMT）1985–1999 年日收盘估计 μ₁ = 0.2059、μ₂ = 0.2459、σ₁₁ = 0.3112、σ₂₂ = 0.2943 等；取 K = 0.1%、ρ = 0.5，算得 <strong>k₁ = 1.039、k₂ = 1.282</strong>。</p>
+<p><strong>回测设置</strong>（2000/1/3–2014/12/31，15年）：初始资金 $100K；每次信号触发用 $50K 做多 / $50K 做空（半仓对冲）；每笔配对交易佣金 $5。</p>
+<p><strong>收益——论文报告的核心数字</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>交易次数</th>
+<th>期末资金</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>做多 TGT / 做空 WMT</td>
+<td>3 笔</td>
+<td>$155.914K</td>
+</tr>
+<tr>
+<td>做多 WMT / 做空 TGT（反向）</td>
+<td>2 笔</td>
+<td>$132.340K</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td><strong>5 笔</strong></td>
+<td><strong>盈利 $88,254（+88.25%）</strong></td>
+</tr>
+</tbody>
+</table>
+<p>三个关键结论：</p>
+<ol>
+<li><strong>15年只交易5次</strong>，大部分时间资金以现金闲置——阈值策略天然低频，避免过度交易；闲置现金还可吃利息或做其他短线，这是论文特别强调的一点。</li>
+<li><strong>正反两个方向交易时间不重叠</strong>，不争用资金，可以同时跑，收益直接叠加。</li>
+<li><strong>市场中性兑现</strong>：2000–2014 横跨科网泡沫破裂与08金融危机，策略依然盈利，这正是配对交易的价值所在。</li>
+</ol>
+<p><img alt="TGT-WMT 价格比、阈值线与净值曲线（2000–2014）" src="fig4-equity-curve.png" /></p>
+<p><em>图：论文 Fig.4。蓝色锯齿为价格比 X²/X¹，绿线为 k₁、k₂ 阈值，上方蓝色阶梯为净值曲线——每次价格比上穿 k₂ 开仓、下穿 k₁ 平仓，净值阶梯式上行。</em></p>
+<p><strong>参数敏感性</strong>（论文 Tables 1–5）：</p>
 <ul>
-<li>S¹ 预期收益 μ₁ 越高 → 阈值整体下移，开仓机会更多</li>
+<li>μ₁ 越高 → 阈值下移，开仓机会更多；μ₂ 越高 → 阈值上移</li>
 <li>波动率越大 → 买卖区间都收缩（风险高，少动手）</li>
-<li>两只股票相关性越高 → 开仓和平仓区间都扩大</li>
-<li>交易成本 K 越大 → 区间收缩，交易更谨慎</li>
-<li>贴现率 ρ 越大（越想要快钱）→ k₂ 下移、持有期缩短</li>
+<li>两只股票相关性越高 → 开仓/平仓区间都扩大</li>
+<li>交易成本 K 越大 → 区间收缩；贴现率 ρ 越大 → 更倾向于快进快出</li>
 </ul>
-<h2>三、结合市场的应用前景</h2>
+<h2>四、结合市场的应用前景</h2>
 <h3>1. A股落地的现实约束</h3>
 <ul>
 <li><strong>融券端</strong>："做空强势股"这条腿在A股较难直接复制——券源有限、融券成本高。可行的变体：用 <strong>ETF 或股指期货</strong>代替个股做空端，或只做多头配对（做多相对弱势、卖出相对强势的现有多头）。</li>

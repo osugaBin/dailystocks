@@ -85,6 +85,8 @@ th{background:#eef2f7}
 tr:nth-child(even) td{background:#fafbfc}
 blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;background:#f7f7f7;font-size:.88rem}
 ul,ol{padding-left:1.4em}
+img{max-width:100%;height:auto;display:block;margin:14px auto}
+figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
 .actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
@@ -311,11 +313,16 @@ def collect_custom():
         d = os.path.join(CUSTOM_DIR, subdir)
         if not os.path.isdir(d):
             continue
-        for fname in sorted(os.listdir(d), reverse=True):
+        names = set(os.listdir(d))
+        for fname in sorted(names, reverse=True):
             m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|html)$", fname)
-            if m:
-                items.append((tab_id, subdir, m.group(1), m.group(2),
-                              m.group(3), os.path.join(d, fname)))
+            if not m:
+                continue
+            # 跳过由 .md 生成的同名 .html，避免重复卡片
+            if m.group(3) == "html" and f"{m.group(1)}-{m.group(2)}.md" in names:
+                continue
+            items.append((tab_id, subdir, m.group(1), m.group(2),
+                          m.group(3), os.path.join(d, fname)))
     return items
 
 

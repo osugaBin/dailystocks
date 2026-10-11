@@ -60,6 +60,8 @@ th{background:#eef2f7}
 tr:nth-child(even) td{background:#fafbfc}
 blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;background:#f7f7f7;font-size:.88rem}
 ul,ol{padding-left:1.4em}
+img{max-width:100%;height:auto;display:block;margin:14px auto}
+figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
 .actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
