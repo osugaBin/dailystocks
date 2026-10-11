@@ -143,8 +143,27 @@ PAGE_TMPL = """<!DOCTYPE html>
 """
 
 
+def fix_list_spacing(text):
+    """Python-Markdown 要求列表前有空行：给直接跟在段落后的列表项补空行，
+    否则 `- ` 会被当成段落文字原样输出。"""
+    lines = text.split("\n")
+    out = []
+    prev_is_list = False
+    prev_blank = True
+    for ln in lines:
+        is_list = bool(re.match(r"^[ \t]*([-*]|\d+\.)\s", ln))
+        is_blank = not ln.strip()
+        if is_list and not prev_blank and not prev_is_list:
+            out.append("")
+        out.append(ln)
+        prev_is_list = is_list
+        prev_blank = is_blank
+    return "\n".join(out)
+
+
 def md_to_html(text):
     text = text.replace("- [ ]", "- □")  # 与 md2pdf 保持一致的缺字处理
+    text = fix_list_spacing(text)
     return markdown.markdown(text, extensions=["tables", "fenced_code"])
 
 
