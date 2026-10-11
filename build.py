@@ -162,6 +162,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
 <link rel="stylesheet" href="{root}assets/style.css">
+{mathjax}
 </head>
 <body>
 <div class="wrap">
@@ -192,6 +193,14 @@ def fix_list_spacing(text):
         prev_is_list = is_list
         prev_blank = is_blank
     return "\n".join(out)
+
+
+# MathJax：只有正文含 $...$ / $$...$$ 时才加载（行内公式 $...$，行间 $$...$$；
+# 注意金额不要写 $ 符号，写"美元"，否则会被误判为公式定界符）
+MATHJAX = """<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>"""
 
 
 def md_to_html(text):
@@ -372,7 +381,7 @@ def build():
         body = md_to_html(body_md)
         page = PAGE_TMPL.format(
             title=htmlmod.escape(title), body=body, meta_line=meta_line,
-            root="../")
+            root="../", mathjax=MATHJAX if "$" in body else "")
         with open(os.path.join(SITE, "reports", slug + ".html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -392,7 +401,7 @@ def build():
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
                 meta_line=f"发布日期：{date} · 类型：{TAB_LABELS[tab_id]}",
-                root="../../")
+                root="../../", mathjax=MATHJAX if "$" in body else "")
             with open(os.path.join(CUSTOM_DIR, subdir, slug + ".html"), "w",
                       encoding="utf-8") as f:
                 f.write(page)
