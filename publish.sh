@@ -10,6 +10,19 @@ if git diff --cached --quiet; then
   echo "no changes, skip push"
 else
   git commit -qm "reports: $(date +%F) 自动更新"
-  git push origin main
-  echo "pushed"
+  # 快讯强调时效性：GitHub 偶发中断时不断重试，不静默跳过
+  PUSHED=""
+  for i in 1 2 3 4 5; do
+    if git push origin main; then
+      echo "pushed"
+      PUSHED=1
+      break
+    fi
+    echo "push attempt $i failed, retry in 15s..."
+    sleep 15
+  done
+  if [ -z "$PUSHED" ]; then
+    echo "push failed after 5 attempts"
+    exit 1
+  fi
 fi
