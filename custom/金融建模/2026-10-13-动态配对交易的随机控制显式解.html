@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动态配对交易：随机控制方法的显式最优策略 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>动态配对交易：随机控制方法的显式最优策略</h1>
+<p><strong>论文</strong>：Agnès Tourin, Raphael Yan, <em>Dynamic pairs trading using the stochastic control approach</em>, Journal of Economic Dynamics &amp; Control 37 (2013), 1972–1981. DOI: <a href="https://doi.org/10.1016/j.jedc.2013.05.010">10.1016/j.jedc.2013.05.010</a>。</p>
+<p>本文把配对交易放进经典的 Merton 最优投资组合框架：投资者的组合由无风险账户和两只协整股票构成，目标是最大化固定期限终期财富的期望指数效用。论文的核心贡献是——对指数效用函数，把高维 HJB 方程约化为一维线性抛物型 PDE，从而得到<strong>最优持仓的闭式解</strong>，并用 GS/JPM 的分钟级数据做了实证演示。</p>
+<h2>一、问题：Merton 框架下的动态配对交易</h2>
+<p>传统配对交易研究（如 Gatev et al. 2006）多为经验规则：价差偏离触发开仓、回归触发平仓。Mudchanatongsuk et al. (2008) 首次用随机控制研究最优配对交易，但限制策略必须"等金额一多一空"（美元中性）。</p>
+<p>Tourin–Yan 放松了这一限制：允许在两只股票上持有<strong>任意金额</strong>的头寸，问题成为标准的随机控制问题——在自融资约束下，选择每时每刻的两只股票持股数 $\pi^1_t, \pi^2_t$，最大化 $\mathbb{E}[U(W_T)]$，其中取指数效用 $U(w) = -e^{-\gamma w}$，$\gamma &gt; 0$ 为常数绝对风险厌恶系数。</p>
+<p>选择指数效用的关键原因是技术性的：它允许把财富变量从值函数中"因子化"出去，从而降维；而幂效用 $U(w) = w^\gamma/\gamma$ 在此模型下无法得到闭式解（作者明确指出）。</p>
+<h2>二、模型：Duan–Pliska 协整设定</h2>
+<p>两只协整股票的价格服从（Duan &amp; Pliska 2004 的扩散极限，历史测度下）：</p>
+<p>$$
+d\log S^1_t = \left(\mu_1 - \tfrac{1}{2}\sigma_1^2 + \delta z_t\right)dt + \sigma_1 dB^1_t, \qquad d\log S^2_t = \left(\mu_2 - \tfrac{1}{2}\sigma_2^2\right)dt + \sigma_2 dB^2_t
+$$</p>
+<p>协整向量 $z_t = a + \log S^1_t + \beta \log S^2_t$ 均值回归：</p>
+<p>$$
+dz_t = \alpha(\eta - z_t)dt + \sigma_\beta dB_t, \quad \alpha = -\delta, \quad \sigma_\beta = \sqrt{\sigma_1^2 + \beta^2\sigma_2^2}
+$$</p>
+<p>为简洁起见，协整项只出现在第一只股票的漂移中（可对称推广）；无风险利率设为零（这是能得到闭式解的关键简化）。参数可用 Engle–Granger 两步法 + ADF 检验估计，或用 Elliott et al. (2005) 的滤波方法。</p>
+<p>财富过程（自融资）：$dW_t = \pi^1_t dS^1_t + \pi^2_t dS^2_t$。</p>
+<h2>三、指数效用与 HJB 方程的降维</h2>
+<p>值函数 $u(t,w,s_1,s_2) = \sup_{\pi^1,\pi^2}\mathbb{E}_{t,w,s_1,s_2}[U(W_T)]$ 满足 HJB 方程。论文做两次经典变量替换：</p>
+<ol>
+<li><strong>对数变换</strong>：$s_1 = e^x, s_2 = e^y$；</li>
+<li><strong>财富因子化</strong>：设 $u(t,w,s_1,s_2) = -e^{-\gamma w} g(t,x,y)$，把财富变量分离出去。</li>
+</ol>
+<p>对 $g$ 的 HJB 取上确界，一阶条件直接给出最优控制的候选形式：</p>
+<p>$$
+\pi^<em>_1 = \frac{(\mu_1+\delta z)g + \sigma_1^2 g_x}{s_1 \sigma_1^2 \gamma g}, \qquad \pi^</em>_2 = \frac{\mu_2 g + \sigma_2^2 g_y}{s_2 \sigma_2^2 \gamma g}
+$$</p>
+<p>代回后发现解本质上只依赖协整过程 $z$，而非两只股票各自的价格。引入 $X = \mu_1 + \delta z$ 并做对数变换 $\Phi(t,X) = -\log g$，非线性 PDE 化为<strong>一维线性抛物型方程</strong>：</p>
+<p>$$
+\Phi_t = -\frac{1}{2}\left(\frac{X^2}{\sigma_1^2} + \frac{\mu_2^2}{\sigma_2^2}\right) + \frac{1}{2}(\sigma_1^2+\beta^2\sigma_2^2)(\delta\Phi_X) - \frac{1}{2}(\sigma_1^2+\beta^2\sigma_2^2)(\delta^2\Phi_{XX})
+$$</p>
+<p>终值条件 $\Phi(T,X) = 0$。该方程有二次型显式解 $\Phi(t,X) = a(t)X^2 + b(t)X + c(t)$，其中</p>
+<p>$$
+a(t) = \frac{(T-t)}{2\sigma_1^2}, \quad b(t) = -\frac{(\sigma_1^2+\beta^2\sigma_2^2)\delta}{4\sigma_1^2}(T-t)^2
+$$</p>
+<p>$c(t)$ 为 $(T-t)$ 的多项式（论文式(19)）。</p>
+<p>注：令 $\delta = 0$ 即退化为标准二维 Merton 问题——值函数与股票无关，两只股票的美元头寸为常数 $\mu_1/(\sigma_1^2\gamma)$ 与 $\mu_2/(\sigma_2^2\gamma)$。协整项 $\delta z$ 正是配对交易相对 Merton 的增量信息。</p>
+<h2>四、闭式解：最优美元头寸</h2>
+<p>把 $a(t), b(t)$ 代回，得到以<strong>美元金额</strong>表示的最优头寸：</p>
+<p>$$
+\pi^*_1 s_1 = \frac{\mu_1+\delta z}{\gamma\sigma_1^2} - \frac{\delta(T-t)(\mu_1+\delta z)}{\gamma\sigma_1^2} + \frac{\delta^2(\sigma_1^2+\beta^2\sigma_2^2)}{4\gamma\sigma_1^2}(T-t)^2
+$$</p>
+<p>$$
+\pi^*_2 s_2 = \frac{\mu_2}{\gamma\sigma_2^2} - \frac{\beta\delta(T-t)(\mu_1+\delta z)}{\gamma\sigma_2^2} + \frac{\beta\delta^2(\sigma_1^2+\beta^2\sigma_2^2)}{4\gamma\sigma_1^2}(T-t)^2
+$$</p>
+<h2>五、解的结构解读</h2>
+<ol>
+<li><strong>与 Merton 问题同构的风险厌恶作用</strong>：两只股票的头寸都与 $\gamma$ 成反比——风险厌恶减半等价于每只股票的投入资金翻倍。从业者选定 $\gamma$ 即选定了杠杆水平。</li>
+<li><strong>头寸不依赖个股价格，只依赖协整因子</strong>：最优金额是 $z_t$（即 $X = \mu_1 + \delta z_t$）的函数，而非 $S^1_t, S^2_t$ 各自的函数——策略盯的是"相对误定价"而非绝对价位，这是配对交易的本质特征在最优控制中的体现。</li>
+<li><strong>三项分解</strong>：首项为 Merton 式 myopic 需求（含协整修正 $\delta z$）；第二项为负的期限修正，随到期临近而衰减；第三项为凸性修正。期限越长，协整项对头寸的扭曲越大。</li>
+<li><strong>符号</strong>：在配对交易情境下两头寸符号相反（$\beta &lt; 0$ 时），一只做多、一只做空，符合直觉。</li>
+</ol>
+<h2>六、验证定理与参数条件</h2>
+<p>论文第4节给出验证定理：候选解在参数满足以下条件时确为值函数、最优控制确为最优马尔可夫控制：</p>
+<p>$$
+|\delta|T &lt; \frac{1}{3}\cdot\frac{\sigma_1^4}{\sigma_\beta^2\sigma_2^2\beta^2}, \qquad |\delta|T(1-|\delta|T) &lt; \frac{1}{64}\cdot\frac{\sigma_1^2}{\sigma_\beta^2}
+$$</p>
+<p>条件本质上是对<strong>期限上限</strong>的限制：$T$ 不能太大，否则指数效用下 OU 过程平方的指数可积性失效，无法保证一致可积。实务含义是该闭式解适用于<strong>日内到数日</strong>的短期限配对交易，而非长期持有——这与配对交易本来的短期限套利属性一致。</p>
+<h2>七、相关性扩展</h2>
+<p>第5节把两只股票布朗运动的相关系数 $\rho$ 纳入模型，推导过程平行，最优头寸变为（论文式(27)(28)）：</p>
+<p>$$
+\pi^*_1 s_1 = \frac{(\mu_1+\delta z)}{\gamma(1-\rho^2)\sigma_1^2} - \frac{\rho\mu_2}{\gamma(1-\rho^2)\sigma_1\sigma_2} + \text{期限修正项}
+$$</p>
+<p>相关性通过 $1/(1-\rho^2)$ 放大头寸——高度相关的股票对中， idiosyncratic 风险小，最优杠杆更高；同时出现 $-\rho\mu_2$ 的交叉对冲项。参数条件相应收紧（论文式(22)(23)）。</p>
+<h2>八、实证示例：GS/JPM 分钟数据</h2>
+<p>作者取 2011年10月17日纽交所 GS 与 JPM 的分钟数据（390个点），用 Engle–Granger 两步法 + ADF 检验（16阶滞后）确认5%水平协整，Phillips–Ouliaris 检验佐证。估计得年化参数：$\delta = -3561.19$（日内均值回归极快），$\rho = 0.61$，$\sigma_1 = 0.38, \sigma_2 = 0.51$。</p>
+<p>取风险容忍 $\gamma = 0.1$，策略当日实现约 <strong>1348 美元</strong>利润（未计借券与交易成本）：开盘后迅速获利、日内波动但始终为正；头寸在上半日较大、下半日逐步平仓至接近零——期限效应（$(T-t)$ 项）驱动的日内减仓形态清晰可见。作者坦承这只是方法演示：未做实时协整检测、无样本外测试，参数按全天数据一次性校准。</p>
+<h2>九、应用展望与A股约束</h2>
+<ol>
+<li><strong>$\gamma$ 即杠杆旋钮</strong>：公式把"风险厌恶—头寸规模"关系显式化，实盘中可先定目标波动率反推 $\gamma$，比拍脑袋定手数更系统。</li>
+<li><strong>盯 $z_t$ 而非价格</strong>：策略信号是协整残差 $z_t = a + \log S^1 + \beta\log S^2$，A股实践中对应 Engle–Granger 回归残差或价差 Z-score，与公式完全对应。</li>
+<li><strong>期限上限的警示</strong>：验证定理要求短期限；A股若把该策略用于跨周持有，闭式解的最优性不再被保证，需数值求解 HJB 或转用离散时间版本。</li>
+<li><strong>A股约束</strong>：模型假设零利率、无交易成本、可任意做空、无涨跌停；A股个股融券成本高、T+1 限制日内调仓，公式中的连续调仓 $\pi_t$ 需离散化为日频再平衡，并加入冲击成本（可参考 Al-Aradi 2015 的惩罚框架，二者互补）。</li>
+<li><strong>与阈值规则的关系</strong>：本文给出的是"连续最优头寸"，而非"开/平仓阈值"；实务中可把 $\pi^*_t s$ 的符号变化点解读为调仓信号，把金额解读为目标仓位——这是把学术闭式解翻译成交易指令的自然方式。</li>
+</ol>
+<hr />
+<p><em>解读人注：DOI 10.1016/j.jedc.2013.05.010；实证部分为单日样本内演示，不构成策略有效性证据。引用公式时请以原文为准。</em></p>
+<p class="meta">发布日期：2026-10-13 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
