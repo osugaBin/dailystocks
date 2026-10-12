@@ -116,6 +116,7 @@ figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:
 .msgfloat-list a:last-child{border-bottom:none}
 .msgfloat-list a:hover{background:#f8fafc}
 .msgfloat-list .t{display:block;font-size:.88rem;color:var(--ink)}
+.msgfloat-list .s{display:block;font-size:.8rem;color:#4b5563;margin-top:4px;line-height:1.5}
 .msgfloat-list .d{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
 /* 快讯存档页 */
 .msg{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
@@ -393,22 +394,23 @@ def build_messages_page(messages):
 
 
 def build_msgfloat(messages):
-    """首页右下角浮窗：最新3条快讯 + 未读红点（localStorage 记忆）。"""
+    """首页右下角浮窗：只显示最新1条快讯（含摘要）+ 未读红点（localStorage 记忆）。"""
     if not messages:
         return ""
-    lis = []
-    for sortkey, date, hm, title, src in messages[:3]:
-        anchor = f"m-{date}-{hm.replace(':', '')}"
-        lis.append(
-            f'<a href="messages.html#{anchor}">'
+    sortkey, date, hm, title, src = messages[0]
+    anchor = f"m-{date}-{hm.replace(':', '')}"
+    excerpt = extract_excerpt(open(src, encoding="utf-8").read(), limit=150)
+    latest_id = anchor
+    item = (f'<a href="messages.html#{anchor}">'
             f'<span class="t">{htmlmod.escape(title)}</span>'
-            f'<span class="d">{date} {hm}</span></a>')
-    latest_id = f"m-{messages[0][1]}-{messages[0][2].replace(':', '')}"
+            + (f'<span class="s">{htmlmod.escape(excerpt)}</span>'
+               if excerpt else "")
+            + f'<span class="d">{date} {hm}</span></a>')
     return f"""<div id="msgfloat">
   <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
   <div id="msgfloat-panel" hidden>
     <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
-    <div class="msgfloat-list">{''.join(lis)}</div>
+    <div class="msgfloat-list">{item}</div>
   </div>
 </div>
 <script>

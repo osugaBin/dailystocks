@@ -91,6 +91,7 @@ figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:
 .msgfloat-list a:last-child{border-bottom:none}
 .msgfloat-list a:hover{background:#f8fafc}
 .msgfloat-list .t{display:block;font-size:.88rem;color:var(--ink)}
+.msgfloat-list .s{display:block;font-size:.8rem;color:#4b5563;margin-top:4px;line-height:1.5}
 .msgfloat-list .d{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
 /* 快讯存档页 */
 .msg{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
