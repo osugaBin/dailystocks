@@ -316,9 +316,9 @@ def extract_excerpt(text, limit=120):
             continue
         if s.startswith("**"):
             s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
-            s = re.sub(r"[*_`]", "", s).strip()
-            if s:
-                return s[:limit] + ("…" if len(s) > limit else "")
+        s = re.sub(r"[*_`]", "", s).strip()
+        if s:
+            return s[:limit] + ("…" if len(s) > limit else "")
     return ""
 
 

@@ -87,56 +87,56 @@
 <a class="card" href="custom/金融建模/2026-10-12-配对交易综述解读.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>统计套利配对交易策略：Krauss (2015) 综述解读与展望</h2>
-<p class="excerpt">GGR (2006) 是开山之作：12个月形成期，用欧氏平方距离（SSD）选出价格走势最接近的20对；6个月交易期，价差偏离超2倍历史标准差开仓、回归平仓。1962–2002美股年化超额收益11%，且不能被反转/动量因子解释——这让它成为经…</p>
+<p class="excerpt">这是配对交易领域引用最广的综述之一。Krauss (2015) 系统梳理了90余篇文献，把配对交易研究分成五大流派：距离法、协整法、时间序列法、随机控制法、其他方法，并逐一评估其优劣。本文做详细解读，最后给出结合市场的展望。</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-配对交易最优规则与止损.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>配对交易最优规则：均值回归价差、三阈值与止损约束</h2>
-<p class="excerpt">1. 价值函数与边界条件</p>
+<p class="excerpt">这篇2013年发表于《Automatica》的论文（Song &amp; Zhang），是配对交易&quot;最优交易规则&quot;系列的重要一篇。它与本站已解读的 Tie, Zhang &amp; Zhang (2017) 出自同一团队（Qing Zhang），可以看作前…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-配对交易最优策略.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>配对交易最优策略：GBM框架下的闭式解、回测与市场应用前景</h2>
-<p class="excerpt">1. 价格模型（GBM）</p>
+<p class="excerpt">配对交易是最经典的市场中性策略之一。这篇2017年发表于 JOTA 的论文（Tie, Zhang &amp; Zhang）去掉了传统配对交易对&quot;均值回归&quot;的依赖，直接在几何布朗运动（GBM）下求出最优买卖阈值的闭式解，并用 Target / Wal…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-股票质押贷款定价.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>股票质押贷款定价：区制切换均值回归模型下的闭式解</h2>
-<p class="excerpt">股票贷款的机制：客户以1股股票做抵押，向银行借金额 $q$；银行收取服务费 $c$（$0 &lt; c &lt; q$），客户实际到手 $q-c$；到期日 $T$，客户有权（非义务）以 $qe^{\gamma T}$ 赎回股票，其中 $\gamma &gt;…</p>
+<p class="excerpt">股票质押贷款——借款人拿股票做抵押借钱，股价涨了就赎回，跌多了就违约走人。从定价角度看，它本质上是一个欧式看涨期权。Prager &amp; Zhang (2010) 把前人的无限期限模型推进到有限期限，并允许股价在几何布朗运动（趋势市）与均值回归…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-均值回归四阈值交易规则.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>做空与滑点下的均值回归交易：四阈值最优规则</h2>
-<p class="excerpt">1. 价格模型（均值回归）</p>
+<p class="excerpt">这篇2010年发表于《Discrete and Continuous Dynamical Systems Series B》的论文（Kong &amp; Zhang），研究均值回归资产的最优买卖问题。它是 Zhang &amp; Zhang (2008) …</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-均值回归双阈值解析解.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>均值回归低买高卖：双阈值最优法则的解析解</h2>
-<p class="excerpt">1. 价格模型</p>
+<p class="excerpt">这是&quot;低买高卖&quot;问题第一次得到严格的数学 treatment：此前文献只有最优卖出（sell-side）的结果，买入端一直没有 rigorous 的分析。Zhang &amp; Zhang (2008, Automatica) 用动态规划 + HJ…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-可切换均值回归最优交易规则.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>可切换均值回归下的最优交易规则：买低卖高的阈值解</h2>
-<p class="excerpt">背景：均值回归是金融和能源市场最常用的价格模型之一——价格总有向&quot;均衡水平&quot;回归的倾向。但经典模型假设均衡水平是常数，现实中均衡会跳：财报、政策、行业逻辑变化，都会让资产的&quot;中枢&quot;上一个台阶或下一个台阶。</p>
+<p class="excerpt">Zhang &amp; Zhang (2008) 给出了均值回归资产&quot;买低卖高&quot;的最优阈值规则，但假设均衡水平恒定不变。Nguyen, Tie &amp; Zhang (2014) 把均衡水平改成随机跳跃一次——价格呈现&quot;台阶&quot;形态：先围绕旧均衡震荡，跳跃…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
 <a class="card" href="custom/金融建模/2026-10-12-低买高卖的随机优化方法.html">
 <div class="badges"><span class="badge model">金融建模</span><span class="badge date">2026-10-12 发布</span></div>
 <h2>低买高卖的随机优化：模型无关的随机逼近交易策略</h2>
-<p class="excerpt">为什么是随机逼近：SA 是 Robbins &amp; Monro (1951) 为&quot;带噪声求根&quot;发明的，Kiefer &amp; Wolfowitz 把它推广到&quot;带噪声优化&quot;（即本文用的 KW 算法）。核心思想很朴素：目标函数算不准，就用带噪声的观测值迭…</p>
+<p class="excerpt">&quot;低买高卖&quot;人人会说，但&quot;多低算低、多高算高&quot;是个硬问题。这篇2009年发表于 Stochastic Analysis and Applications 的论文（Song, Yin &amp; Zhang）给出了一个模型无关的数值解法：只假设资产价…</p>
 <div class="meta">数据基准 2026-10-12</div>
 </a>
 
@@ -162,7 +162,7 @@
   <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
   <div id="msgfloat-panel" hidden>
     <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
-    <div class="msgfloat-list"><a href="messages.html#m-2026-10-12-1030"><span class="t">本周宏观日历</span><span class="d">2026-10-12 10:30</span></a></div>
+    <div class="msgfloat-list"><a href="messages.html#m-2026-10-12-1030"><span class="t">本周宏观日历</span><span class="s">本周是CPI周，关键日程（北京时间）：</span><span class="d">2026-10-12 10:30</span></a></div>
   </div>
 </div>
 <script>
