@@ -72,6 +72,8 @@ section[hidden]{display:none!important}
   border-radius:10px;padding:28px;text-align:center;font-size:.9rem}
 .card h2{font-size:1.12rem;margin:0 0 6px}
 .card p.excerpt{margin:0;color:#4b5563;font-size:.92rem}
+.more{text-align:center;margin:4px 0 18px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
 .back{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
 /* report body */
@@ -491,9 +493,9 @@ def build():
         with open(os.path.join(SITE, "reports", slug + ".html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
-        daily_cards.append(card(
+        daily_cards.append((pub_date, card(
             f"reports/{slug}.html", rtype, pub_date, title,
-            excerpt, data_date, news_cfg["note"] if news_cfg else ""))
+            excerpt, data_date, news_cfg["note"] if news_cfg else "")))
         print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
 
     tab_cards = {"data": [], "model": []}
@@ -525,15 +527,17 @@ def build():
 
     panels = {
         "daily": ("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析"
-                  " — 定时任务自动更新", daily_cards),
+                  " — 定时任务自动更新", [c for _, c in daily_cards],
+                  f"archive-{daily_cards[0][0][:7]}.html" if daily_cards else ""),
         "data": ("量化分析与数据挖掘 — 把 .md / .html 按 "
                  "<code>YYYY-MM-DD-标题</code> 命名放入 custom/数据掘金/ 重新构建",
-                 tab_cards["data"]),
+                 tab_cards["data"], "archive-data.html"),
         "model": ("金融建模相关报告 — 把 .md / .html 按 "
                   "<code>YYYY-MM-DD-标题</code> 命名放入 custom/金融建模/ 重新构建",
-                  tab_cards["model"]),
+                  tab_cards["model"], "archive-model.html"),
     }
     order = ["daily", "data", "model"]
+    HOME_LIMIT = 10  # 首页每栏最多显示条数，超出进归档页
     tabbar = ['<div class="tabs" role="tablist">']
     for tid in order:
         n = len(panels[tid][1])
@@ -545,8 +549,12 @@ def build():
     tabbar.append("</div>")
     parts = ["\n".join(tabbar)]
     for tid in order:
-        hint, cards = panels[tid]
-        inner = "\n".join(cards) if cards else '<p class="empty">暂无内容</p>'
+        hint, cards, archive_href = panels[tid]
+        shown = cards[:HOME_LIMIT]
+        inner = "\n".join(shown) if shown else '<p class="empty">暂无内容</p>'
+        if len(cards) > HOME_LIMIT and archive_href:
+            inner += (f'<p class="more"><a href="{archive_href}">'
+                      f"查看全部 {len(cards)} 篇 →</a></p>")
         hid = "" if tid == "daily" else " hidden"
         parts.append(
             f'<section id="tab-{tid}"{hid}>\n'
@@ -559,6 +567,43 @@ def build():
                 .replace("{msgfloat}", build_msgfloat(messages)))
     print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
           f" + {len(tab_cards['model'])} model")
+
+    build_archives(daily_cards, tab_cards)
+
+
+def build_archives(daily_cards, tab_cards):
+    """归档页：每日报告按月（archive-YYYY-MM.html），数据掘金/金融建模各一页全量。"""
+    # 每日报告按月分组
+    months = {}
+    for pub_date, html in daily_cards:
+        months.setdefault(pub_date[:7], []).append(html)
+    month_list = sorted(months.keys(), reverse=True)
+    for ym in month_list:
+        nav = " · ".join(
+            f'<a href="archive-{m}.html">{m}</a>' if m != ym else f"<b>{m}</b>"
+            for m in month_list)
+        body = (f'<p class="section-hint">按月归档 · {nav}</p>\n'
+                + "\n".join(months[ym]))
+        page = PAGE_TMPL.format(
+            title=f"每日报告归档 {ym}", body=body,
+            meta_line=f"{ym} · 共 {len(months[ym])} 篇", root="",
+            mathjax="")
+        with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
+                  encoding="utf-8") as f:
+            f.write(page)
+        print(f"page: archive-{ym}.html ({len(months[ym])} 篇)")
+    # 数据掘金 / 金融建模全量归档
+    for tab_id, fname in (("data", "archive-data.html"),
+                          ("model", "archive-model.html")):
+        cards = tab_cards[tab_id]
+        body = "\n".join(cards) if cards else '<p class="empty">暂无内容</p>'
+        page = PAGE_TMPL.format(
+            title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
+            meta_line=f"共 {len(cards)} 篇", root="", mathjax="")
+        with open(os.path.join(SITE, fname), "w",
+                  encoding="utf-8") as f:
+            f.write(page)
+        print(f"page: {fname} ({len(cards)} 篇)")
 
 
 if __name__ == "__main__":
