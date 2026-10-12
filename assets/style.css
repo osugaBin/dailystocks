@@ -62,6 +62,36 @@ blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;
 ul,ol{padding-left:1.4em}
 img{max-width:100%;height:auto;display:block;margin:14px auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
+/* 及时快讯浮窗 */
+#msgfloat{position:fixed;right:16px;bottom:16px;z-index:60;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+#msgfloat-btn{position:relative;display:flex;align-items:center;border:1px solid #1a3a6b;
+  background:#1a3a6b;color:#fff;border-radius:24px;padding:10px 18px;font-size:.9rem;
+  cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+#msgfloat-btn:hover{background:#24487f}
+.msgfloat-dot{position:absolute;top:5px;right:7px;width:9px;height:9px;border-radius:50%;
+  background:#ef4444;display:none}
+#msgfloat-panel{position:absolute;right:0;bottom:58px;width:340px;max-width:calc(100vw - 32px);
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.16);overflow:hidden;text-align:left}
+.msgfloat-head{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--line)}
+.msgfloat-head b{font-size:.95rem}
+.msgfloat-head a{font-size:.8rem}
+.msgfloat-list a{display:block;padding:10px 14px;border-bottom:1px solid var(--line);
+  text-decoration:none;color:inherit}
+.msgfloat-list a:last-child{border-bottom:none}
+.msgfloat-list a:hover{background:#f8fafc}
+.msgfloat-list .t{display:block;font-size:.88rem;color:var(--ink)}
+.msgfloat-list .d{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+/* 快讯存档页 */
+.msg{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
+.msg-meta{color:var(--muted);font-size:.8rem;margin-bottom:6px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.msg h2{border:none;padding:0;margin:0 0 8px;font-size:1.15rem}
+.site-nav{margin-top:10px;font-size:.85rem;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.site-nav a{margin-right:14px}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
 .actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
@@ -69,7 +99,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button:hover{border-color:var(--accent)}
 @page{size:A4;margin:18mm 15mm}
 @media print{
-  .back,.actions,footer.site-foot{display:none!important}
+  .back,.actions,footer.site-foot,#msgfloat{display:none!important}
   body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
   .wrap{max-width:none;margin:0;padding:0}
   h1{font-size:17pt;border-bottom:2px solid #333;padding-bottom:8px}

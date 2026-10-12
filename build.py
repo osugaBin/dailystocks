@@ -87,6 +87,36 @@ blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;
 ul,ol{padding-left:1.4em}
 img{max-width:100%;height:auto;display:block;margin:14px auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
+/* 及时快讯浮窗 */
+#msgfloat{position:fixed;right:16px;bottom:16px;z-index:60;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+#msgfloat-btn{position:relative;display:flex;align-items:center;border:1px solid #1a3a6b;
+  background:#1a3a6b;color:#fff;border-radius:24px;padding:10px 18px;font-size:.9rem;
+  cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+#msgfloat-btn:hover{background:#24487f}
+.msgfloat-dot{position:absolute;top:5px;right:7px;width:9px;height:9px;border-radius:50%;
+  background:#ef4444;display:none}
+#msgfloat-panel{position:absolute;right:0;bottom:58px;width:340px;max-width:calc(100vw - 32px);
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.16);overflow:hidden;text-align:left}
+.msgfloat-head{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--line)}
+.msgfloat-head b{font-size:.95rem}
+.msgfloat-head a{font-size:.8rem}
+.msgfloat-list a{display:block;padding:10px 14px;border-bottom:1px solid var(--line);
+  text-decoration:none;color:inherit}
+.msgfloat-list a:last-child{border-bottom:none}
+.msgfloat-list a:hover{background:#f8fafc}
+.msgfloat-list .t{display:block;font-size:.88rem;color:var(--ink)}
+.msgfloat-list .d{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+/* 快讯存档页 */
+.msg{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
+.msg-meta{color:var(--muted);font-size:.8rem;margin-bottom:6px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.msg h2{border:none;padding:0;margin:0 0 8px;font-size:1.15rem}
+.site-nav{margin-top:10px;font-size:.85rem;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.site-nav a{margin-right:14px}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
 .actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
@@ -94,7 +124,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button:hover{border-color:var(--accent)}
 @page{size:A4;margin:18mm 15mm}
 @media print{
-  .back,.actions,footer.site-foot{display:none!important}
+  .back,.actions,footer.site-foot,#msgfloat{display:none!important}
   body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
   .wrap{max-width:none;margin:0;padding:0}
   h1{font-size:17pt;border-bottom:2px solid #333;padding-bottom:8px}
@@ -124,6 +154,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <header class="site-head">
 <h1>DrX Daily · 每日市场洞察</h1>
 <p>数据驱动 · 行情复盘 · 金融建模</p>
+<nav class="site-nav"><a href="messages.html">及时快讯</a></nav>
 </header>
 {content}
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
@@ -143,6 +174,7 @@ INDEX_TMPL = """<!DOCTYPE html>
   if(h==='data'||h==='model') show(h);
 })();
 </script>
+{msgfloat}
 </body>
 </html>
 """
@@ -314,6 +346,78 @@ def extract_html_title(text):
 
 CUSTOM_DIRS = {"数据掘金": "data", "金融建模": "model"}  # custom/ 子目录 -> tab id
 TAB_LABELS = {"daily": "每日报告", "data": "数据掘金", "model": "金融建模"}
+MSG_DIR = os.path.join(CUSTOM_DIR, "快讯")  # 及时消息：YYYY-MM-DD-HHMM-标题.md
+
+
+def collect_messages():
+    items = []  # (sortkey, date, hm, title, src_path)
+    if not os.path.isdir(MSG_DIR):
+        return items
+    for fname in sorted(os.listdir(MSG_DIR), reverse=True):
+        m = re.match(r"(\d{4}-\d{2}-\d{2})-(\d{4})-(.+)\.md$", fname)
+        if not m:
+            continue
+        date, hm, title = m.group(1), m.group(2), m.group(3)
+        items.append((f"{date} {hm}", date, f"{hm[:2]}:{hm[2:]}", title,
+                      os.path.join(MSG_DIR, fname)))
+    return items
+
+
+def build_messages_page(messages):
+    """快讯存档页 messages.html（全文，按时间倒序）。"""
+    blocks = []
+    for sortkey, date, hm, title, src in messages:
+        body = md_to_html(open(src, encoding="utf-8").read())
+        body = re.sub(r"^<h1>.*?</h1>", "", body, count=1,
+                      flags=re.S).strip()  # 去正文H1，页面单独渲染标题
+        anchor = f"m-{date}-{hm.replace(':', '')}"
+        blocks.append(
+            f'<article class="msg" id="{anchor}">'
+            f'<div class="msg-meta">{date} {hm}</div>'
+            f"<h2>{htmlmod.escape(title)}</h2>{body}</article>")
+    content = "\n".join(blocks) if blocks else '<p class="empty">暂无快讯</p>'
+    page = PAGE_TMPL.format(
+        title="及时快讯", body=content,
+        meta_line=f"共 {len(messages)} 条 · 按时间倒序", root="", mathjax="")
+    with open(os.path.join(SITE, "messages.html"), "w",
+              encoding="utf-8") as f:
+        f.write(page)
+    print(f"page: messages.html ({len(messages)} 条快讯)")
+
+
+def build_msgfloat(messages):
+    """首页右下角浮窗：最新3条快讯 + 未读红点（localStorage 记忆）。"""
+    if not messages:
+        return ""
+    lis = []
+    for sortkey, date, hm, title, src in messages[:3]:
+        anchor = f"m-{date}-{hm.replace(':', '')}"
+        lis.append(
+            f'<a href="messages.html#{anchor}">'
+            f'<span class="t">{htmlmod.escape(title)}</span>'
+            f'<span class="d">{date} {hm}</span></a>')
+    latest_id = f"m-{messages[0][1]}-{messages[0][2].replace(':', '')}"
+    return f"""<div id="msgfloat">
+  <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
+  <div id="msgfloat-panel" hidden>
+    <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
+    <div class="msgfloat-list">{''.join(lis)}</div>
+  </div>
+</div>
+<script>
+(function(){{
+  var btn=document.getElementById('msgfloat-btn'),
+      panel=document.getElementById('msgfloat-panel'),
+      dot=document.getElementById('msgfloat-dot'),
+      latest='{latest_id}';
+  function seen(){{try{{return localStorage.getItem('drx_msg_seen')===latest;}}catch(e){{return true;}}}}
+  dot.style.display=seen()?'none':'block';
+  btn.addEventListener('click',function(){{
+    panel.hidden=!panel.hidden;
+    if(!panel.hidden){{try{{localStorage.setItem('drx_msg_seen',latest);}}catch(e){{}}dot.style.display='none';}}
+  }});
+}})();
+</script>"""
 
 
 def collect_custom():
@@ -351,6 +455,8 @@ def card(href, rtype, pub_date, title, excerpt, data_date, news_note=""):
 
 
 def build():
+    messages = collect_messages()
+    build_messages_page(messages)
     os.makedirs(os.path.join(SITE, "reports"), exist_ok=True)
     os.makedirs(os.path.join(SITE, "assets"), exist_ok=True)
     with open(os.path.join(SITE, "assets", "style.css"), "w",
@@ -449,7 +555,8 @@ def build():
 
     with open(os.path.join(SITE, "index.html"), "w",
               encoding="utf-8") as f:
-        f.write(INDEX_TMPL.replace("{content}", content))
+        f.write(INDEX_TMPL.replace("{content}", content)
+                .replace("{msgfloat}", build_msgfloat(messages)))
     print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
           f" + {len(tab_cards['model'])} model")
 

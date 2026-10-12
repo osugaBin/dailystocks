@@ -11,6 +11,7 @@
 <header class="site-head">
 <h1>DrX Daily · 每日市场洞察</h1>
 <p>数据驱动 · 行情复盘 · 金融建模</p>
+<nav class="site-nav"><a href="messages.html">及时快讯</a></nav>
 </header>
 <div class="tabs" role="tablist">
 <button class="tab active" data-tab="daily" role="tab"><span class="t">每日报告</span><span class="count">7 篇</span></button>
@@ -153,6 +154,27 @@
   tabs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.tab)})});
   var h=(location.hash||'').replace('#','');
   if(h==='data'||h==='model') show(h);
+})();
+</script>
+<div id="msgfloat">
+  <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
+  <div id="msgfloat-panel" hidden>
+    <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
+    <div class="msgfloat-list"><a href="messages.html#m-2026-10-12-1030"><span class="t">本周宏观日历</span><span class="d">2026-10-12 10:30</span></a></div>
+  </div>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('msgfloat-btn'),
+      panel=document.getElementById('msgfloat-panel'),
+      dot=document.getElementById('msgfloat-dot'),
+      latest='m-2026-10-12-1030';
+  function seen(){try{return localStorage.getItem('drx_msg_seen')===latest;}catch(e){return true;}}
+  dot.style.display=seen()?'none':'block';
+  btn.addEventListener('click',function(){
+    panel.hidden=!panel.hidden;
+    if(!panel.hidden){try{localStorage.setItem('drx_msg_seen',latest);}catch(e){}dot.style.display='none';}
+  });
 })();
 </script>
 </body>
