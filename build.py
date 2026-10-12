@@ -39,6 +39,12 @@ body{
 .site-head{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:20px}
 .site-head h1{font-size:1.5rem;margin:0}
 .site-head p{color:var(--muted);margin:6px 0 0;font-size:.9rem}
+.sub-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.sub-row p{margin:0}
+.msg-btn{display:inline-block;background:#1a3a6b;color:#fff;text-decoration:none;
+  border-radius:20px;padding:6px 18px;font-size:.85rem;white-space:nowrap;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.msg-btn:hover{background:#24487f;color:#fff}
 a{color:var(--accent)}
 .section-title{font-size:1.15rem;margin:26px 0 4px;border:none;padding:0}
 .section-hint{color:var(--muted);font-size:.82rem;margin:0 0 14px;
@@ -116,9 +122,6 @@ figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:
 .msg-meta{color:var(--muted);font-size:.8rem;margin-bottom:6px;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .msg h2{border:none;padding:0;margin:0 0 8px;font-size:1.15rem}
-.site-nav{margin-top:10px;font-size:.85rem;
-  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
-.site-nav a{margin-right:14px}
 footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14px;color:var(--muted);font-size:.8rem}
 .actions{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0 0 6px}
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
@@ -155,8 +158,10 @@ INDEX_TMPL = """<!DOCTYPE html>
 <div class="wrap">
 <header class="site-head">
 <h1>DrX Daily · 每日市场洞察</h1>
+<div class="sub-row">
 <p>数据驱动 · 行情复盘 · 金融建模</p>
-<nav class="site-nav"><a href="messages.html">及时快讯</a></nav>
+<a class="msg-btn" href="messages.html">及时快讯</a>
+</div>
 </header>
 {content}
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
