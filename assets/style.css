@@ -39,12 +39,12 @@ a{color:var(--accent)}
 .badge.data{background:#e0f2fe;color:#0369a1}
 .badge.model{background:#fef9c3;color:#a16207}
 /* tabs */
-.tabs{display:flex;gap:10px;margin:20px 0 18px;flex-wrap:wrap}
-.tab{flex:1;min-width:130px;border:1px solid var(--line);background:#fff;border-radius:12px;
-  padding:12px 8px;cursor:pointer;text-align:center;
+.tabs{display:flex;gap:8px;margin:20px 0 18px}
+.tab{flex:1 1 0;min-width:0;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 4px;cursor:pointer;text-align:center;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
-.tab .t{display:block;font-size:1rem;font-weight:600;color:var(--ink)}
-.tab .count{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+.tab .t{display:block;font-size:clamp(.85rem,4.5vw,1rem);font-weight:600;color:var(--ink);white-space:nowrap}
+.tab .count{display:block;font-size:.75rem;color:var(--muted);margin-top:2px;white-space:nowrap}
 .tab.active{background:#1a3a6b;border-color:#1a3a6b}
 .tab.active .t{color:#fff}
 .tab.active .count{color:#cbd5e1}
