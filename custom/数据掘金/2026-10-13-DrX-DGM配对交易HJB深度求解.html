@@ -36,7 +36,7 @@ $$\min\lbrace \rho w_1 - Lw_1,\ w_1 - w_0 - \beta_s + \beta_by \rbrace = 0, \tag
 <p><strong>参数</strong>（论文 §6，Target/Walmart 校准）：$\mu_1 = 0.2059$、$\mu_2 = 0.2459$，$\sigma_{11} = 0.3112$、$\sigma_{12} = \sigma_{21} = 0.0729$、$\sigma_{22} = 0.2943$，$\rho = 0.5$，$K = 0.1\%$。得 $\lambda = 0.0529$，特征根 $\delta_1 = 2.483$、$\delta_2 = -2.239$，闭式解 $k_1 = 1.038$、$k_2 = 1.283$（论文报告 1.039、1.282）。</p>
 <h2>3. 方法：DGM 求解耦合变分不等式</h2>
 <p>DGM 损失函数采用自由边界罚函数形式（Sirignano &amp; Spiliopoulos §4）：</p>
-<p>$$J = \mathbb{E}[(\rho w_0 - Lw_0)^2\mathbf{1}<em>{\lbrace w_0 &gt; \psi_0\rbrace}] + \lambda</em>{\text{obs}}\mathbb{E}[\max(\psi_0 - w_0,0)^2] + (w_1 \text{对称项}) + \lambda_{\text{bc}}J_{\text{bc}},$$</p>
+<p>$$J = \mathbb{E}[(\rho w_0 - Lw_0)^2\mathbf{1}_{\lbrace w_0 &gt; \psi_0\rbrace}] + \lambda_{\text{obs}}\mathbb{E}[\max(\psi_0 - w_0,0)^2] + (w_1 \text{对称项}) + \lambda_{\text{bc}}J_{\text{bc}},$$</p>
 <p>其中障碍 $\psi_0 = w_1 - \beta_b + \beta_sy$、$\psi_1 = w_0 + \beta_s - \beta_by$，指示函数由当前网络值决定（不对指示函数求导）。$w_0$、$w_1$ 由同一 MLP（3 隐层 × 64 单元，tanh 激活）的两个输出头表示，$w'$、$w''$ 由链式法则解析求出（非数值差分），梯度经双重反向传播精确计算。Adam 优化，$y \in [0.1,4.0]$ 上均匀随机采样（无网格），batch 1024，训练 8000 迭代。</p>
 <p>边界条件取自渐近行为：$w_0(0.1) = 0$、$w_1(0.1) = \beta_s - 0.1\beta_b$、$w_0(4.0) = 4\beta_s - \beta_b$、$w_1(4.0) = 0$。</p>
 <h2>4. 结果</h2>
