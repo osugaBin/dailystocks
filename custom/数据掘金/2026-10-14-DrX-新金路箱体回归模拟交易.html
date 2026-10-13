@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-新金路箱体回归模拟交易 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>DrX-新金路箱体回归模拟交易</h1>
+<p><strong>DrX Quantitative Research</strong> · 2026年10月14日 · 每日 17:00 更新</p>
+<blockquote>
+<p>30 万元虚拟资金，基于箱体回归分析的机械化模拟交易。全程记录信号、成交、资金曲线。</p>
+</blockquote>
+<h2>一、模拟规则</h2>
+<p><strong>标的</strong>：新金路 (000510.SZ)</p>
+<p><strong>信号生成</strong>（每日 17:00，基于截至当日收盘的 boxreg 分析）：</p>
+<ul>
+<li>Box_Position ≤ 0.25 → <strong>BUY</strong>，限价 = 箱体下沿</li>
+<li>Box_Position ≥ 0.75 → <strong>SELL</strong>，限价 = 箱体上沿</li>
+<li>否则 HOLD，无信号</li>
+</ul>
+<p><strong>成交判定</strong>（次日）：</p>
+<ul>
+<li>BUY：若次日最低价 ≤ 限价 → 以限价成交；否则撤单</li>
+<li>SELL：若次日最高价 ≥ 限价 → 以限价成交；否则撤单</li>
+</ul>
+<p><strong>仓位管理</strong>：</p>
+<ul>
+<li>初始资金 300,000 元，空仓启动</li>
+<li>每次 BUY 动用 50% 可用现金（100 股整数倍）</li>
+<li>每次 SELL 卖出 50% 持仓（100 股整数倍）</li>
+</ul>
+<p><strong>费用</strong>：佣金万三（最低 5 元）双边收取；印花税 0.1% 仅卖出时收取。</p>
+<h2>二、启动分析（2026-10-14）</h2>
+<p>基于 2026-10-13 收盘数据的 boxreg 分析：</p>
+<p><img alt="新金路箱体回归分析" src="xinjinlu_boxreg_20261014.png" /></p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>收盘价 (10-13)</td>
+<td>14.82</td>
+</tr>
+<tr>
+<td>箱体上沿 / 下沿</td>
+<td>19.76 / 14.01</td>
+</tr>
+<tr>
+<td>Box 位置</td>
+<td>0.14（贴近下沿）</td>
+</tr>
+<tr>
+<td>回归中轨</td>
+<td>17.64（横向，β=+0.0058/日）</td>
+</tr>
+<tr>
+<td>最近支撑 / 压力</td>
+<td>14.69 / 17.44</td>
+</tr>
+</tbody>
+</table>
+<p><strong>首笔信号</strong>：BUY @ 14.01（箱体下沿）。10 月 14 日盘中若最低价触及 14.01 即成交，预计买入约 10,700 股（动用 50% 资金）。</p>
+<h2>三、每日记录</h2>
+<h3>2026-10-14（待收盘）</h3>
+<ul>
+<li>信号：BUY @ 14.01（基于 10-13 数据，Box_Position=0.14）</li>
+<li>成交：待 17:00 确认</li>
+<li>资金：300,000.00 元（现金），持仓 0 股</li>
+</ul>
+<hr />
+<p><em>本模拟为量化研究记录，不构成投资建议。</em></p>
+<p class="meta">发布日期：2026-10-14 · 类型：数据掘金</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
