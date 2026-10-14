@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-100万组合模拟仓 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css">
+
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<h1>DrX-100万组合模拟仓</h1>
+<p><strong>DrX Quantitative Research</strong> · 2026年10月14日 · 每日收盘后更新</p>
+<blockquote>
+<p>100 万元虚拟资金组合：30w 箱体均值回归池 + 70w 价值/趋势池。基于 boxreg 策略的机械化模拟交易。</p>
+</blockquote>
+<h2>一、组合结构</h2>
+<table>
+<thead>
+<tr>
+<th>资金池</th>
+<th>金额</th>
+<th>标的</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30w 箱体池</td>
+<td>300,000</td>
+<td>新金路 (000510.SZ)</td>
+<td>箱体下沿低吸，T+1 分步建仓，三阶止盈</td>
+</tr>
+<tr>
+<td>70w 价值池</td>
+<td>400,000</td>
+<td>长江电力、紫金矿业、药明康德、汇川技术、阳光电源、百济神州</td>
+<td>上升通道回踩 -1σ/-2σ 低吸</td>
+</tr>
+<tr>
+<td>70w 突破池</td>
+<td>300,000</td>
+<td>中际旭创、亨通光电、中芯国际、兆易创新、佰维存储、澜起科技、泽璟制药</td>
+<td>放量突破箱体上沿追击</td>
+</tr>
+</tbody>
+</table>
+<p><strong>风控</strong>：每只标的独立硬止损（S4 位或 ATR 止损取严）；70w 池 v1 阶段仅记录信号与市值，暂不自动下单。</p>
+<h2>二、启动状态（2026-10-14）</h2>
+<h3>30w 箱体池：新金路</h3>
+<ul>
+<li>现价 14.82，箱体 [15.68~18.98]，Box 位置 -0.26（<strong>破位</strong>）</li>
+<li>信号：<strong>破位离场/观望</strong>，不买入</li>
+<li>资金：300,000.00（现金），持仓 0 股</li>
+</ul>
+<h3>70w 池：首次扫描</h3>
+<ul>
+<li>长江电力 (600900.SH)：现价 29.15，箱体 [27.93~28.84]，Box 位置 1.34 → <strong>分批止盈区</strong>，不追高</li>
+<li>其余 12 只：Tushare 接口限频，扫描待晚间重试</li>
+</ul>
+<p><strong>组合权益</strong>：1,000,000.00（初始）</p>
+<p><img alt="100万组合权益曲线" src="portfolio100w_equity.png" /></p>
+<h2>三、每日记录</h2>
+<h3>2026-10-14（启动日）</h3>
+<ul>
+<li>30w：新金路破位，空仓观望</li>
+<li>70w：长江电力处止盈区；其余待扫描</li>
+<li>组合权益：1,000,000.00（+0.00%）</li>
+</ul>
+<hr />
+<p><em>本模拟为量化研究记录，不构成投资建议。</em></p>
+<p class="meta">发布日期：2026-10-14 · 类型：数据掘金</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+</body>
+</html>
