@@ -16,12 +16,19 @@
 </div>
 </header>
 <div class="tabs" role="tablist">
-<button class="tab active" data-tab="daily" role="tab"><span class="t">每日报告</span><span class="count">25 篇</span></button>
+<button class="tab active" data-tab="daily" role="tab"><span class="t">每日报告</span><span class="count">26 篇</span></button>
 <button class="tab" data-tab="data" role="tab"><span class="t">数据掘金</span><span class="count">5 篇</span></button>
 <button class="tab" data-tab="model" role="tab"><span class="t">金融建模</span><span class="count">12 篇</span></button>
 </div>
 <section id="tab-daily">
 <p class="section-hint">早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析 — 定时任务自动更新</p>
+<a class="card" href="reports/2026-10-21-evening.html">
+<div class="badges"><span class="badge evening">晚间</span><span class="badge date">2026-10-21 发布</span></div>
+<h2>A股收盘技术分析报告</h2>
+<p class="excerpt">定性：电池链业绩冲击引发回调，宁德时代 Q3 净利环比下滑、股价大跌 12.03%（路透社经由 Aju Press），直接带崩电池、能源金属板块，创业板大跌 1.62%、沪深300 跌 0.97%；沪指 -0.60% 收 3713.03，守…</p>
+<div class="meta">数据基准 2026-10-21</div>
+</a>
+
 <a class="card" href="reports/2026-10-21-morning.html">
 <div class="badges"><span class="badge morning">早盘</span><span class="badge date">2026-10-21 发布</span></div>
 <h2>美股A股对标映射分析</h2>
@@ -84,14 +91,7 @@
 <p class="excerpt">以下为公开新闻报道的周五（10 月 16 日）收盘数据口径，仅做新闻引用，不做重复技术分析：</p>
 <div class="meta">数据基准 2026-10-17</div>
 </a>
-
-<a class="card" href="reports/2026-10-16-evening.html">
-<div class="badges"><span class="badge evening">晚间</span><span class="badge date">2026-10-16 发布</span></div>
-<h2>A股收盘技术分析报告</h2>
-<p class="excerpt">定性：六大指数涨跌不一，沪指微涨 +0.24% 收 3716.28，沪深300/中证500/科创50 小幅飘红，深成 -0.12%、创业板 -0.39% 相对偏弱。沪深两市成交额约 1.56 万亿（沪 7325 亿 + 深 8229 亿），…</p>
-<div class="meta">数据基准 2026-10-16</div>
-</a>
-<p class="more"><a href="archive-2026-10.html">查看全部 25 篇 →</a></p>
+<p class="more"><a href="archive-2026-10.html">查看全部 26 篇 →</a></p>
 </section>
 <section id="tab-data" hidden>
 <p class="section-hint">量化分析与数据挖掘 — 把 .md / .html 按 <code>YYYY-MM-DD-标题</code> 命名放入 custom/数据掘金/ 重新构建</p>
@@ -225,7 +225,7 @@
   <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
   <div id="msgfloat-panel" hidden>
     <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
-    <div class="msgfloat-list"><a href="messages.html#m-2026-10-20-1705"><span class="t">收盘沪指涨0.12%尾盘ETF放量托底</span><span class="s">10月20日A股收盘：沪指+0.12%收3735.37（深成-0.14%、创业板-0.26%），成交约1.47万亿（较昨日微放量约227亿）。</span><span class="d">2026-10-20 17:05</span></a></div>
+    <div class="msgfloat-list"><a href="messages.html#m-2026-10-21-2040"><span class="t">美股盘前AI链反扑</span><span class="s">（盘前涨幅为截稿快照，开盘可能变化；SpaceX&quot;合并&quot;仅为特别委员会探讨阶段，非确定交易。）</span><span class="d">2026-10-21 20:40</span></a></div>
   </div>
 </div>
 <script>
@@ -233,7 +233,7 @@
   var btn=document.getElementById('msgfloat-btn'),
       panel=document.getElementById('msgfloat-panel'),
       dot=document.getElementById('msgfloat-dot'),
-      latest='m-2026-10-20-1705';
+      latest='m-2026-10-21-2040';
   function seen(){try{return localStorage.getItem('drx_msg_seen')===latest;}catch(e){return true;}}
   dot.style.display=seen()?'none':'block';
   btn.addEventListener('click',function(){
