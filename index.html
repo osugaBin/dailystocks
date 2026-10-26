@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
 <link rel="stylesheet" href="assets/style.css">
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
@@ -12,7 +13,7 @@
 <h1>DrX Daily · 每日市场洞察</h1>
 <div class="sub-row">
 <p>数据驱动 · 行情复盘 · 金融建模</p>
-<a class="msg-btn" href="messages.html">及时快讯</a>
+<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html">及时快讯</a></div>
 </div>
 </header>
 <div class="tabs" role="tablist">
@@ -248,9 +249,9 @@
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
     <div class="donate-title">赞赏我的开发</div>
     <img class="donate-coffee" src="assets/donate-coffee.jpg" alt="Buy me a coffee">
-    <a href="assets/donate-wechat.jpg" target="_blank" rel="noopener"><img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码"></a>
+    <img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码">
     <div class="donate-label">微信</div>
-    <a href="assets/donate-alipay.jpg" target="_blank" rel="noopener"><img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码"></a>
+    <img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码">
     <div class="donate-label">支付宝</div>
   </div>
 </div>
@@ -269,6 +270,27 @@
   setClosed(wasClosed,false);
   closeBtn.addEventListener('click',function(){setClosed(true,true);});
   openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'浅色模式':'深色模式';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
 })();
 </script>
 </body>

@@ -9,11 +9,12 @@
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
 <p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>DGM：求解高维偏微分方程的深度学习算法</h1>
 <p><strong>论文</strong>：Justin Sirignano, Konstantinos Spiliopoulos, <em>DGM: A Deep Learning Algorithm for Solving Partial Differential Equations</em>, arXiv:<a href="https://arxiv.org/abs/1708.07469">1708.07469</a> [q-fin.MF], 2018年9月。</p>
 <p>高维偏微分方程是计算金融、物理、工程中的长期难题：有限差分在 $d$ 个空间维上需要 $O(h^{-(d+1)})$ 个网格点，维度稍高即不可行。本文提出<strong>深度伽辽金方法（Deep Galerkin Method, DGM）</strong>：用深度神经网络逼近 PDE 的解，以随机梯度下降在随机采样的时空点上训练网络满足微分算子、初值和边值条件——<strong>无网格（meshfree）</strong>，这是能做到 200 维的关键。论文还证明了神经网络对一类拟线性抛物型 PDE 的逼近能力定理，并在高维美式期权自由边界 PDE、HJB 方程、Burgers 方程上验证了精度。</p>
@@ -85,5 +86,55 @@ $$</p>
 <p class="meta">发布日期：2026-10-13 · 类型：金融建模</p>
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
 </div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat.jpg" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="../../assets/donate-alipay.jpg" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'浅色模式':'深色模式';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
 </body>
 </html>

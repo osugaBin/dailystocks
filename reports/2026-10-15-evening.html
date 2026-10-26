@@ -6,11 +6,12 @@
 <title>A股收盘技术分析报告 · DrX Daily</title>
 <link rel="stylesheet" href="../assets/style.css">
 
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
 <p class="back"><a href="../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>A股收盘技术分析报告</h1>
 <blockquote>
 <p>数据说明：本报告于 2026-10-15 生成，数据为当日（周四）收盘；三脚本（fetch/analyze/sell_timing）已刷新当日数据（股票池最新日期 20261015），技术指标以本次 fresh CSV 为准。新浪六指数 f2（昨收）与 10-14 已核验收盘逐点一致（上证 3767.23、深成 12110.59、创业板 2866.76、科创50 1380.26、沪深300 4217.68、中证500 6980.11），口径同源。Tushare 当日 IP 限流：中芯国际、阳光电源、汇川技术 3 只改用东财 push2his 前复权补拉当日日 K，3M 最高等历史口径为前复权，与 Tushare 不复权口径略有差异。当日晨报联动：早间对标映射报告预测"低开震荡、结构分化"（见 comparison/美股A股对标映射分析_20261015），低开与防御领涨兑现，但科技链跌幅超预期、"杀跌抛压有限"被证伪。</p>
@@ -732,5 +733,55 @@
 <p class="meta">发布日期：2026-10-15 · 数据基准：2026-10-15 · 类型：晚间</p>
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
 </div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../assets/donate-wechat.jpg" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="../assets/donate-alipay.jpg" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'浅色模式':'深色模式';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
 </body>
 </html>

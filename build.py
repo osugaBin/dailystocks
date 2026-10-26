@@ -45,6 +45,12 @@ body{
   border-radius:20px;padding:6px 18px;font-size:.85rem;white-space:nowrap;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .msg-btn:hover{background:#24487f;color:#fff}
+.head-btns{display:flex;gap:8px;align-items:center}
+.theme-toggle{display:inline-block;background:var(--card);color:var(--ink);
+  border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:.85rem;
+  cursor:pointer;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;white-space:nowrap}
+.theme-toggle:hover{border-color:var(--accent)}
+.actions .theme-toggle{border-radius:8px}
 a{color:var(--accent)}
 .section-title{font-size:1.15rem;margin:26px 0 4px;border:none;padding:0}
 .section-hint{color:var(--muted);font-size:.82rem;margin:0 0 14px;
@@ -132,7 +138,6 @@ figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:
 #donatefloat-close:hover{background:#e2e8f0}
 .donate-title{color:#e05d52;font-size:.98rem;font-weight:700;margin:2px 22px 8px}
 #donatefloat img{margin:0 auto}
-#donatefloat a{display:block}
 .donate-coffee{display:block;width:100%;border-radius:6px;margin-bottom:8px}
 .donate-qr{display:block;width:100%;border-radius:8px}
 .donate-label{font-size:.8rem;color:#4b5563;margin:3px 0 8px}
@@ -154,34 +159,60 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
   padding:6px 14px;font-size:.85rem;cursor:pointer;color:var(--accent)}
 .actions button:hover{border-color:var(--accent)}
-/* 系统自适应深色：跟随操作系统/浏览器外观，浅色为默认不改动 */
+/* 深色配色：系统自适应 + 手动切换（data-theme 由切换按钮写入、优先于系统；两组规则内容相同，改一处须同步另一组） */
 @media (prefers-color-scheme: dark){
-  :root{--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;
-    --card:#151d2b;--bg:#0f141d}
-  .site-head{border-bottom-color:#e2e8f0}
-  h1{color:#f1f5f9;border-bottom-color:#64748b}
-  h2{color:#f1f5f9}
-  th{background:#1c2739}
-  th,td{border-color:#475569}
-  tr:nth-child(even) td{background:#131a26}
-  blockquote{background:#16202f;color:#cbd5e1;border-left-color:#475569}
-  .section-hint code{background:#1e293b}
-  .card p.excerpt{color:#a5b0bf}
-  .tab{background:var(--bg)}
-  .actions button{background:var(--bg)}
-  #msgfloat-panel{background:var(--bg)}
-  .msgfloat-list a:hover{background:#1a2436}
-  .msgfloat-list .t{color:var(--ink)}
-  .msgfloat-list .s{color:#a5b0bf}
-  .msg{background:var(--bg)}
-  .donate-title{color:#f28b82}
-  .donate-label{color:#cbd5e1}
-  #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
-  #donatefloat-close:hover{background:rgba(255,255,255,.28)}
+  :root:not([data-theme="light"]){--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d}
+  :root:not([data-theme="light"]) .site-head{border-bottom-color:#e2e8f0}
+  :root:not([data-theme="light"]) h1{color:#f1f5f9;border-bottom-color:#64748b}
+  :root:not([data-theme="light"]) h2{color:#f1f5f9}
+  :root:not([data-theme="light"]) th{background:#1c2739}
+  :root:not([data-theme="light"]) th, :root:not([data-theme="light"]) td{border-color:#475569}
+  :root:not([data-theme="light"]) tr:nth-child(even) td{background:#131a26}
+  :root:not([data-theme="light"]) blockquote{background:#16202f;color:#cbd5e1;border-left-color:#475569}
+  :root:not([data-theme="light"]) .section-hint code{background:#1e293b}
+  :root:not([data-theme="light"]) .card p.excerpt{color:#a5b0bf}
+  :root:not([data-theme="light"]) .tab{background:var(--bg)}
+  :root:not([data-theme="light"]) .actions button{background:var(--bg)}
+  :root:not([data-theme="light"]) #msgfloat-panel{background:var(--bg)}
+  :root:not([data-theme="light"]) .msgfloat-list a:hover{background:#1a2436}
+  :root:not([data-theme="light"]) .msgfloat-list .t{color:var(--ink)}
+  :root:not([data-theme="light"]) .msgfloat-list .s{color:#a5b0bf}
+  :root:not([data-theme="light"]) .msg{background:var(--bg)}
+  :root:not([data-theme="light"]) .donate-title{color:#f28b82}
+  :root:not([data-theme="light"]) .donate-label{color:#cbd5e1}
+  :root:not([data-theme="light"]) #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
+  :root:not([data-theme="light"]) #donatefloat-close:hover{background:rgba(255,255,255,.28)}
 }
+:root[data-theme="dark"]{--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d}
+:root[data-theme="dark"] .site-head{border-bottom-color:#e2e8f0}
+:root[data-theme="dark"] h1{color:#f1f5f9;border-bottom-color:#64748b}
+:root[data-theme="dark"] h2{color:#f1f5f9}
+:root[data-theme="dark"] th{background:#1c2739}
+:root[data-theme="dark"] th, :root[data-theme="dark"] td{border-color:#475569}
+:root[data-theme="dark"] tr:nth-child(even) td{background:#131a26}
+:root[data-theme="dark"] blockquote{background:#16202f;color:#cbd5e1;border-left-color:#475569}
+:root[data-theme="dark"] .section-hint code{background:#1e293b}
+:root[data-theme="dark"] .card p.excerpt{color:#a5b0bf}
+:root[data-theme="dark"] .tab{background:var(--bg)}
+:root[data-theme="dark"] .actions button{background:var(--bg)}
+:root[data-theme="dark"] #msgfloat-panel{background:var(--bg)}
+:root[data-theme="dark"] .msgfloat-list a:hover{background:#1a2436}
+:root[data-theme="dark"] .msgfloat-list .t{color:var(--ink)}
+:root[data-theme="dark"] .msgfloat-list .s{color:#a5b0bf}
+:root[data-theme="dark"] .msg{background:var(--bg)}
+:root[data-theme="dark"] .donate-title{color:#f28b82}
+:root[data-theme="dark"] .donate-label{color:#cbd5e1}
+:root[data-theme="dark"] #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
+:root[data-theme="dark"] #donatefloat-close:hover{background:rgba(255,255,255,.28)}
 @page{size:A4;margin:18mm 15mm}
 @media print{
   .back,.actions,footer.site-foot,#msgfloat,#donatefloat{display:none!important}
+  :root[data-theme="dark"],:root:not([data-theme="light"]){--ink:#222;--muted:#666;--accent:#2a6cb6;--line:#e5e7eb;--card:#f8fafc;--bg:#fff}
+  [data-theme="dark"] h1,:root:not([data-theme="light"]) h1{color:#111;border-bottom-color:#333}
+  [data-theme="dark"] h2,:root:not([data-theme="light"]) h2{color:#1a1a1a}
+  [data-theme="dark"] th,:root:not([data-theme="light"]) th{background:#eef2f7}
+  [data-theme="dark"] tr:nth-child(even) td,:root:not([data-theme="light"]) tr:nth-child(even) td{background:#fafbfc}
+  [data-theme="dark"] blockquote,:root:not([data-theme="light"]) blockquote{background:#f7f7f7;color:#555;border-left-color:#ccc}
   :root{--ink:#222;--muted:#666;--accent:#2a6cb6;--line:#e5e7eb;--card:#f8fafc;--bg:#fff}
   body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
   .wrap{max-width:none;margin:0;padding:0}
@@ -206,6 +237,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
 <link rel="stylesheet" href="assets/style.css">
+{themeinit}
 </head>
 <body>
 <div class="wrap">
@@ -213,7 +245,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <h1>DrX Daily · 每日市场洞察</h1>
 <div class="sub-row">
 <p>数据驱动 · 行情复盘 · 金融建模</p>
-<a class="msg-btn" href="messages.html">及时快讯</a>
+<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html">及时快讯</a></div>
 </div>
 </header>
 {content}
@@ -256,15 +288,17 @@ PAGE_TMPL = """<!DOCTYPE html>
 <title>{title} · DrX Daily</title>
 <link rel="stylesheet" href="{root}assets/style.css">
 {mathjax}
+{themeinit}
 </head>
 <body>
 <div class="wrap">
 <p class="back"><a href="{root}index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
 {body}
 <p class="meta">{meta_line}</p>
 <footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
 </div>
+{donatefloat}
 </body>
 </html>
 """
@@ -439,7 +473,8 @@ def build_messages_page(messages):
     content = "\n".join(blocks) if blocks else '<p class="empty">暂无快讯</p>'
     page = PAGE_TMPL.format(
         title="及时快讯", body=content,
-        meta_line=f"共 {len(messages)} 条 · 按时间倒序", root="", mathjax="")
+        meta_line=f"共 {len(messages)} 条 · 按时间倒序", root="", mathjax="",
+        themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
     with open(os.path.join(SITE, "messages.html"), "w",
               encoding="utf-8") as f:
         f.write(page)
@@ -489,9 +524,9 @@ DONATEFLOAT_HTML = """<div id="donatefloat">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
     <div class="donate-title">赞赏我的开发</div>
     <img class="donate-coffee" src="assets/donate-coffee.jpg" alt="Buy me a coffee">
-    <a href="assets/donate-wechat.jpg" target="_blank" rel="noopener"><img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码"></a>
+    <img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码">
     <div class="donate-label">微信</div>
-    <a href="assets/donate-alipay.jpg" target="_blank" rel="noopener"><img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码"></a>
+    <img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码">
     <div class="donate-label">支付宝</div>
   </div>
 </div>
@@ -512,6 +547,38 @@ DONATEFLOAT_HTML = """<div id="donatefloat">
   openBtn.addEventListener('click',function(){setClosed(false,true);});
 })();
 </script>"""
+
+
+
+THEME_INIT = """<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>"""
+
+THEME_SCRIPT = """<script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'\u6d45\u8272\u6a21\u5f0f':'\u6df1\u8272\u6a21\u5f0f';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>"""
+
+
+def donatefloat_html(root=""):
+    """donate float + theme script; subpages prefix image paths with root, close state shared site-wide."""
+    return DONATEFLOAT_HTML.replace('src="assets/', 'src="' + root + 'assets/') + THEME_SCRIPT
 
 
 def collect_custom():
@@ -581,7 +648,8 @@ def build():
         body = md_to_html(body_md)
         page = PAGE_TMPL.format(
             title=htmlmod.escape(title), body=body, meta_line=meta_line,
-            root="../", mathjax=MATHJAX if "$" in body else "")
+            root="../", mathjax=MATHJAX if "$" in body else "",
+            themeinit=THEME_INIT, donatefloat=donatefloat_html("../"))
         with open(os.path.join(SITE, "reports", slug + ".html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -601,7 +669,8 @@ def build():
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
                 meta_line=f"发布日期：{date} · 类型：{TAB_LABELS[tab_id]}",
-                root="../../", mathjax=MATHJAX if "$" in body else "")
+                root="../../", mathjax=MATHJAX if "$" in body else "",
+                themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"))
             with open(os.path.join(CUSTOM_DIR, subdir, slug + ".html"), "w",
                       encoding="utf-8") as f:
                 f.write(page)
@@ -657,7 +726,8 @@ def build():
               encoding="utf-8") as f:
         f.write(INDEX_TMPL.replace("{content}", content)
                 .replace("{msgfloat}", build_msgfloat(messages))
-                .replace("{donatefloat}", DONATEFLOAT_HTML))
+                .replace("{donatefloat}", donatefloat_html(""))
+                .replace("{themeinit}", THEME_INIT))
     print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
           f" + {len(tab_cards['model'])} model")
 
@@ -680,7 +750,7 @@ def build_archives(daily_cards, tab_cards):
         page = PAGE_TMPL.format(
             title=f"每日报告归档 {ym}", body=body,
             meta_line=f"{ym} · 共 {len(months[ym])} 篇", root="",
-            mathjax="")
+            mathjax="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
         with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -692,7 +762,8 @@ def build_archives(daily_cards, tab_cards):
         body = "\n".join(cards) if cards else '<p class="empty">暂无内容</p>'
         page = PAGE_TMPL.format(
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
-            meta_line=f"共 {len(cards)} 篇", root="", mathjax="")
+            meta_line=f"共 {len(cards)} 篇", root="", mathjax="",
+            themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
         with open(os.path.join(SITE, fname), "w",
                   encoding="utf-8") as f:
             f.write(page)
