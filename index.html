@@ -242,5 +242,34 @@
   });
 })();
 </script>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script>
 </body>
 </html>

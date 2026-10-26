@@ -118,6 +118,32 @@ figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:
 .msgfloat-list .t{display:block;font-size:.88rem;color:var(--ink)}
 .msgfloat-list .s{display:block;font-size:.8rem;color:#4b5563;margin-top:4px;line-height:1.5}
 .msgfloat-list .d{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+/* 打赏浮窗（仅首页，位于快讯浮窗上方，可关闭） */
+#donatefloat{position:fixed;right:16px;bottom:76px;z-index:59;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+#donatefloat-panel{position:relative;width:264px;max-width:calc(100vw - 32px);
+  max-height:calc(100vh - 150px);overflow-y:auto;background:#152238;color:#fff;
+  border:1px solid #24365a;border-radius:14px;padding:14px 14px 10px;
+  box-shadow:0 8px 28px rgba(0,0,0,.28);text-align:center}
+#donatefloat-panel[hidden],#donatefloat-open[hidden]{display:none!important}
+#donatefloat-close{position:absolute;top:6px;right:8px;width:30px;height:30px;
+  border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;
+  font-size:1.15rem;line-height:1;cursor:pointer;padding:0}
+#donatefloat-close:hover{background:rgba(255,255,255,.25)}
+.donate-title{color:#f28b82;font-size:1.08rem;font-weight:700;margin:2px 24px 12px}
+#donatefloat img{margin:0 auto}
+.donate-coffee{display:block;width:100%;border-radius:8px;margin-bottom:14px}
+.donate-qr{display:block;width:100%;border-radius:10px}
+.donate-label{font-size:.88rem;color:#e5e7eb;margin:6px 0 14px}
+.donate-label:last-child{margin-bottom:4px}
+#donatefloat-open{border:1px solid #152238;background:#152238;color:#fff;
+  border-radius:24px;padding:10px 18px;font-size:.9rem;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.22)}
+#donatefloat-open:hover{background:#1f3355}
+@media(max-width:600px){
+  #donatefloat{right:12px;bottom:70px}
+  #donatefloat-panel{max-height:calc(100vh - 140px)}
+}
 /* 快讯存档页 */
 .msg{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
 .msg-meta{color:var(--muted);font-size:.8rem;margin-bottom:6px;
@@ -130,7 +156,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button:hover{border-color:var(--accent)}
 @page{size:A4;margin:18mm 15mm}
 @media print{
-  .back,.actions,footer.site-foot,#msgfloat{display:none!important}
+  .back,.actions,footer.site-foot,#msgfloat,#donatefloat{display:none!important}
   body{background:#fff;color:#222;font-size:10.5pt;line-height:1.7}
   .wrap{max-width:none;margin:0;padding:0}
   h1{font-size:17pt;border-bottom:2px solid #333;padding-bottom:8px}
@@ -183,6 +209,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 })();
 </script>
 {msgfloat}
+{donatefloat}
 </body>
 </html>
 """
@@ -429,6 +456,38 @@ def build_msgfloat(messages):
 </script>"""
 
 
+
+DONATEFLOAT_HTML = """<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="assets/donate-wechat.jpg" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="assets/donate-alipay.jpg" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script>"""
+
+
 def collect_custom():
     items = []  # (tab_id, subdir, date, name, ext, src_path)
     for subdir, tab_id in CUSTOM_DIRS.items():
@@ -571,7 +630,8 @@ def build():
     with open(os.path.join(SITE, "index.html"), "w",
               encoding="utf-8") as f:
         f.write(INDEX_TMPL.replace("{content}", content)
-                .replace("{msgfloat}", build_msgfloat(messages)))
+                .replace("{msgfloat}", build_msgfloat(messages))
+                .replace("{donatefloat}", DONATEFLOAT_HTML))
     print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
           f" + {len(tab_cards['model'])} model")
 
