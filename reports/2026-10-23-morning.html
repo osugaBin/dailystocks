@@ -336,6 +336,7 @@
   }
   var wasClosed=false;
   try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
   setClosed(wasClosed,false);
   closeBtn.addEventListener('click',function(){setClosed(true,true);});
   openBtn.addEventListener('click',function(){setClosed(false,true);});
