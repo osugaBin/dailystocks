@@ -29,7 +29,7 @@ CSS = """/* dailystocks site */
   --card:#f8fafc; --bg:#fff;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--bg);color-scheme:light}
 body{
   font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;
   color:var(--ink); background:var(--bg);
@@ -161,7 +161,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button:hover{border-color:var(--accent)}
 /* 深色配色：系统自适应 + 手动切换（data-theme 由切换按钮写入、优先于系统；两组规则内容相同，改一处须同步另一组） */
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d}
+  :root:not([data-theme="light"]){--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d;color-scheme:dark}
   :root:not([data-theme="light"]) .site-head{border-bottom-color:#e2e8f0}
   :root:not([data-theme="light"]) h1{color:#f1f5f9;border-bottom-color:#64748b}
   :root:not([data-theme="light"]) h2{color:#f1f5f9}
@@ -183,7 +183,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
   :root:not([data-theme="light"]) #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
   :root:not([data-theme="light"]) #donatefloat-close:hover{background:rgba(255,255,255,.28)}
 }
-:root[data-theme="dark"]{--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d}
+:root[data-theme="dark"]{--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d;color-scheme:dark}
 :root[data-theme="dark"] .site-head{border-bottom-color:#e2e8f0}
 :root[data-theme="dark"] h1{color:#f1f5f9;border-bottom-color:#64748b}
 :root[data-theme="dark"] h2{color:#f1f5f9}
@@ -236,7 +236,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261026b">
+<link rel="stylesheet" href="assets/style.css?v=20261026c">
 {themeinit}
 </head>
 <body>
@@ -286,7 +286,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261026b">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261026c">
 {mathjax}
 {themeinit}
 </head>
