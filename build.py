@@ -101,6 +101,8 @@ blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;
 ul,ol{padding-left:1.4em}
 img{max-width:100%;height:auto;display:block;margin:14px auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
+details.older-records{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 16px;margin:12px 0 20px}
+details.older-records summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0}
 /* 及时快讯浮窗 */
 #msgfloat{position:fixed;right:16px;bottom:16px;z-index:60;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
@@ -236,7 +238,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261026c">
+<link rel="stylesheet" href="assets/style.css?v=20261102a">
 {themeinit}
 </head>
 <body>
@@ -286,7 +288,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261026c">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261102a">
 {mathjax}
 {themeinit}
 </head>
@@ -334,6 +336,37 @@ def md_to_html(text):
     text = text.replace("- [ ]", "- □")  # 与 md2pdf 保持一致的缺字处理
     text = fix_list_spacing(text)
     return markdown.markdown(text, extensions=["tables", "fenced_code"])
+
+
+def collapse_daily_records(body, keep_days=3):
+    """「三、每日记录」小节只展开最近 keep_days 天，更早条目折叠进 <details>。
+
+    条目以 <h3>YYYY-MM-DD 开头；按不同日期计天数（同一天多条一并展开）。
+    md 源文件保持全量，只改页面呈现；每日追加新条目后自动滚动折叠。
+    """
+    marker = "<h2>三、每日记录</h2>"
+    idx = body.find(marker)
+    if idx < 0:
+        return body
+    head, rest = body[:idx + len(marker)], body[idx + len(marker):]
+    entries = list(re.finditer(r"<h3>(\d{4}-\d{2}-\d{2})", rest))
+    if not entries:
+        return body
+    dates = []
+    for m in entries:
+        if m.group(1) not in dates:
+            dates.append(m.group(1))
+    if len(dates) <= keep_days:
+        return body
+    keep = set(dates[-keep_days:])
+    split = next(m.start() for m in entries if m.group(1) in keep)
+    older, recent = rest[:split], rest[split:]
+    n_old = sum(1 for m in entries if m.start() < split)
+    details = (f'<details class="older-records"><summary>'
+               f'更早的记录（共 {n_old} 条 · {dates[0]} 至 '
+               f'{dates[-keep_days - 1]}，点击展开）</summary>\n'
+               + older + "</details>\n")
+    return head + details + recent
 
 
 def extract_h1(text):
@@ -666,7 +699,7 @@ def build():
             title = extract_h1(text)
             excerpt = extract_excerpt(text)
             slug = f"{date}-{name}"
-            body = md_to_html(text)
+            body = collapse_daily_records(md_to_html(text))
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
                 meta_line=f"发布日期：{date} · 类型：{TAB_LABELS[tab_id]}",

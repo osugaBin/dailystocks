@@ -76,6 +76,8 @@ blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;
 ul,ol{padding-left:1.4em}
 img{max-width:100%;height:auto;display:block;margin:14px auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
+details.older-records{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 16px;margin:12px 0 20px}
+details.older-records summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0}
 /* 及时快讯浮窗 */
 #msgfloat{position:fixed;right:16px;bottom:16px;z-index:60;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
