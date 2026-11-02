@@ -11,6 +11,7 @@
 import os
 import re
 import html as htmlmod
+from datetime import date as _date, datetime as _datetime
 
 import markdown
 
@@ -67,6 +68,7 @@ a{color:var(--accent)}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
 .badge.news{background:#dcfce7;color:#15803d}
+.badge.update{background:#ccfbf1;color:#0f766e}
 .badge.data{background:#e0f2fe;color:#0369a1}
 .badge.model{background:#fef9c3;color:#a16207}
 /* tabs */
@@ -238,7 +240,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261102a">
+<link rel="stylesheet" href="assets/style.css?v=20261102b">
 {themeinit}
 </head>
 <body>
@@ -288,7 +290,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261102a">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261102b">
 {mathjax}
 {themeinit}
 </head>
@@ -372,6 +374,27 @@ def collapse_daily_records(body, keep_days=3):
 def extract_h1(text):
     m = re.search(r"^#\s+(.+)$", text, re.M)
     return m.group(1).strip() if m else "(无标题)"
+
+
+def last_update_date(src, text, pub_date):
+    """文章最近更新日期：正文中最晚的日期（ISO 与中文格式）与源文件
+    修改日期取最大者，且不早于发布日期、不晚于构建当天。
+    每日追加条目的博客正文含当日日期，更新日期随之自动滚动。"""
+    today = _date.today().isoformat()
+    upd = pub_date
+    for pat in (r"(20\d{2})-(\d{1,2})-(\d{1,2})",
+                r"(20\d{2})年(\d{1,2})月(\d{1,2})日"):
+        for y, m, d in re.findall(pat, text):
+            ds = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+            if upd < ds <= today:
+                upd = ds
+    try:
+        mt = _datetime.fromtimestamp(os.path.getmtime(src)).strftime("%Y-%m-%d")
+        if upd < mt <= today:
+            upd = mt
+    except OSError:
+        pass
+    return upd
 
 
 def extract_data_date(h1):
@@ -634,9 +657,12 @@ def collect_custom():
     return items
 
 
-def card(href, rtype, pub_date, title, excerpt, data_date, news_note=""):
+def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
+         update_date=""):
     badges = (f'<span class="badge {rtype}">{TYPE_LABEL[rtype]}</span>'
               f'<span class="badge date">{pub_date} 发布</span>')
+    if update_date and update_date > pub_date:
+        badges += f'<span class="badge update">{update_date} 更新</span>' 
     if news_note:
         badges += '<span class="badge news">新闻版</span>'
         meta = "本期为新闻版"
@@ -699,10 +725,15 @@ def build():
             title = extract_h1(text)
             excerpt = extract_excerpt(text)
             slug = f"{date}-{name}"
+            upd = last_update_date(src, text, date)
             body = collapse_daily_records(md_to_html(text))
+            meta_line = f"{date} 发布 · 类型：{TAB_LABELS[tab_id]}"
+            if upd > date:
+                meta_line = (f"{date} 发布 · {upd} 更新"
+                             f" · 类型：{TAB_LABELS[tab_id]}")
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
-                meta_line=f"发布日期：{date} · 类型：{TAB_LABELS[tab_id]}",
+                meta_line=meta_line,
                 root="../../", mathjax=MATHJAX if "$" in body else "",
                 themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"))
             with open(os.path.join(CUSTOM_DIR, subdir, slug + ".html"), "w",
@@ -715,10 +746,12 @@ def build():
             text = open(src, encoding="utf-8").read()
             title = extract_html_title(text) or name
             excerpt = ""
+            upd = last_update_date(src, text, date)
             href = f"custom/{subdir}/{os.path.basename(src)}"
             print(f"file: {href}")
         tab_cards[tab_id].append(
-            card(href, tab_id, date, title, excerpt, date))
+            card(href, tab_id, date, title, excerpt, date,
+                 update_date=upd))
 
     panels = {
         "daily": ("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析"

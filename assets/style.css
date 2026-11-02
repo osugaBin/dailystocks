@@ -42,6 +42,7 @@ a{color:var(--accent)}
 .badge.custom{background:#ede9fe;color:#6d28d9}
 .badge.date{background:#f1f5f9;color:#475569}
 .badge.news{background:#dcfce7;color:#15803d}
+.badge.update{background:#ccfbf1;color:#0f766e}
 .badge.data{background:#e0f2fe;color:#0369a1}
 .badge.model{background:#fef9c3;color:#a16207}
 /* tabs */
