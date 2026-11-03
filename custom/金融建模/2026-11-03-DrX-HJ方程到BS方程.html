@@ -38,7 +38,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <h3>第三阶段：最优控制与随机控制（第 19 讲及拓展）</h3>
 <ul>
 <li><strong>第 19 讲（最优控制问题）</strong>：Pontryagin 极大值原理（PMP）是随机控制的两大支柱之一（另一个是 HJB 方程），常用于求解带约束的效用最大化问题（如不允许卖空）。重点研读 §19.1（问题的提法）与 §19.2（Pontryagin 极大值原理）。</li>
-<li><strong>拓展（书中未详述，但必须掌握）</strong>：将确定性状态方程 $\dot{x} = f(x,u)$ 替换为随机微分方程 $dX_t = b(X_t, u_t)dt + \sigma(X_t, u_t)dW_t$，得到<strong>随机最优控制</strong>；HJB 方程 $V_t + \sup_u { \mathcal{L}^u V + f(t,x,u) } = 0$，其中 $\mathcal{L}^u$ 是受控过程的生成元；<strong>Feynman-Kac 公式</strong>是连接 PDE（HJB）与随机过程（布朗运动）的桥梁，可把第 5 讲的 H-J 方程看作其无扩散项的退化情形。</li>
+<li><strong>拓展（书中未详述，但必须掌握）</strong>：将确定性状态方程 $\dot{x} = f(x,u)$ 替换为随机微分方程 $dX_t = b(X_t, u_t)dt + \sigma(X_t, u_t)dW_t$，得到<strong>随机最优控制</strong>；HJB 方程 $V_t + \sup_u \lbrace \mathcal{L}^u V + f(t,x,u) \rbrace = 0$，其中 $\mathcal{L}^u$ 是受控过程的生成元；<strong>Feynman-Kac 公式</strong>是连接 PDE（HJB）与随机过程（布朗运动）的桥梁，可把第 5 讲的 H-J 方程看作其无扩散项的退化情形。</li>
 </ul>
 <h3>阅读策略</h3>
 <ol>
@@ -66,7 +66,7 @@ $$</p>
 $$</p>
 <p>其中 $H$ 是 Hamilton 函数，它是 Lagrange 函数 $L$ 关于速度变量的 <strong>Legendre 变换</strong>：</p>
 <p>$$
-H(t,u,\xi) = \sup_{p} { \langle p, \xi \rangle - L(t,u,p) }
+H(t,u,\xi) = \sup_{p} \lbrace \langle p, \xi \rangle - L(t,u,p) \rbrace
 $$</p>
 <p>（对光滑且严格凸的 $L$，这就是在 $\xi = L_p(t,u,p)$ 处取的 $\langle p, \xi \rangle - L$。）这里 $S(t,u)$ 是<strong>作用量（程函）</strong>：沿最优轨迹（极值曲线）累积的 Lagrange 量；$\nabla_u S$ 对应广义动量 $\xi = L_p$。</p>
 <p>引入布朗运动后，我们不再求"一条最优路径"，而是求"随机扰动下的最优期望"。考虑一般的随机最优控制问题：最大化期望收益</p>
@@ -79,7 +79,7 @@ dV(t, X_t) = \left( V_t + b V_x + \frac{1}{2}\sigma^2 V_{xx} \right) dt + \sigma
 $$</p>
 <p>最优性要求折现后的值函数为鞅（漂移为零），于是得到 <strong>HJB 方程</strong>：</p>
 <p>$$
-\partial_t V + \sup_{u} \left{ \mathcal{L}^u V + f(t, x, u) \right} = 0, \qquad \mathcal{L}^u V = b(x,u) V_x + \frac{1}{2}\sigma^2(x,u) V_{xx}
+\partial_t V + \sup_{u} \left\lbrace \mathcal{L}^u V + f(t, x, u) \right\rbrace = 0, \qquad \mathcal{L}^u V = b(x,u) V_x + \frac{1}{2}\sigma^2(x,u) V_{xx}
 $$</p>
 <p><strong>关键对照</strong>：第 5 讲中 H-J 方程的 $\sup_p$ 是为做 Legendre 变换（把 $p$ 换成对偶变量 $\xi$）；HJB 方程中的 $\sup_u$ 是对控制变量求极值——本质上同样是一个变分问题。而 $\frac{1}{2}\sigma^2 V_{xx}$ 这一项，是随机性（二阶扩散）带来的、确定性理论中不存在的修正。</p>
 <h3>3. Delta 对冲：从 HJB 到 Black-Scholes 方程</h3>
