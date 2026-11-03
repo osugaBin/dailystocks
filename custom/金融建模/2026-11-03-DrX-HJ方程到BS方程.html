@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲</h1>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
+<blockquote>
+<p>本系列以张恭庆《变分学讲义》为蓝本，沿着一条主线推进：确定性的 Hamilton-Jacobi（H-J）方程，加上布朗运动的二阶扩散项，如何一步步演变为随机最优控制的 Hamilton-Jacobi-Bellman（HJB）方程，并最终在无套利条件下退化为 Black-Scholes（B-S）方程。张恭庆在前言中特意提到"随机变分学（Malliavin Calculus）成为金融数学的重要部分"——本系列正是沿这句话展开。</p>
+</blockquote>
+<h2>一、研究方案：金融数学视角下的《变分学讲义》研读</h2>
+<h3>核心映射：从"确定性路径"到"随机过程轨道"</h3>
+<p>带着一个核心问题读这本书：<strong>如何用变分法研究布朗运动的轨道？</strong> 在经典力学中，变分法寻找使作用量最小的轨迹；在金融数学中，我们寻找使期望效用最大（或风险最小）的<strong>最优控制策略</strong>，或者寻找导致极端风险（大偏差）的<strong>最可能路径</strong>。</p>
+<h3>第一阶段：经典变分与对偶交易（第 1–8 讲）</h3>
+<p>这部分教如何将最优化问题转化为微分方程，是推导对偶关系（Duality）的基础。</p>
+<ul>
+<li><strong>第 1–3 讲（变分问题、E-L 方程、二阶变分）</strong>：无套利定价理论的核心是对偶性——原问题（Primal）通常是求最小方差对冲策略或最大化终端财富，对偶问题（Dual）则是寻找等价鞅测度（风险中性测度）。重点研读<strong>第 1 讲例 1.6（商品的再投资）</strong>：其控制变量、状态变量与目标泛函的结构，与金融中的最优投资组合（Merton 问题）极其相似；任务是用 E-L 方程求解例 1.6 的最优控制 $u(t)$。</li>
+<li><strong>第 4–5 讲（强极小、极值场与 Hamilton-Jacobi 理论）</strong>：<strong>第 5 讲是全书与金融数学衔接最紧的一讲</strong>——连续时间金融中的 HJB 方程就是随机最优控制的核心，而第 5 讲的程函方程与 Legendre 变换正是 HJB 方程在确定性情形下的"原型"。重点研读 §5.3（Hamilton 方程组）与 §5.4（Hamilton-Jacobi 方程）。本讲即本系列第一讲的主题（见第二节）。</li>
+<li><strong>第 7–8 讲（约束极值与 Noether 定理）</strong>：约束极值直接对应金融中的约束优化（VaR 约束、杠杆约束）；Noether 定理揭示对称性与守恒律的关系，在金融中对应风险中性定价的平移不变性与无套利。</li>
+</ul>
+<h3>第二阶段：随机变分与大偏差——极端风险与期权定价（第 9–11 讲）</h3>
+<ul>
+<li><strong>第 9 讲（直接方法）</strong>：极端暴跌（黑天鹅）概率极小而影响巨大，大偏差理论（LDP）正是研究这类小概率事件的工具。第 9 讲的极小化序列与弱收敛，是大偏差理论中寻找"最可能发生极端事件的路径"的数学基础。</li>
+<li><strong>第 10–11 讲（Sobolev 空间与弱下半连续性）</strong>：金融中常需对布朗运动的路径求导（计算 Delta、Vega 等希腊字母），Malliavin Calculus 就是无穷维空间上的微分学；第 10 讲的 Sobolev 空间与广义导数是其确定性模拟。第 11 讲的 Tonelli-Morrey 定理（凸性 + 下半连续性 $\Rightarrow$ 极小值存在）是证明最优投资组合存在性的理论基础——CRRA 等效用函数取负号后即为凸函数。</li>
+</ul>
+<h3>第三阶段：最优控制与随机控制（第 19 讲及拓展）</h3>
+<ul>
+<li><strong>第 19 讲（最优控制问题）</strong>：Pontryagin 极大值原理（PMP）是随机控制的两大支柱之一（另一个是 HJB 方程），常用于求解带约束的效用最大化问题（如不允许卖空）。重点研读 §19.1（问题的提法）与 §19.2（Pontryagin 极大值原理）。</li>
+<li><strong>拓展（书中未详述，但必须掌握）</strong>：将确定性状态方程 $\dot{x} = f(x,u)$ 替换为随机微分方程 $dX_t = b(X_t, u_t)dt + \sigma(X_t, u_t)dW_t$，得到<strong>随机最优控制</strong>；HJB 方程 $V_t + \sup_u { \mathcal{L}^u V + f(t,x,u) } = 0$，其中 $\mathcal{L}^u$ 是受控过程的生成元；<strong>Feynman-Kac 公式</strong>是连接 PDE（HJB）与随机过程（布朗运动）的桥梁，可把第 5 讲的 H-J 方程看作其无扩散项的退化情形。</li>
+</ul>
+<h3>阅读策略</h3>
+<ol>
+<li><strong>战略跳过</strong>：第 6 讲（多重积分变分）主要服务于几何与 PDE，可快速略过；第 12–13 讲（特征值与正则性）除非研究期权定价 PDE 的解析性质，否则只读结论。</li>
+<li><strong>重视凸分析与对偶</strong>：金融数学中无处不对偶，仔细阅读<strong>第 14 讲（对偶作用原理）</strong>——Kantorovich 对偶（最优传输）与 Fenchel-Legendre 对偶（凸共轭）在计算不完全市场下的无套利价格上下界时有奇效。</li>
+<li><strong>把布朗运动当"路径"看</strong>：变分学处理的是路径（函数）。研究最优控制或对冲策略时，本质上是在无穷维的路径空间（Wiener 空间）中寻找最优的"函数"。</li>
+<li><strong>伴随阅读</strong>：Øksendal《Stochastic Differential Equations》（最优控制部分）或 Fleming &amp; Rishel；Nualart《The Malliavin Calculus and Related Topics》（前两章）；Freidlin-Wentzell 大偏差理论在金融极端风险中的应用。</li>
+</ol>
+<h2>二、第一讲：从确定性 H-J 方程到 Black-Scholes 方程</h2>
+<p>第 5 讲讲的是<strong>确定性的 Hamilton-Jacobi 理论</strong>，而 Black-Scholes 方程是一个<strong>随机偏微分方程</strong>（抛物型 PDE）。表面上一个是确定性的轨道优化，另一个是随机环境下的期望定价，但它们背后的数学灵魂完全一致——<strong>对偶性（Duality）与 Legendre 变换</strong>。下面分四步完成这一演变：先设定金融环境，再由动态规划把 H-J"升维"为 HJB，然后用 Delta 对冲严格推导出 B-S 方程，最后与第 5 讲逐项对照。</p>
+<h3>1. 金融环境与状态方程</h3>
+<p>在风险中性测度 $\mathbb{Q}$ 下（所有漂移率替换为无风险利率 $r$），标的资产价格 $S_t$ 服从几何布朗运动：</p>
+<p>$$
+dS_t = r S_t dt + \sigma S_t dW_t
+$$</p>
+<p>其中 $W_t$ 是标准布朗运动，$\sigma$ 是波动率。要求欧式期权在 $t$ 时刻的价格 $V(t, S)$，到期日 $T$ 的终端条件为：</p>
+<p>$$
+V(T, S) = \Phi(S) = \max(S - K, 0)
+$$</p>
+<p>其中 $K$ 是执行价格。若回到物理测度 $\mathbb{P}$，股票的漂移是 $\mu$ 而非 $r$，并另有利率为 $r$ 的无风险资产——第二步与第三步将看到，漂移 $\mu$ 最终如何被对冲消去。</p>
+<h3>2. 从 H-J 到 HJB：动态规划与 Itô 修正</h3>
+<p>第 5 讲 §5.4 中，确定性 H-J 方程的形式为：</p>
+<p>$$
+\partial_t S(t,u) + H(t, u, \nabla_u S(t,u)) = 0
+$$</p>
+<p>其中 $H$ 是 Hamilton 函数，它是 Lagrange 函数 $L$ 关于速度变量的 <strong>Legendre 变换</strong>：</p>
+<p>$$
+H(t,u,\xi) = \sup_{p} { \langle p, \xi \rangle - L(t,u,p) }
+$$</p>
+<p>（对光滑且严格凸的 $L$，这就是在 $\xi = L_p(t,u,p)$ 处取的 $\langle p, \xi \rangle - L$。）这里 $S(t,u)$ 是<strong>作用量（程函）</strong>：沿最优轨迹（极值曲线）累积的 Lagrange 量；$\nabla_u S$ 对应广义动量 $\xi = L_p$。</p>
+<p>引入布朗运动后，我们不再求"一条最优路径"，而是求"随机扰动下的最优期望"。考虑一般的随机最优控制问题：最大化期望收益</p>
+<p>$$
+\sup_{u} \mathbb{E} \left[ \int_t^T f(s, X_s, u_s) ds + g(X_T) \right]
+$$</p>
+<p>受控状态方程（SDE）为 $dX_s = b(X_s, u_s) ds + \sigma(X_s, u_s) dW_s$。设值函数 $V(t, x)$ 为 $t$ 时刻状态为 $x$ 时的最大期望收益。由<strong>动态规划原理</strong>（即变分法中"最优性原理"的随机版）与 <strong>Itô 引理</strong>：</p>
+<p>$$
+dV(t, X_t) = \left( V_t + b V_x + \frac{1}{2}\sigma^2 V_{xx} \right) dt + \sigma V_x dW_t
+$$</p>
+<p>最优性要求折现后的值函数为鞅（漂移为零），于是得到 <strong>HJB 方程</strong>：</p>
+<p>$$
+\partial_t V + \sup_{u} \left{ \mathcal{L}^u V + f(t, x, u) \right} = 0, \qquad \mathcal{L}^u V = b(x,u) V_x + \frac{1}{2}\sigma^2(x,u) V_{xx}
+$$</p>
+<p><strong>关键对照</strong>：第 5 讲中 H-J 方程的 $\sup_p$ 是为做 Legendre 变换（把 $p$ 换成对偶变量 $\xi$）；HJB 方程中的 $\sup_u$ 是对控制变量求极值——本质上同样是一个变分问题。而 $\frac{1}{2}\sigma^2 V_{xx}$ 这一项，是随机性（二阶扩散）带来的、确定性理论中不存在的修正。</p>
+<h3>3. Delta 对冲：从 HJB 到 Black-Scholes 方程</h3>
+<p>期权定价的特殊之处在于：不需要知道投资者的风险偏好，也不必真正求解最优控制。构造一个<strong>自融资投资组合</strong>：1 份期权空头加 $\Delta$ 份标的股票多头，组合价值 $\Pi = \Delta S - V$，其变化为 $d\Pi = \Delta dS - dV$。</p>
+<p><strong>（1）用 Itô 引理展开 $dV$。</strong> 因 $S$ 的二次变差 $d\langle S \rangle = \sigma^2 S^2 dt$，在物理测度下（漂移 $\mu$）：</p>
+<p>$$
+dV = \left( \partial_t V + \mu S \partial_S V + \frac{1}{2} \sigma^2 S^2 \partial_{SS} V \right) dt + \sigma S \partial_S V dW_t
+$$</p>
+<p><strong>（2）消去风险项——变分中的"极值条件"。</strong> 代入 $d\Pi$ 后，$dW_t$ 的系数为 $\sigma S (\Delta - V_S)$。要使组合无风险，必须选取控制变量</p>
+<p>$$
+\Delta = V_S
+$$</p>
+<p>这正好对应第 5 讲中的广义动量 $\xi = L_p$：<strong>Delta 就是期权价格函数的"广义动量"</strong>。</p>
+<p><strong>（3）无套利条件——变分中的"平稳性条件"。</strong> 风险消去后，组合收益率必须等于无风险利率：$d\Pi = r \Pi dt$。将 $\Delta = V_S$ 代入，漂移项 $\mu$ 恰好抵消：</p>
+<p>$$
+d\Pi = -\left( V_t + \frac{1}{2} \sigma^2 S^2 V_{SS} \right) dt = r(V_S S - V) dt
+$$</p>
+<p>移项整理，即得 <strong>Black-Scholes 方程</strong>：</p>
+<p>$$
+\boxed{ \partial_t V + \frac{1}{2} \sigma^2 S^2 \partial_{SS} V + r S \partial_S V - r V = 0 }
+$$</p>
+<p>注意：$\mu$ 的消失正是"消去最优控制"的数学表现——HJB 方程中的 $\sup$ 与漂移被对冲一并移除，二阶非线性方程<strong>退化为线性 PDE</strong>。等价地，在风险中性测度 $\mathbb{Q}$ 下折现价格 $e^{-rt}V(t, S_t)$ 是鞅，由 <strong>Feynman-Kac 定理</strong>令其漂移为零，也直接得到同一方程，且 $V(t,S) = e^{-r(T-t)} \mathbb{E}^{\mathbb{Q}}[\Phi(S_T) \mid S_t = S]$。</p>
+<h3>4. 与第 5 讲的逐项对照</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">第 5 讲（确定性力学）</th>
+<th style="text-align: left;">Black-Scholes（随机金融）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态变量 $u$</td>
+<td style="text-align: left;">股票价格 $S$</td>
+</tr>
+<tr>
+<td style="text-align: left;">广义动量 $\xi = \nabla_u S$</td>
+<td style="text-align: left;">Delta（对冲比率）$\Delta = \partial V / \partial S$</td>
+</tr>
+<tr>
+<td style="text-align: left;">Lagrange 量 $L(u,p)$</td>
+<td style="text-align: left;">物理测度 $\mathbb{P}$ 下的漂移/收益</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hamilton 量 $H(u,\xi)$</td>
+<td style="text-align: left;">风险中性测度 $\mathbb{Q}$ 下的折现（对偶变量）</td>
+</tr>
+<tr>
+<td style="text-align: left;">Legendre 变换 $\xi = L_p$</td>
+<td style="text-align: left;">测度变换（Girsanov 定理）</td>
+</tr>
+<tr>
+<td style="text-align: left;">H-J 方程（一阶）</td>
+<td style="text-align: left;">HJB 方程（二阶，带波动项）</td>
+</tr>
+<tr>
+<td style="text-align: left;">程函 $S(t,u)$（最优作用量）</td>
+<td style="text-align: left;">期权价格 $V(t,S)$（折现期望）</td>
+</tr>
+</tbody>
+</table>
+<p>三点深层对应：</p>
+<ol>
+<li><strong>Hamilton 函数</strong>：可以把 B-S 方程写成 $\partial_t V + H = 0$ 的形式，其中随机版 Hamilton 量 $H(t, S, \nabla V) = \frac{1}{2} \sigma^2 S^2 V_{SS} + r S V_S - r V$，这里的 $V_{SS}$ 扮演了第 5 讲中 $L_{pp}$（二阶导数）的角色。</li>
+<li><strong>Legendre 变换</strong>：第 5 讲中 $\xi = L_p$；金融中 $\Delta = V_S$。从原空间到对偶空间的切换，在金融里实现为测度变换（Girsanov 定理）：原空间是物理测度 $\mathbb{P}$ 下的期望收益（对应 $L$），对偶空间是风险中性测度 $\mathbb{Q}$ 下的折现期望（对应 $H$）。</li>
+<li><strong>一阶 → 二阶</strong>：H-J 方程是一阶非线性 PDE（无布朗运动，只有一阶导数）；B-S 方程是二阶线性 PDE，二阶项 $\frac{1}{2} \sigma^2 S^2 V_{SS}$ 正是 Itô 引理带来的 <strong>Itô 修正项</strong>，即 HJB 方程中扩散生成元的贡献。</li>
+</ol>
+<h3>5. 小结与思考</h3>
+<p>本讲的主线是：<strong>在存在随机扰动的世界里，寻找一个控制变量（$\Delta$），使系统（投资组合）的一阶变分（风险项）为零</strong>——这与变分法求极值曲线的平稳性条件是同一种思想。确定性 H-J 方程经"加扩散项"升维为 HJB 方程，再经 Delta 对冲消去控制与漂移，最终落回线性的 B-S 方程。</p>
+<p><strong>思考题</strong>：第 5 讲中 H-J 方程的解是程函 $g(t,u)$，满足 $\nabla_u g = p$；B-S 方程的解 $V(t,S)$ 满足 $\partial_S V = \Delta$。若把 $V(t,S)$ 看作某种"随机作用量"，它的 Legendre 变换是什么？在金融里对应什么经济学含义？（提示：对应<strong>凸对偶</strong>与<strong>风险中性测度的刻画</strong>，这正是第 14 讲的内容，也是本系列后续讲次的入口。）</p>
+<p><strong>后续讲次预告</strong>：第二讲将二选一推进——(A) Feynman-Kac 公式的严格化：用第 10 讲 Sobolev 空间与第 12 讲半群理论的语言给出证明框架；(B) 回到方案第一阶段，用 E-L 方程求解第 1 讲例 1.6 并对照 Merton 问题。</p>
+<p class="meta">2026-11-03 发布 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'浅色模式':'深色模式';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
