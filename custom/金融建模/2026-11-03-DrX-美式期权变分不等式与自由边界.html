@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-专题例讲：美式期权的变分不等式与自由边界——障碍问题同构与永久美式看跌期权的解析解 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<p class="back"><a href="../../index.html">← 全部报告</a></p>
+<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-专题例讲：美式期权的变分不等式与自由边界——障碍问题同构与永久美式看跌期权的解析解</h1>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
+<blockquote>
+<p>这是变分法系列的一个"例子讲"：不铺新理论，而是拿一个具体问题把工具走通。问题选美式期权定价——它是张恭庆《变分学讲义》第 7 讲 §7.3 <strong>障碍问题（Obstacle Problem）</strong> 在金融中的完美同构：价格被内在价值"托底"，最优行权时刻是最优停止，行权边界是自由边界。本讲先补齐严格地基（生成元、动态规划、粘性解），再用变分不等式刻画美式期权，最后完整求解一个可解析的例子：<strong>永久美式看跌期权</strong>。</p>
+</blockquote>
+<h2>一、前置地基：生成元、动态规划原理与粘性解</h2>
+<p>第一讲用"构造无风险组合"的直觉推了 B-S 方程。要处理美式期权（带约束、最优停止），需要随机动态规划的严格版本，它是第 5 讲"沿极值曲线求作用量"在概率测度空间中的推广，分三层。</p>
+<p><strong>（1）生成元与半群。</strong> 确定性系统 $\dot{u} = \psi(t,u)$ 沿轨迹的全导数算子是 $\frac{d}{dt} = \partial_t + \psi \cdot \nabla_u$（Liouville 算子）。受控 SDE $dX_s = b(X_s, u_s)ds + \sigma(X_s, u_s)dW_s$ 中，由 Itô 引理，沿随机轨道的"全导数"是无穷小生成元：</p>
+<p>$$
+\mathcal{L}^u V = b(x,u) \cdot \nabla_x V + \frac{1}{2}\mathrm{Tr}\left[\sigma(x,u)\sigma(x,u)^\top \nabla^2_x V\right]
+$$</p>
+<p>$\mathcal{L}^u$ 是随机过程半群 $\lbrace P_s^u \rbrace_{s \ge 0}$ 的生成元；无控制时 $V(t,x) = \mathbb{E}[g(X_T) \mid X_t = x]$ 由 <strong>Feynman-Kac 公式</strong>等价于向后抛物型 PDE $\partial_t V + \mathcal{L}^u V = 0$、$V(T,x) = g(x)$——这就是 H-J 方程的随机版。</p>
+<p><strong>（2）动态规划原理（DPP）。</strong> 它是变分法"最优性原理"的随机形式：最优策略的任何一段子策略也最优。对任意停时 $\tau \ge t$：</p>
+<p>$$
+V(t,x) = \sup_{u} \mathbb{E} \left[ \int_t^\tau f(X_s, u_s)ds + V(\tau, X_\tau) \,\middle|\, X_t = x \right]
+$$</p>
+<p>这正是确定性变分中"拆分积分区间"思想的推广。在 $[t, t+h]$ 上取常数控制、由 DPP 与 Itô 公式展开、除以 $h$ 令 $h \to 0$（变分学的<strong>局部化原理</strong>），即得 HJB 方程 $\partial_t V + \sup_u \lbrace \mathcal{L}^u V + f \rbrace = 0$ 的严格推导。</p>
+<p><strong>（3）粘性解。</strong> 上述推导假设 $V \in C^{1,2}$，但带约束（禁卖空、行权）时值函数往往不可微——这对应变分学中的不光滑极值问题（张 第 13 讲正则性）。随机控制中的替代物是 Crandall–Lions 的<strong>粘性解</strong>：对任意光滑测试函数 $\phi$，若 $V - \phi$ 在 $(t,x)$ 达局部极大，则 $\partial_t \phi + \sup_u \lbrace \mathcal{L}^u \phi + f \rbrace \le 0$；达局部极小则反向不等式成立。下面美式期权的变分不等式，正是这一思想的直接产物。</p>
+<h2>二、障碍问题与美式期权的同构</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">张 第 7 讲 §7.3（薄膜障碍问题）</th>
+<th style="text-align: left;">美式期权定价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">薄膜高度 $u(x)$ 不能穿透障碍 $\psi(x)$：$u \le \psi$</td>
+<td style="text-align: left;">期权价值不能低于立即行权的内在价值：$V(t,S) \ge \Phi(S)$</td>
+</tr>
+<tr>
+<td style="text-align: left;">极小化能量泛函 $I(u) = \int_\Omega \left[ \frac{1}{2}\lvert \nabla u \rvert^2 - fu \right] dx$</td>
+<td style="text-align: left;">无套利定价：$V$ 在可持有时须满足 B-S 方程</td>
+</tr>
+<tr>
+<td style="text-align: left;">接触集与非接触集之间的未知边界（自由边界）</td>
+<td style="text-align: left;">最优行权边界 $S^*(t)$：一侧行权、一侧持有</td>
+</tr>
+<tr>
+<td style="text-align: left;">凸集上的变分不等式 $a(u, v-u) \ge (f, v-u)$</td>
+<td style="text-align: left;">凸集 $C = \lbrace V \in H^1 : V \ge \Phi \rbrace$ 上的抛物型变分不等式</td>
+</tr>
+</tbody>
+</table>
+<p>以美式看跌为例，$\Phi(S) = \max(K - S, 0)$。概率语言里同一对象叫 <strong>Snell 包络</strong>：美式期权价格是折现收益过程在风险中性测度下的最小上鞅——变分不等式的解（原问题）等价于"最大的次调和下界"（对偶问题），两种语言在此合流。</p>
+<h2>三、变分不等式：线性互补形式</h2>
+<p>美式期权价格 $V(t,S)$ 求解如下<strong>线性互补问题（LCP）</strong>，它是变分不等式最经典的等价形式：</p>
+<p>$$
+\min \left\lbrace -\partial_t V - \frac{1}{2}\sigma^2 S^2 \partial_{SS} V - r S \partial_S V + rV, \;\; V - \Phi(S) \right\rbrace = 0, \qquad V(T, S) = \Phi(S)
+$$</p>
+<p>$\min \lbrace \cdot, \cdot \rbrace = 0$ 的含义是：在任意 $(t, S)$ 处，两件事必居其一（或同时成立）：</p>
+<ol>
+<li><strong>继续持有区</strong>：$V &gt; \Phi(S)$，此时必须满足 B-S 方程（第一项 $= 0$）；</li>
+<li><strong>行权区</strong>：$V = \Phi(S)$，此时 B-S 算子 $\ge 0$，价格被内在价值"顶住"。</li>
+</ol>
+<p>两个区域的分界 $S^<em>(t)$ 事先未知，随解一起求出——这就是</em><em>自由边界问题</em>*。</p>
+<h2>四、自由边界条件：价值匹配与平滑匹配</h2>
+<p>对美式看跌，在行权边界 $S = S^<em>(t)$ 上须满足两个</em><em>高联系条件</em>*：</p>
+<ol>
+<li><strong>价值匹配</strong>：$V(t, S^<em>(t)) = \Phi(S^</em>(t)) = K - S^*(t)$（价格在边界上连续）；</li>
+<li><strong>平滑匹配</strong>：$\partial_S V(t, S^<em>(t)) = \partial_S \Phi(S^</em>(t)) = -1$（Delta 在边界上连续）。</li>
+</ol>
+<p>平滑匹配在变分学中对应<strong>自然边界条件</strong>（张 第 2 讲 §2.3：端点未被强加条件时，极小点自动满足的横截条件）。只有价值匹配则二阶导数在边界跳跃、Delta 不连续，不是真正的弱解；平滑匹配正是把自由边界"解出来"的第二个方程。下面例题将看到它如何唯一确定 $S^*$。</p>
+<h2>五、例题求解（Option 1）：永久美式看跌期权的解析解</h2>
+<p><strong>问题</strong>：$T = \infty$（永续）、标的无红利、风险中性下 $dS_t = r S_t dt + \sigma S_t dW_t$。求美式看跌 $V(S)$ 与最优行权边界 $S^*$。此时问题与 $t$ 无关，变分不等式退化为 ODE 障碍问题——恰是张 第 7 讲习题量级的一维问题，可用 $C^1$ 拼接（平滑匹配）求解析解。</p>
+<p><strong>第 1 步：持有区的 ODE 与通解。</strong> 在 $S &gt; S^*$ 的持有区，$V$ 满足 B-S 方程的稳态形式：</p>
+<p>$$
+\frac{1}{2}\sigma^2 S^2 V''(S) + r S V'(S) - r V(S) = 0
+$$</p>
+<p>这是 Euler 型方程，试 $V = S^\lambda$ 得特征方程 $\frac{\sigma^2}{2}\lambda(\lambda - 1) + r\lambda - r = 0$，两根为 $\lambda_1 = 1$ 与 $\lambda_2 = -\gamma$，其中</p>
+<p>$$
+\gamma = \frac{2r}{\sigma^2} &gt; 0
+$$</p>
+<p>通解 $V(S) = A S + B S^{-\gamma}$。边界条件 $S \to \infty$ 时看跌价值 $\to 0$，迫使 $A = 0$，故持有区 $V(S) = B S^{-\gamma}$，待定常数 $B$ 与自由边界 $S^*$ 两个未知量，正好由两个高联系条件确定。</p>
+<p><strong>第 2 步：价值匹配 + 平滑匹配联立。</strong></p>
+<p>$$
+B \, (S^<em>)^{-\gamma} = K - S^</em>, \qquad -\gamma B \, (S^*)^{-\gamma-1} = -1
+$$</p>
+<p>由平滑匹配得 $B = \dfrac{(S^<em>)^{\gamma+1}}{\gamma}$，代入价值匹配：$\dfrac{S^</em>}{\gamma} = K - S^*$，解出</p>
+<p>$$
+\boxed{ S^* = \frac{\gamma}{\gamma + 1} K = \frac{2r}{2r + \sigma^2} K }
+$$</p>
+<p><strong>第 3 步：完整解。</strong></p>
+<p>$$
+V(S) = \begin{cases} K - S, &amp; S \le S^<em> \ (K - S^</em>) \left( \dfrac{S}{S^<em>} \right)^{-\gamma}, &amp; S &gt; S^</em> \end{cases}
+$$</p>
+<p><strong>第 4 步：验证变分不等式（解的完备性）。</strong> 行权区内 $V = K - S$，代入 B-S 算子：$\frac{1}{2}\sigma^2 S^2 \cdot 0 + rS \cdot (-1) - r(K - S) = -rK &lt; 0$，即 $-(\text{B-S 算子作用于 } V) = rK &gt; 0$，互补条件严格成立；持有区方程取等号、且 $V &gt; K - S$（由 $S^{-\gamma}$ 的凸性与两端拼接可得）。故上式确为变分不等式的解。另注意一个对照：无红利美式<strong>看涨</strong>的内在价值障碍永远在 B-S 解下方、接触集为空、自由边界消失——它恒等于欧式看涨，这正是障碍问题中"障碍不起作用"的退化情形。</p>
+<p><strong>数值例</strong>（数字保留 2 位）：取 $r = 5.00\%$、$\sigma = 20.00\%$、$K = 100.00$。则 $\gamma = 2.50$，最优行权边界 $S^<em> = 71.43$（约为执行价的 71.43%），$K - S^</em> = 28.57$：</p>
+<ul>
+<li>$S = 100.00$：$V = 28.57 \times (100.00 / 71.43)^{-2.50} = 12.32$；</li>
+<li>$S = 80.00$：$V = 28.57 \times (80.00 / 71.43)^{-2.50} = 21.52$（内在价值 20.00，时间价值 1.52）；</li>
+<li>$S = 71.43$：$V = 28.57 = K - S^<em>$，且 $V'(S^</em>) = -\gamma (K - S^<em>) / S^</em> = -1.00$，平滑匹配数值验算通过。</li>
+</ul>
+<p>经济直觉：波动越大（$\sigma \uparrow$，$\gamma \downarrow$），$S^<em>$ 越低——越值得等待；利率越高（$r \uparrow$），$S^</em>$ 越靠近 $K$——行权拿到现金的利息收益越可观，越应早行权。</p>
+<h2>六、小结与后续</h2>
+<p>本讲把一条链走通了：<strong>障碍问题（第 7 讲）→ 变分不等式/LCP → 自由边界 + 高联系条件 → 永久美式看跌的闭式解</strong>。有限到期（$T &lt; \infty$）的美式期权没有这样的解析解，$S^<em>(t)$ 随时间变化，只能数值求解——这正是学习路径中里程碑 </em><em>M1（HJB 数值求解器）</em><em> 的第一个验收案例：用 PSOR/罚方法数值解出的行权边界，应在 $T \to \infty$ 极限下收敛到本讲的 $S^</em> = \dfrac{2r}{2r + \sigma^2}K$。</p>
+<p>后续可选方向（留待后续讲次）：<strong>Option 2</strong>——最优停止的概率视角：Snell 包络与变分不等式的严格桥梁；<strong>Option 3</strong>——罚函数法：把变分不等式化为无约束光滑 PDE 并写出算法（与 M1 直接衔接）。</p>
+<p class="meta">2026-11-03 发布 · 类型：金融建模</p>
+<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title">赞赏我的开发</div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label">微信</div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label">支付宝</div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var label=effective()==='dark'?'浅色模式':'深色模式';
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+  }
+  document.querySelectorAll('.theme-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
