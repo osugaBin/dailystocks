@@ -24,14 +24,14 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <h2>一、公式原理</h2>
 <h3>1. 箱体与回归通道（位置的度量衡）</h3>
 <ul>
-<li><strong>箱体</strong>：取近 180 个交易日价格的稳健分位数定界——下沿 $\text{Box}<em>{lower}$ ≈ 20% 分位、上沿 $\text{Box}</em>{upper}$ ≈ 80% 分位（密集成交区近似），箱高 $\text{Box}<em>{range} = \text{Box}</em>{upper} - \text{Box}<em>{lower}$，中轴 $\text{Box}</em>{mid} = (\text{Box}<em>{lower} + \text{Box}</em>{upper})/2$。</li>
+<li><strong>箱体</strong>：取近 180 个交易日价格的稳健分位数定界——下沿 $\text{Box}_{lower}$ ≈ 20% 分位、上沿 $\text{Box}_{upper}$ ≈ 80% 分位（密集成交区近似），箱高 $\text{Box}_{range} = \text{Box}_{upper} - \text{Box}_{lower}$，中轴 $\text{Box}_{mid} = (\text{Box}_{lower} + \text{Box}_{upper})/2$。</li>
 <li><strong>回归通道</strong>：对价格做线性回归得中轨与 $\pm 2\sigma$ 通道，用于判断通道方向（上升 / 横向 / 下降）与中轨末端值 $\text{Ch}_{mid}$。</li>
 <li><strong>ATR</strong>：14 日平均真实波幅，度量"正常波动有多大"，供止损距离标定。</li>
 <li><strong>原理</strong>：均值回归策略的前提是价格在箱体内震荡。箱体用分位数而非最高/最低价，是为了让边界代表"成交密集区"而非极端毛刺；破位后箱体<strong>锁定不随新低下移</strong>，防止"箱体追着价格跑、永远提示买入"的死锁。</li>
 </ul>
 <h3>2. Box 位置与信号</h3>
 <p>$$
-\text{Pos} = \frac{P_{close} - \text{Box}<em>{lower}}{\text{Box}</em>{range}}
+\text{Pos} = \frac{P_{close} - \text{Box}_{lower}}{\text{Box}_{range}}
 $$</p>
 <ul>
 <li>$\text{Pos} \le 0.25$ → <strong>BUY</strong>（挂下沿限价买单）</li>
@@ -87,7 +87,7 @@ $$</p>
 <p><strong>原理</strong>：跳空低开越过下沿 1.50% 以上，说明下沿已被市场用脚投票否定，此时按原价买入等于接飞刀——宁可错过，不可接错。</p>
 <h3>6. 硬止损（下单前算死、建仓即锁定）</h3>
 <p>$$
-D_{stop} = \min\left(1.0 \times \text{ATR},\; 0.20 \times \text{Box}<em>{range}\right), \quad D</em>{stop} \ge 2.50\% \times \text{Limit}; \qquad \text{Stop} = \text{Box}<em>{lower} - D</em>{stop}
+D_{stop} = \min\left(1.0 \times \text{ATR},\; 0.20 \times \text{Box}_{range}\right), \quad D_{stop} \ge 2.50\% \times \text{Limit}; \qquad \text{Stop} = \text{Box}_{lower} - D_{stop}
 $$</p>
 <p>（若外部报告另有 S4 硬止损位，取两者中更高、即更严者。）</p>
 <ul>
@@ -97,7 +97,7 @@ $$</p>
 </ul>
 <h3>7. 三阶止盈（3:4:3，分位数兑现）</h3>
 <p>$$
-\text{TP1} = \max\left(\text{Box}<em>{mid},\; \text{Ch}</em>{mid}\right) \;(\text{且} \ge \text{Limit} \times 1.02), \qquad \text{TP2} = \text{Box}<em>{lower} + 0.80 \times \text{Box}</em>{range}, \qquad \text{TP3} = \min\left(\text{Box}<em>{upper},\; \text{Ch}</em>{+2\sigma}\right)
+\text{TP1} = \max\left(\text{Box}_{mid},\; \text{Ch}_{mid}\right) \;(\text{且} \ge \text{Limit} \times 1.02), \qquad \text{TP2} = \text{Box}_{lower} + 0.80 \times \text{Box}_{range}, \qquad \text{TP3} = \min\left(\text{Box}_{upper},\; \text{Ch}_{+2\sigma}\right)
 $$</p>
 <p>（阶梯须严格递增，相邻至少差 0.02。）卖出股数：TP1 = 总股数 × 30%（向下取整到手），TP2 = × 40%，TP3 = 剩余全部。</p>
 <p><strong>原理</strong>：TP1 在中轴/中轨先收回三成（落袋 + 降低成本基数），TP2 在 0.80 分位兑现主力四成，TP3 留三成博上沿极值。涨一段锁一段，与止损的刚性对称——下行有底、上行分段。</p>
@@ -325,7 +325,7 @@ $$</p>
 </tbody>
 </table>
 <blockquote>
-<p>说明：Gemini 稿曾对 TP1 的 14.55 与中轴 13.86 不一致感到含糊——按代码公式 $\text{TP1} = \max(\text{Box}<em>{mid}, \text{Ch}</em>{mid})$，回归中轨末端 14.55 高于箱体中轴 13.86，故取 14.55，并非笔误。</p>
+<p>说明：Gemini 稿曾对 TP1 的 14.55 与中轴 13.86 不一致感到含糊——按代码公式 $\text{TP1} = \max(\text{Box}_{mid}, \text{Ch}_{mid})$，回归中轨末端 14.55 高于箱体中轴 13.86，故取 14.55，并非笔误。</p>
 </blockquote>
 <h3>11-03 盘中判定：T0 成交</h3>
 <table>
