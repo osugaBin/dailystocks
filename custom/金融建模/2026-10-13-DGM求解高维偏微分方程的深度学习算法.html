@@ -41,16 +41,12 @@ $$</p>
 <p>$\nabla G$ 是 $\nabla J$ 的无偏估计，SGD 平均意义下沿下降方向走。从不构造网格——采样点可以逐批处理，内存占用与维度无关，这是 DGM 能上高维的根本原因。</p>
 <h2>三、网络架构：为什么用类 LSTM 结构</h2>
 <p>PDE 的解常有"急转弯"：如期权终值 $\max(p(x),0)$ 在 $p(x)=0$ 处一阶导数不连续，扩散项虽有光滑作用，解在某些区域仍变化剧烈。普通全连接网络拟合这类形态吃力，论文采用<strong>类似 LSTM 的门控架构</strong>：</p>
-<p>$$
-\begin{aligned}
-S^1 &amp;= \sigma(W^1 x + b^1) \
-Z^\ell &amp;= \sigma(U^{z,\ell}x + W^{z,\ell}S^\ell + b^{z,\ell}) \
-G^\ell &amp;= \sigma(U^{g,\ell}x + W^{g,\ell}S^\ell + b^{g,\ell}) \
-R^\ell &amp;= \sigma(U^{r,\ell}x + W^{r,\ell}S^\ell + b^{r,\ell}) \
-H^\ell &amp;= \sigma(U^{h,\ell}x + W^{h,\ell}(S^\ell \odot R^\ell) + b^{h,\ell}) \
-S^{\ell+1} &amp;= (1-G^\ell)\odot H^\ell + Z^\ell \odot S^\ell
-\end{aligned}
-$$</p>
+<p>$$S^1 = \sigma(W^1 x + b^1)$$</p>
+<p>$$Z^\ell = \sigma(U^{z,\ell}x + W^{z,\ell}S^\ell + b^{z,\ell})$$</p>
+<p>$$G^\ell = \sigma(U^{g,\ell}x + W^{g,\ell}S^\ell + b^{g,\ell})$$</p>
+<p>$$R^\ell = \sigma(U^{r,\ell}x + W^{r,\ell}S^\ell + b^{r,\ell})$$</p>
+<p>$$H^\ell = \sigma(U^{h,\ell}x + W^{h,\ell}(S^\ell \odot R^\ell) + b^{h,\ell})$$</p>
+<p>$$S^{\ell+1} = (1-G^\ell)\odot H^\ell + Z^\ell \odot S^\ell$$</p>
 <p>其中 $\odot$ 为逐元素乘法。反复的门控乘法让网络能表达在局部剧烈变化的函数，类似 LSTM/highway network 的思想。论文用 $L=3$（4个隐藏层）、每层 $M=50$、$\tanh$ 激活（保证解光滑、求经典解）；训练用 ADAM + 分段衰减学习率，约 10 万次迭代、每批 5000 个采样点（6 GPU 异步 SGD，总计约 5 亿个时空点）。</p>
 <h2>四、二阶导数的高效计算：蒙特卡洛近似</h2>
 <p>$\mathcal{L}f$ 含二阶导 $\partial^2 f/\partial x_i\partial x_j$，$d=200$ 时有 2 万个二阶导要算，直接自动微分的计算与内存成本为 $O(d^2N)$（$N$ 为批量）。论文第3节给出蒙特卡洛近似：利用恒等式</p>
@@ -83,7 +79,7 @@ $$</p>
 </ol>
 <hr />
 <p><em>解读人注：arXiv:1708.07469；200维实验基于 Blue Waters 超算。引用公式与定理编号请以原文为准。</em></p>
-<p class="meta"><span class="lz">2026-10-13 发布 · 类型：金融建模</span><span class="le">Published 2026-10-13 · Financial Modeling</span></p>
+<p class="meta"><span class="lz">2026-10-13 发布 · 2026-11-04 更新 · 类型：金融建模</span><span class="le">Published 2026-10-13 · Updated 2026-11-04 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
