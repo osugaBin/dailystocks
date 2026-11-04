@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-100万组合模拟仓 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>DrX-100万组合模拟仓</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This page documents a CNY 1,000,000 simulated portfolio that runs three independent strategy sleeves side by side. A CNY 300,000 sleeve trades Xinjinlu (000510.SZ) under the mechanical box-regression rule set; a CNY 400,000 value sleeve tracks six industry leaders for pullback entries; and a CNY 300,000 trend sleeve scans seven semiconductor and AI-theme names for right-side breakouts. Each sleeve keeps its own budget, signals and risk limits, and the combined book is marked to market every trading day with an interactive candlestick-style equity curve. In the current phase the value and trend sleeves record signals and valuations without auto-executing, so the page functions as an auditable lab notebook: every rule is stated in advance, every signal is logged, and performance can be attributed sleeve by sleeve. The design goal is discipline under drawdowns - position size and exits are decided by pre-committed formulas, not by intraday sentiment.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年10月14日 · 每日收盘后更新</p>
 <blockquote>
@@ -294,7 +294,7 @@
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

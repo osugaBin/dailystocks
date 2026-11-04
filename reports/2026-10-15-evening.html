@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>A股收盘技术分析报告 · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../assets/style.css?v=20261104b">
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>A股收盘技术分析报告</h1>
 <blockquote>
 <p>数据说明：本报告于 2026-10-15 生成，数据为当日（周四）收盘；三脚本（fetch/analyze/sell_timing）已刷新当日数据（股票池最新日期 20261015），技术指标以本次 fresh CSV 为准。新浪六指数 f2（昨收）与 10-14 已核验收盘逐点一致（上证 3767.23、深成 12110.59、创业板 2866.76、科创50 1380.26、沪深300 4217.68、中证500 6980.11），口径同源。Tushare 当日 IP 限流：中芯国际、阳光电源、汇川技术 3 只改用东财 push2his 前复权补拉当日日 K，3M 最高等历史口径为前复权，与 Tushare 不复权口径略有差异。当日晨报联动：早间对标映射报告预测"低开震荡、结构分化"（见 comparison/美股A股对标映射分析_20261015），低开与防御领涨兑现，但科技链跌幅超预期、"杀跌抛压有限"被证伪。</p>
@@ -775,7 +775,7 @@
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

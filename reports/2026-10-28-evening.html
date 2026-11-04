@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>A股收盘技术分析报告 · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../assets/style.css?v=20261104b">
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>A股收盘技术分析报告</h1>
 <blockquote>
 <p>本报告于 2026-10-28（周三）晚间生成，数据截至 2026年10月28日收盘。股票池数据经 Tushare Pro 三脚本当日刷新（最新日期 20261028），大盘指数取自新浪财经实时接口，新浪昨收（f2）与 10 月 27 日已核验报告收盘逐点一致，口径同源。同日晨间对标报告（美股A股对标映射分析_20261028）用于交叉验证昨日收盘与当日消息。</p>
@@ -397,7 +397,7 @@
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

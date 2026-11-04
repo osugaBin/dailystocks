@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-变分法金融数学学习路径：三本书、四阶段与策略实现规划 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>DrX-变分法金融数学学习路径：三本书、四阶段与策略实现规划</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This is the roadmap for a self-study programme that connects three books: Zhang Gongqing&#x27;s Lectures on the Calculus of Variations as the skeleton (it poses the problems), Oksendal&#x27;s Stochastic Differential Equations as the toolbox (it supplies the rigorous language), and Nualart&#x27;s Malliavin Calculus as the lift to infinite dimensions (differentiation on Wiener space, whose integration-by-parts formula computes Greeks without differentiating the payoff). The path runs in four stages of roughly three weeks each - classical variational methods and duality; stochastic analysis foundations; stochastic control and dual pricing; stochastic variational methods and extreme risk - each with an explicit pass criterion. Attached is an engineering plan of five milestones that turns the theory into running, simulated systems on this site: an HJB variational-inequality solver, a Malliavin-weight Greeks and hedging engine, a pairs-trading HJB simulation, a large-deviation risk gauge for the tracked stock universe, and a constrained portfolio solver - each shipped small, benchmarked, and subordinated to the existing trading discipline.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
 <blockquote>
@@ -220,7 +220,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

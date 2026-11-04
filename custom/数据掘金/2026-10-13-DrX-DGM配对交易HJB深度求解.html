@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-DGM：以深度学习求解配对交易 HJB 变分不等式 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>DrX-DGM：以深度学习求解配对交易 HJB 变分不等式</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report applies the Deep Galerkin Method (DGM) to the Hamilton-Jacobi-Bellman variational inequality of an optimal pairs-trading problem (Tie, Zhang &amp; Zhang, 2017), whose free boundary - the entry and exit thresholds of the trade - is known in closed form: k1 = 1.038 and k2 = 1.283 under the paper&#x27;s Target/Walmart calibration. A NumPy multilayer perceptron with hand-coded backpropagation is trained for 8,000 iterations on randomly sampled collocation points, with no mesh and no labeled data. The learned value surface is smooth and qualitatively correct, but the trading boundaries extracted from its curvature peaks (1.341 and 1.411) deviate from the closed form by 29.1% and 9.9%. The diagnosis is structural: a smooth network rounds off the kink that the smooth-fit conditions place exactly at the free boundary. The exercise provides a reproducible baseline for neural PDE solvers in stochastic control, and a caution on reading decision boundaries off smooth approximators.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年10月13日</p>
 <h2>Abstract</h2>
@@ -142,7 +142,7 @@ $$\min\lbrace \rho w_1 - Lw_1,\ w_1 - w_0 - \beta_s + \beta_by \rbrace = 0, \tag
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

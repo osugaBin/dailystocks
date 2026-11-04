@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>A股收盘技术分析报告 · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../assets/style.css?v=20261104b">
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>A股收盘技术分析报告</h1>
 <blockquote>
 <p>A股休市，本期为新闻版：本报告于 2026-11-01（周日）生成，A股当日休市，跳过三脚本数据刷新与一切技术指标计算（不重复数据分析），数据表格全部省略；报告以 11 月 1 日重要新闻汇总 + 板块/个股新闻点评为核心。周五（10 月 30 日）A股收盘技术分析见 20261030 期报告，本期不再重复；周五收盘要点引用自该期已核验报告：上证 3599.02 点（跌 1.44%，失守 3600 点），深成跌 2.73%，创业板跌 4.13%，科创 50 跌 5.48%，两市成交约 1.67 万亿。</p>
@@ -148,7 +148,7 @@
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

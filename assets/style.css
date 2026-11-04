@@ -71,6 +71,11 @@ section[hidden]{display:none!important}
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
 .back{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
+.head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.head-row .lang-toggle{flex:none;margin-top:4px}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top-row .back{margin:0}
+.top-row .lang-toggle{flex:none}
 /* report body */
 h1{font-size:1.45rem;border-bottom:2px solid #333;padding-bottom:8px}
 h2{font-size:1.2rem;color:#1a1a1a;margin-top:1.4em;border-left:4px solid var(--accent);padding-left:10px}

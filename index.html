@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261104a">
+<link rel="stylesheet" href="assets/style.css?v=20261104b">
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
 <header class="site-head">
-<h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1>
+<div class="head-row"><h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <div class="sub-row">
 <p><span class="lz">数据驱动 · 行情复盘 · 金融建模</span><span class="le">Data-Driven · Market Review · Financial Modeling</span></p>
-<div class="head-btns"><button type="button" class="theme-toggle lang-toggle">EN</button><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
+<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
 </div>
 </header>
 <div class="tabs" role="tablist">
@@ -292,7 +292,7 @@
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

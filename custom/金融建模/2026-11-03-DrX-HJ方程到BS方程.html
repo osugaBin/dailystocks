@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Lecture 1 of a study series that rebuilds mathematical finance on the variational calculus of Zhang Gongqing&#x27;s Lectures on the Calculus of Variations. The lecture asks a single question: where does the Black-Scholes equation actually come from? Starting from the deterministic Hamilton-Jacobi equation of classical mechanics, it lifts the problem to finance by dynamic programming under geometric Brownian motion: Ito&#x27;s lemma turns the Bellman principle into the Hamilton-Jacobi-Bellman equation, the delta-hedging argument identifies the generalized momentum with the hedge ratio and eliminates the drift, and the Black-Scholes PDE falls out - with the Feynman-Kac formula closing the loop back to a probabilistic representation. A term-by-term table maps every object of the derivation onto its variational counterpart (value function, momentum, Legendre transform), setting up the series&#x27; three-stage plan: classical variational methods and duality, stochastic variational methods and large deviations, and optimal control. Exercises point to the Legendre duality developed later in the course.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
 <blockquote>
@@ -196,7 +196,7 @@ $$</p>
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

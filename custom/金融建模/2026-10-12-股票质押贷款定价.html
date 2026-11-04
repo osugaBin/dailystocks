@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>股票质押贷款定价：区制切换均值回归模型下的闭式解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>股票质押贷款定价：区制切换均值回归模型下的闭式解</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>A stock loan - cash borrowed against pledged shares, with the borrower free to walk away if the price falls - is economically a European call option on the pledged stock. Prager &amp; Zhang (2010, Journal of Systems Science and Complexity) price it in the setting practitioners actually face: finite maturity, and a share price that switches once between a geometric Brownian (trending) regime and a mean-reverting (range-bound) regime, capturing the way a stock alternates between momentum and consolidation over a loan&#x27;s life. The article explains the contract mechanics (loan amount, service fee, redemption price growing at the lending rate), derives the closed-form valuation across the two regimes, and examines how the loan value and the implied safe lending ratio respond to volatility, mean-reversion speed, maturity and the switching intensity. A final section discusses the relevance to China&#x27;s large stock-pledge market, where margin-call spirals in falling markets made exactly these parameters a systemic concern.</p></div>
 <p>股票质押贷款——借款人拿股票做抵押借钱，股价涨了就赎回，跌多了就违约走人。从定价角度看，它本质上是一个欧式看涨期权。Prager &amp; Zhang (2010) 把前人的无限期限模型推进到<strong>有限期限</strong>，并允许股价在<strong>几何布朗运动（趋势市）</strong>与<strong>均值回归（震荡市）</strong>之间切换一次，给出了贷款价值的闭式公式。本文解读其模型、公式与数值结论，并讨论它对A股股票质押业务的现实意义。</p>
 <blockquote>
@@ -153,7 +153,7 @@ $$</p>
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);

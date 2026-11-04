@@ -98,6 +98,11 @@ section[hidden]{display:none!important}
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
 .meta{color:var(--muted);font-size:.8rem;margin-top:8px}
 .back{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.9rem}
+.head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.head-row .lang-toggle{flex:none;margin-top:4px}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top-row .back{margin:0}
+.top-row .lang-toggle{flex:none}
 /* report body */
 h1{font-size:1.45rem;border-bottom:2px solid #333;padding-bottom:8px}
 h2{font-size:1.2rem;color:#1a1a1a;margin-top:1.4em;border-left:4px solid var(--accent);padding-left:10px}
@@ -248,16 +253,16 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261104a">
+<link rel="stylesheet" href="assets/style.css?v=20261104b">
 {themeinit}
 </head>
 <body>
 <div class="wrap">
 <header class="site-head">
-<h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1>
+<div class="head-row"><h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <div class="sub-row">
 <p><span class="lz">数据驱动 · 行情复盘 · 金融建模</span><span class="le">Data-Driven · Market Review · Financial Modeling</span></p>
-<div class="head-btns"><button type="button" class="theme-toggle lang-toggle">EN</button><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
+<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
 </div>
 </header>
 {content}
@@ -298,14 +303,14 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261104a">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261104b">
 {mathjax}
 {themeinit}
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="{root}index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="{root}index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
 {body}
 <p class="meta">{meta_line}</p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
@@ -667,7 +672,7 @@ THEME_SCRIPT = """<script>
     document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
   window.drxPaintTheme=paint;
-  document.querySelectorAll('.theme-toggle').forEach(function(b){
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
