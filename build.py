@@ -710,7 +710,7 @@ def collect_custom():
 
 
 def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
-         update_date=""):
+         update_date="", title_html=""):
     badges = (f'<span class="badge {rtype}">{bi(TYPE_LABEL[rtype], TYPE_LABEL_EN[rtype])}</span>'
               f'<span class="badge date">{bi(pub_date + " 发布", "Published " + pub_date)}</span>')
     if update_date and update_date > pub_date:
@@ -723,7 +723,8 @@ def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
     excerpt_html = (f'<p class="excerpt">{htmlmod.escape(excerpt)}</p>'
                     if excerpt else "")
     return CARD_TMPL.format(
-        href=href, badges=badges, title=htmlmod.escape(title),
+        href=href, badges=badges,
+        title=title_html if title_html else htmlmod.escape(title),
         excerpt_html=excerpt_html, meta=meta)
 
 
@@ -779,7 +780,20 @@ def build():
             slug = f"{date}-{name}"
             upd = last_update_date(src, text, date)
             body = collapse_daily_records(md_to_html(text))
-            abs_text = ABSTRACTS.get(slug)
+            _entry = ABSTRACTS.get(slug) or {}
+            if isinstance(_entry, str):
+                _entry = {"abstract": _entry}
+            title_en = _entry.get("title", "")
+            title_html = ""
+            if title_en:
+                title_html = bi(htmlmod.escape(title),
+                                htmlmod.escape(title_en))
+                body = re.sub(
+                    r"<h1>(.*?)</h1>",
+                    lambda m: "<h1>" + bi(m.group(1),
+                                          htmlmod.escape(title_en)) + "</h1>",
+                    body, count=1, flags=re.S)
+            abs_text = _entry.get("abstract", "")
             if abs_text:
                 _box = ('<div class="abstract"><h3>'
                         + bi("英文摘要", "Abstract")
@@ -811,7 +825,8 @@ def build():
             print(f"file: {href}")
         tab_cards[tab_id].append(
             card(href, tab_id, date, title, excerpt, date,
-                 update_date=upd))
+                 update_date=upd,
+                 title_html=title_html if ext == "md" else ""))
 
     panels = {
         "daily": (bi("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析 — 定时任务自动更新",
