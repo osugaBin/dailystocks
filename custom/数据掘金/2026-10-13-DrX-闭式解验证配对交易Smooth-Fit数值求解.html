@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Before trusting a neural-network solver, its benchmark must itself be verified. This technical report independently reproduces the closed-form solution reported in Section 6 of Tie, Zhang &amp; Zhang (2017) for optimal pairs trading under geometric Brownian motion. Starting from the paper&#x27;s Target/Walmart calibration (drifts 0.2059 and 0.2459, correlation structure and a proportional transaction cost K = 0.001), the value function is reduced to a one-dimensional problem in the price ratio, and the entry and exit thresholds are obtained by solving the smooth-fit algebraic system to full precision: k1 = 1.038 and k2 = 1.283, matching the paper&#x27;s rounded values 1.039 and 1.282. Every intermediate quantity - the reduced volatility, the characteristic roots and the constants of the general solution - is derived and cross-checked. The verified solution serves as the exact reference against which the companion DGM study measures its approximation error.</p></div>
 <p><strong>对象</strong>: Tie, Zhang &amp; Zhang (2017, JOTA) 配对交易论文 §6 的闭式解
 <strong>目标</strong>: 独立复现论文报告的 $k_1=1.039$、$k_2=1.282$（Target/Walmart 校准）
 <strong>日期</strong>: 2026-10-13
@@ -293,19 +293,19 @@ $$</p>
 <hr />
 <h2>10. 结论</h2>
 <p>独立复现了论文的闭式解：$k_1 = 1.0380$、$k_2 = 1.2831$，与论文报告的 1.039、1.282 一致（0.1% 相对误差，属三位小数舍入范围）。Smooth-fit 残差达机器精度，PDE 与变分不等式检验全部通过。该闭式解作为 DGM 数值实验的精确基准可靠。</p>
-<p class="meta">2026-10-13 发布 · 类型：数据掘金</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-13 发布 · 类型：数据掘金</span><span class="le">Published 2026-10-13 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -333,14 +333,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

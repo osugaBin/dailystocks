@@ -11,6 +11,7 @@
 import os
 import re
 import html as htmlmod
+import json
 from datetime import date as _date, datetime as _datetime
 
 import markdown
@@ -52,6 +53,13 @@ body{
   cursor:pointer;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;white-space:nowrap}
 .theme-toggle:hover{border-color:var(--accent)}
 .actions .theme-toggle{border-radius:8px}
+.le{display:none}
+html[data-lang="en"] .le{display:inline}
+html[data-lang="en"] .lz{display:none}
+.abstract{border:1px solid var(--line);border-left:3px solid var(--accent);
+  background:var(--card);border-radius:8px;padding:12px 16px;margin:16px 0 20px}
+.abstract h3{margin:0 0 6px;font-size:.95rem;border:none;padding:0}
+.abstract p{margin:0;font-size:.92rem}
 a{color:var(--accent)}
 .section-title{font-size:1.15rem;margin:26px 0 4px;border:none;padding:0}
 .section-hint{color:var(--muted);font-size:.82rem;margin:0 0 14px;
@@ -240,20 +248,20 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261102b">
+<link rel="stylesheet" href="assets/style.css?v=20261104a">
 {themeinit}
 </head>
 <body>
 <div class="wrap">
 <header class="site-head">
-<h1>DrX Daily · 每日市场洞察</h1>
+<h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1>
 <div class="sub-row">
-<p>数据驱动 · 行情复盘 · 金融建模</p>
-<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html">及时快讯</a></div>
+<p><span class="lz">数据驱动 · 行情复盘 · 金融建模</span><span class="le">Data-Driven · Market Review · Financial Modeling</span></p>
+<div class="head-btns"><button type="button" class="theme-toggle lang-toggle">EN</button><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
 </div>
 </header>
 {content}
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <script>
 (function(){
@@ -290,17 +298,17 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261102b">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261104a">
 {mathjax}
 {themeinit}
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="{root}index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<p class="back"><a href="{root}index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
 {body}
 <p class="meta">{meta_line}</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 {donatefloat}
 </body>
@@ -497,6 +505,20 @@ def extract_html_title(text):
 
 CUSTOM_DIRS = {"数据掘金": "data", "金融建模": "model"}  # custom/ 子目录 -> tab id
 TAB_LABELS = {"daily": "每日报告", "data": "数据掘金", "model": "金融建模"}
+TYPE_LABEL_EN = {"morning": "Morning", "evening": "Evening", "custom": "Other",
+                 "data": "Data Mining", "model": "Financial Modeling"}
+TAB_LABELS_EN = {"daily": "Daily Reports", "data": "Data Mining",
+                 "model": "Financial Modeling"}
+
+def bi(zh, en):
+    """双语 span：默认中文，html[data-lang="en"] 时显示英文（CSS + LANG_SCRIPT）。"""
+    return f'<span class="lz">{zh}</span><span class="le">{en}</span>'
+
+ABSTRACTS = {}
+_abs_file = os.path.join(SITE, "abstracts.json")
+if os.path.exists(_abs_file):
+    with open(_abs_file, encoding="utf-8") as _f:
+        ABSTRACTS = json.load(_f)
 MSG_DIR = os.path.join(CUSTOM_DIR, "快讯")  # 及时消息：YYYY-MM-DD-HHMM-标题.md
 
 
@@ -526,10 +548,11 @@ def build_messages_page(messages):
             f'<article class="msg" id="{anchor}">'
             f'<div class="msg-meta">{date} {hm}</div>'
             f"<h2>{htmlmod.escape(title)}</h2>{body}</article>")
-    content = "\n".join(blocks) if blocks else '<p class="empty">暂无快讯</p>'
+    content = "\n".join(blocks) if blocks else f'<p class="empty">{bi("暂无快讯", "No alerts yet")}</p>'
     page = PAGE_TMPL.format(
         title="及时快讯", body=content,
-        meta_line=f"共 {len(messages)} 条 · 按时间倒序", root="", mathjax="",
+        meta_line=bi(f"共 {len(messages)} 条 · 按时间倒序",
+                     f"{len(messages)} alerts - newest first"), root="", mathjax="",
         themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
     with open(os.path.join(SITE, "messages.html"), "w",
               encoding="utf-8") as f:
@@ -551,9 +574,9 @@ def build_msgfloat(messages):
                if excerpt else "")
             + f'<span class="d">{date} {hm}</span></a>')
     return f"""<div id="msgfloat">
-  <button id="msgfloat-btn" type="button"><span>及时快讯</span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
+  <button id="msgfloat-btn" type="button"><span><span class="lz">及时快讯</span><span class="le">Market Alerts</span></span><span class="msgfloat-dot" id="msgfloat-dot"></span></button>
   <div id="msgfloat-panel" hidden>
-    <div class="msgfloat-head"><b>及时快讯</b><a href="messages.html">全部存档 →</a></div>
+    <div class="msgfloat-head"><b><span class="lz">及时快讯</span><span class="le">Market Alerts</span></b><a href="messages.html"><span class="lz">全部存档 →</span><span class="le">All Alerts →</span></a></div>
     <div class="msgfloat-list">{item}</div>
   </div>
 </div>
@@ -575,15 +598,15 @@ def build_msgfloat(messages):
 
 
 DONATEFLOAT_HTML = """<div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -609,6 +632,28 @@ DONATEFLOAT_HTML = """<div id="donatefloat">
 
 THEME_INIT = """<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>"""
 
+LANG_INIT = """<script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>"""
+THEME_INIT = THEME_INIT + LANG_INIT
+
+LANG_SCRIPT = """<script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'\u4e2d\u6587':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>"""
+
 THEME_SCRIPT = """<script>
 (function(){
   function effective(){
@@ -617,9 +662,11 @@ THEME_SCRIPT = """<script>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'\u6d45\u8272\u6a21\u5f0f':'\u6df1\u8272\u6a21\u5f0f';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'\u6d45\u8272\u6a21\u5f0f'):(en?'Dark Mode':'\u6df1\u8272\u6a21\u5f0f');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
@@ -635,7 +682,7 @@ THEME_SCRIPT = """<script>
 
 def donatefloat_html(root=""):
     """donate float + theme script; subpages prefix image paths with root, close state shared site-wide."""
-    return DONATEFLOAT_HTML.replace('src="assets/', 'src="' + root + 'assets/') + THEME_SCRIPT
+    return DONATEFLOAT_HTML.replace('src="assets/', 'src="' + root + 'assets/') + THEME_SCRIPT + LANG_SCRIPT
 
 
 def collect_custom():
@@ -659,15 +706,15 @@ def collect_custom():
 
 def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
          update_date=""):
-    badges = (f'<span class="badge {rtype}">{TYPE_LABEL[rtype]}</span>'
-              f'<span class="badge date">{pub_date} 发布</span>')
+    badges = (f'<span class="badge {rtype}">{bi(TYPE_LABEL[rtype], TYPE_LABEL_EN[rtype])}</span>'
+              f'<span class="badge date">{bi(pub_date + " 发布", "Published " + pub_date)}</span>')
     if update_date and update_date > pub_date:
-        badges += f'<span class="badge update">{update_date} 更新</span>' 
+        badges += f'<span class="badge update">{bi(update_date + " 更新", "Updated " + update_date)}</span>' 
     if news_note:
-        badges += '<span class="badge news">新闻版</span>'
-        meta = "本期为新闻版"
+        badges += f'<span class="badge news">{bi("新闻版", "News Edition")}</span>'
+        meta = bi("本期为新闻版", "News edition")
     else:
-        meta = f"数据基准 {data_date}"
+        meta = bi(f"数据基准 {data_date}", f"Data as of {data_date}")
     excerpt_html = (f'<p class="excerpt">{htmlmod.escape(excerpt)}</p>'
                     if excerpt else "")
     return CARD_TMPL.format(
@@ -697,14 +744,14 @@ def build():
             body_md = ("# " + title + "\n\n> " + note + "\n\n"
                        + news_edition_body(text, news_cfg))
             excerpt = news_cfg["summary"]
-            meta_line = (f"发布日期：{pub_date} · 类型：{TYPE_LABEL[rtype]}"
-                         f" · 本期为新闻版")
+            meta_line = bi(f"发布日期：{pub_date} · 类型：{TYPE_LABEL[rtype]} · 本期为新闻版",
+                           f"Published {pub_date} · {TYPE_LABEL_EN[rtype]} · News edition")
         else:
             body_md = re.sub(r"^#\s+.+$", "# " + title, text,
                              count=1, flags=re.M)
             excerpt = extract_excerpt(text)
-            meta_line = (f"发布日期：{pub_date} · 数据基准：{data_date}"
-                         f" · 类型：{TYPE_LABEL[rtype]}")
+            meta_line = bi(f"发布日期：{pub_date} · 数据基准：{data_date} · 类型：{TYPE_LABEL[rtype]}",
+                           f"Published {pub_date} · Data as of {data_date} · {TYPE_LABEL_EN[rtype]}")
         body = md_to_html(body_md)
         page = PAGE_TMPL.format(
             title=htmlmod.escape(title), body=body, meta_line=meta_line,
@@ -727,10 +774,18 @@ def build():
             slug = f"{date}-{name}"
             upd = last_update_date(src, text, date)
             body = collapse_daily_records(md_to_html(text))
-            meta_line = f"{date} 发布 · 类型：{TAB_LABELS[tab_id]}"
+            abs_text = ABSTRACTS.get(slug)
+            if abs_text:
+                _box = ('<div class="abstract"><h3>'
+                        + bi("英文摘要", "Abstract")
+                        + f'</h3><p>{htmlmod.escape(abs_text)}</p></div>')
+                body = (body.replace("</h1>", "</h1>" + _box, 1)
+                        if "</h1>" in body else _box + body)
+            meta_line = bi(f"{date} 发布 · 类型：{TAB_LABELS[tab_id]}",
+                           f"Published {date} · {TAB_LABELS_EN[tab_id]}")
             if upd > date:
-                meta_line = (f"{date} 发布 · {upd} 更新"
-                             f" · 类型：{TAB_LABELS[tab_id]}")
+                meta_line = bi(f"{date} 发布 · {upd} 更新 · 类型：{TAB_LABELS[tab_id]}",
+                               f"Published {date} · Updated {upd} · {TAB_LABELS_EN[tab_id]}")
             page = PAGE_TMPL.format(
                 title=htmlmod.escape(title), body=body,
                 meta_line=meta_line,
@@ -754,14 +809,15 @@ def build():
                  update_date=upd))
 
     panels = {
-        "daily": ("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析"
-                  " — 定时任务自动更新", [c for _, c in daily_cards],
+        "daily": (bi("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析 — 定时任务自动更新",
+                     "Morning · US-China cross-market mapping / Evening · A-share close technical analysis - updated automatically on schedule"),
+                  [c for _, c in daily_cards],
                   f"archive-{daily_cards[0][0][:7]}.html" if daily_cards else ""),
-        "data": ("量化分析与数据挖掘 — 把 .md / .html 按 "
-                 "<code>YYYY-MM-DD-标题</code> 命名放入 custom/数据掘金/ 重新构建",
+        "data": (bi("量化分析与数据挖掘 — 把 .md / .html 按 <code>YYYY-MM-DD-标题</code> 命名放入 custom/数据掘金/ 重新构建",
+                    "Quantitative analysis and data mining - research notes and reproducible strategy studies"),
                  tab_cards["data"], "archive-data.html"),
-        "model": ("金融建模相关报告 — 把 .md / .html 按 "
-                  "<code>YYYY-MM-DD-标题</code> 命名放入 custom/金融建模/ 重新构建",
+        "model": (bi("金融建模相关报告 — 把 .md / .html 按 <code>YYYY-MM-DD-标题</code> 命名放入 custom/金融建模/ 重新构建",
+                     "Financial modeling - paper studies and derivations in stochastic control, variational methods and derivatives pricing"),
                   tab_cards["model"], "archive-model.html"),
     }
     order = ["daily", "data", "model"]
@@ -772,17 +828,18 @@ def build():
         active = " active" if tid == "daily" else ""
         tabbar.append(
             f'<button class="tab{active}" data-tab="{tid}" role="tab">'
-            f'<span class="t">{TAB_LABELS[tid]}</span>'
-            f'<span class="count">{n} 篇</span></button>')
+            f'<span class="t">{bi(TAB_LABELS[tid], TAB_LABELS_EN[tid])}</span>'
+            f'<span class="count">{bi(str(n) + " 篇", str(n) + " posts")}</span></button>')
     tabbar.append("</div>")
     parts = ["\n".join(tabbar)]
     for tid in order:
         hint, cards, archive_href = panels[tid]
         shown = cards[:HOME_LIMIT]
-        inner = "\n".join(shown) if shown else '<p class="empty">暂无内容</p>'
+        inner = "\n".join(shown) if shown else f'<p class="empty">{bi("暂无内容", "No content yet")}</p>'
         if len(cards) > HOME_LIMIT and archive_href:
             inner += (f'<p class="more"><a href="{archive_href}">'
-                      f"查看全部 {len(cards)} 篇 →</a></p>")
+                      + bi(f"查看全部 {len(cards)} 篇 →", f"View all {len(cards)} →")
+                      + "</a></p>")
         hid = "" if tid == "daily" else " hidden"
         parts.append(
             f'<section id="tab-{tid}"{hid}>\n'
@@ -812,11 +869,12 @@ def build_archives(daily_cards, tab_cards):
         nav = " · ".join(
             f'<a href="archive-{m}.html">{m}</a>' if m != ym else f"<b>{m}</b>"
             for m in month_list)
-        body = (f'<p class="section-hint">按月归档 · {nav}</p>\n'
+        body = (f'<p class="section-hint">{bi("按月归档", "Monthly archive")} · {nav}</p>\n'
                 + "\n".join(months[ym]))
         page = PAGE_TMPL.format(
             title=f"每日报告归档 {ym}", body=body,
-            meta_line=f"{ym} · 共 {len(months[ym])} 篇", root="",
+            meta_line=bi(f"{ym} · 共 {len(months[ym])} 篇",
+                         f"{ym} - {len(months[ym])} reports"), root="",
             mathjax="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
         with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
                   encoding="utf-8") as f:
@@ -826,10 +884,10 @@ def build_archives(daily_cards, tab_cards):
     for tab_id, fname in (("data", "archive-data.html"),
                           ("model", "archive-model.html")):
         cards = tab_cards[tab_id]
-        body = "\n".join(cards) if cards else '<p class="empty">暂无内容</p>'
+        body = "\n".join(cards) if cards else f'<p class="empty">{bi("暂无内容", "No content yet")}</p>'
         page = PAGE_TMPL.format(
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
-            meta_line=f"共 {len(cards)} 篇", root="", mathjax="",
+            meta_line=bi(f"共 {len(cards)} 篇", f"{len(cards)} posts"), root="", mathjax="",
             themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
         with open(os.path.join(SITE, fname), "w",
                   encoding="utf-8") as f:

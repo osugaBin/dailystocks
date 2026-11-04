@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-专题例讲：美式期权的变分不等式与自由边界——障碍问题同构与永久美式看跌期权的解析解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DrX-专题例讲：美式期权的变分不等式与自由边界——障碍问题同构与永久美式看跌期权的解析解</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-专题例讲：美式期权的变分不等式与自由边界——障碍问题同构与永久美式看跌期权的解析解</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>An American option is an obstacle problem: the value function is a membrane held above the payoff obstacle, in contact where exercise is optimal and free where it is not. This lecture develops that isomorphism rigorously - from the dynamic programming principle through the Hamilton-Jacobi-Bellman variational inequality and its linear complementarity form, min(-Vt - L V, V - payoff) = 0, to viscosity solutions, the Snell envelope, and the two classical solution technologies, variational methods and penalty approximation. The worked example solves the perpetual American put in closed form: with gamma = 2r/sigma^2, value matching and smooth pasting give the exercise boundary S* = 2rK/(2r + sigma^2) and the value V = (K - S*)(S/S*)^(-gamma) in the holding region. For r = 5%, sigma = 20% and K = 100, S* = 71.43 and V(100) = 12.32. This closed form is adopted as the acceptance benchmark for the numerical HJB solver built later in the series.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
 <blockquote>
 <p>这是变分法系列的一个"例子讲"。第一讲停留在"构造无风险组合"的金融工程直觉上；这一讲不再停留在直觉，而是深入泛函分析与随机分析的底层，看确定性变分法（张恭庆第 5 讲）如何严格地泛化为随机动态规划，再用第 7 讲 §7.3 的障碍问题攻克美式期权定价，最后完整求解一个可解析的例子：<strong>永久美式看跌期权</strong>。其本质，是把第 5 讲"沿极值曲线求作用量"的思想，推广到"在概率测度空间中求期望泛函的极值"。</p>
@@ -207,19 +207,19 @@ $$</p>
 <h2>七、小结与后续</h2>
 <p>本讲把一条链完整走通：<strong>确定性变分（H-J）→ 随机动态规划（DPP/HJB/粘性解）→ 障碍问题（第 7 讲）→ 变分不等式/LCP → 自由边界 + 高联系条件 → 永久美式看跌的闭式解</strong>。有限到期（$T &lt; \infty$）的美式期权没有这样的解析解，$S^{\ast}(t)$ 随时间变化，只能数值求解——这正是学习路径中里程碑 <strong>M1（HJB 数值求解器）</strong> 的第一个验收案例：用 PSOR/罚方法数值解出的行权边界，应在 $T \to \infty$ 极限下收敛到本讲的 $S^{\ast} = \dfrac{2r}{2r + \sigma^2}K$。</p>
 <p>后续可选方向（留待后续讲次）：<strong>Option 2</strong>——最优停止（Optimal Stopping）的概率视角：如何用 Snell 包络和变分不等式建立严格的随机分析桥梁；<strong>Option 3</strong>——罚函数法：把变分不等式转化为一个无约束的光滑 PDE，并写出算法（与 M1 直接衔接）。</p>
-<p class="meta">2026-11-03 发布 · 类型：金融建模</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-11-03 发布 · 类型：金融建模</span><span class="le">Published 2026-11-03 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -247,14 +247,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

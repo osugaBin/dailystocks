@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>A股收盘技术分析报告 · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../assets/style.css?v=20261104a">
 
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>A股收盘技术分析报告</h1>
 <blockquote>
 <p>A股休市，本期为新闻版：本报告于 2026-10-31（周六）生成，A股当日休市，跳过三脚本数据刷新与一切技术指标计算（不重复数据分析），数据表格全部省略；报告以 10 月 30-31 日重要新闻汇总 + 板块/个股新闻点评为核心。周五（10 月 30 日）A股收盘技术分析见 20261030 期报告，本期不再重复。</p>
@@ -81,19 +81,19 @@
 <li>□ 纪律位：周五报告中的 S4 硬止损与止盈位继续有效，触及即执行，不因周末消息面改变纪律</li>
 </ul>
 <p><em>报告生成时间：2026-10-31 20:30（北京时间） | 数据截至：2026年10月30日（周五）收盘（上一交易日，引用自 10-30 已核验报告） | 本期为 A股休市新闻版，无技术指标计算与数据表格 | 基于公开新闻搜索摘要，尽量用国外平台信息，中国国内新闻采信中国网页信息</em></p>
-<p class="meta">发布日期：2026-10-31 · 数据基准：2026-10-30 · 类型：晚间</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">发布日期：2026-10-31 · 数据基准：2026-10-30 · 类型：晚间</span><span class="le">Published 2026-10-31 · Data as of 2026-10-30 · Evening</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -121,14 +121,33 @@
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

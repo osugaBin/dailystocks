@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>做空与滑点下的均值回归交易：四阈值最优规则 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>做空与滑点下的均值回归交易：四阈值最优规则</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>做空与滑点下的均值回归交易：四阈值最优规则</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Kong &amp; Zhang (2010, Discrete and Continuous Dynamical Systems - Series B) extend the two-threshold buy-low-sell-high rule of Zhang &amp; Zhang (2008) in the two directions practice demands: short selling and execution slippage. The trader may now hold long, flat or short positions in a mean-reverting asset, and every trade pays both a proportional cost and a slippage term. The dynamic programming formulation leads to a quasi-variational inequality whose solution has a four-threshold structure: a buy-to-cover level and a short-entry level on the short side, mirrored by a long-entry and a take-profit level on the long side, with a no-trade band in the middle. Smooth-fit conditions again collapse the free-boundary problem into four quasi-algebraic equations. The study explains the geometry of the four regions, how slippage widens the no-trade band, and why the two-threshold rule is recovered when shorting is banned - a clean view of how constraints reshape optimal trading rules.</p></div>
 <p>这篇2010年发表于《Discrete and Continuous Dynamical Systems Series B》的论文（Kong &amp; Zhang），研究均值回归资产的最优买卖问题。它是 Zhang &amp; Zhang (2008) 的直接扩展——后者只允许"空仓/做多"两种仓位，本文把<strong>做空</strong>纳入框架，并计入<strong>滑点成本</strong>，证明最优策略可由四个阈值价格完全刻画，且求解化为四个拟代数方程。这是理解整个"最优交易规则"系列工作的起点。</p>
 <blockquote>
 <p>原文：Kong, H. T. &amp; Zhang, Q. (2010), "An optimal trading rule of a mean-reverting asset", <em>Discrete and Continuous Dynamical Systems Series B</em>, 14(4), 1403–1417.
@@ -109,19 +109,19 @@ $$</p>
 <p>这篇是承上启下的一篇：<strong>Zhang &amp; Zhang (2008)</strong> 给出均值回归资产双阈值（无做空）→ <strong>本文 (2010)</strong> 加入做空与滑点，四阈值 → <strong>Song &amp; Zhang (2013)</strong> 把框架搬到配对交易价差，并加入止损 → <strong>Tie, Zhang &amp; Zhang (2017)</strong> 彻底去掉均值回归假设，在GBM下求解。沿着这条线读，能看到"最优交易"这个课题十年的方法论演进：从单资产到配对，从均值回归到一般扩散，从无约束到带止损约束。</p>
 <h2>附：原文链接</h2>
 <p><a href="https://doi.org/10.3934/dcdsb.2010.14.1403">DOI官方链接</a></p>
-<p class="meta">2026-10-12 发布 · 类型：金融建模</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-12 发布 · 类型：金融建模</span><span class="le">Published 2026-10-12 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -149,14 +149,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

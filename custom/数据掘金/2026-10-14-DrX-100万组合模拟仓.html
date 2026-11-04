@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-100万组合模拟仓 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DrX-100万组合模拟仓</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-100万组合模拟仓</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This page documents a CNY 1,000,000 simulated portfolio that runs three independent strategy sleeves side by side. A CNY 300,000 sleeve trades Xinjinlu (000510.SZ) under the mechanical box-regression rule set; a CNY 400,000 value sleeve tracks six industry leaders for pullback entries; and a CNY 300,000 trend sleeve scans seven semiconductor and AI-theme names for right-side breakouts. Each sleeve keeps its own budget, signals and risk limits, and the combined book is marked to market every trading day with an interactive candlestick-style equity curve. In the current phase the value and trend sleeves record signals and valuations without auto-executing, so the page functions as an auditable lab notebook: every rule is stated in advance, every signal is logged, and performance can be attributed sleeve by sleeve. The design goal is discipline under drawdowns - position size and exits are decided by pre-committed formulas, not by intraday sentiment.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年10月14日 · 每日收盘后更新</p>
 <blockquote>
 <p>100 万元虚拟资金组合：30w 箱体均值回归池 + 40w 价值池 + 30w 趋势池。基于 boxreg 策略的机械化模拟交易。</p>
@@ -249,19 +249,19 @@
 <li>数据口径说明：今日 Tushare pro_bar 复权接口限频，603259、688008、688235、688266、688525、688981 等回退为不复权日线回退计算箱体/止损线，存在除权缺口偏差风险；紫金矿业格式异常、兆易创新 IP 超限扫描异常，计入常规观察；限频恢复后复权重算校验</li>
 </ul>
 <p><em>本模拟为量化研究记录，不构成投资建议。</em></p>
-<p class="meta">2026-10-14 发布 · 2026-11-03 更新 · 类型：数据掘金</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-14 发布 · 2026-11-03 更新 · 类型：数据掘金</span><span class="le">Published 2026-10-14 · Updated 2026-11-03 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -289,14 +289,33 @@
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

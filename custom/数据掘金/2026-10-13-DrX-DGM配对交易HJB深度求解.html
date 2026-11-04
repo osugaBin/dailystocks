@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-DGM：以深度学习求解配对交易 HJB 变分不等式 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DrX-DGM：以深度学习求解配对交易 HJB 变分不等式</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-DGM：以深度学习求解配对交易 HJB 变分不等式</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report applies the Deep Galerkin Method (DGM) to the Hamilton-Jacobi-Bellman variational inequality of an optimal pairs-trading problem (Tie, Zhang &amp; Zhang, 2017), whose free boundary - the entry and exit thresholds of the trade - is known in closed form: k1 = 1.038 and k2 = 1.283 under the paper&#x27;s Target/Walmart calibration. A NumPy multilayer perceptron with hand-coded backpropagation is trained for 8,000 iterations on randomly sampled collocation points, with no mesh and no labeled data. The learned value surface is smooth and qualitatively correct, but the trading boundaries extracted from its curvature peaks (1.341 and 1.411) deviate from the closed form by 29.1% and 9.9%. The diagnosis is structural: a smooth network rounds off the kink that the smooth-fit conditions place exactly at the free boundary. The exercise provides a reproducible baseline for neural PDE solvers in stochastic control, and a caution on reading decision boundaries off smooth approximators.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年10月13日</p>
 <h2>Abstract</h2>
 <p>We solve the Hamilton–Jacobi–Bellman (HJB) quasi-variational inequalities for optimal pairs trading under geometric Brownian motions (Tie, Zhang &amp; Zhang, 2017) using the Deep Galerkin Method (DGM). Instead of the classical closed-form approach via smooth-fit conditions, we train a neural network meshfree on the PDE residual with a free-boundary penalty formulation, recovering the value functions and the optimal trading thresholds $k_1$, $k_2$ that define the buy/sell/hold regions. Numerical experiments on the Target/Walmart calibration reproduce the two threshold rays $x_2 = k_1x_1$, $x_2 = k_2x_1$ and the 3D value-function surfaces. We document the free-boundary smoothing challenge: DGM accurately learns the value functions but sharp threshold extraction requires a hybrid algebraic refinement.</p>
@@ -97,19 +97,19 @@ $$\min\lbrace \rho w_1 - Lw_1,\ w_1 - w_0 - \beta_s + \beta_by \rbrace = 0, \tag
 <li>闭式解验证：smooth-fit 方程组数值求解得 $k_1 = 1.0380$、$k_2 = 1.2831$，与论文（1.039、1.282）一致。</li>
 <li>代码：<code>~/workspace/dgm-pairs/</code>（dgm_core.py、pairs_model.py、solve_stationary.py）。</li>
 </ul>
-<p class="meta">2026-10-13 发布 · 类型：数据掘金</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-13 发布 · 类型：数据掘金</span><span class="le">Published 2026-10-13 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -137,14 +137,33 @@ $$\min\lbrace \rho w_1 - Lw_1,\ w_1 - w_0 - \beta_s + \beta_by \rbrace = 0, \tag
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

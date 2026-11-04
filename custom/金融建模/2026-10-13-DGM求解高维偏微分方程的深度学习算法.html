@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DGM：求解高维偏微分方程的深度学习算法 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DGM：求解高维偏微分方程的深度学习算法</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DGM：求解高维偏微分方程的深度学习算法</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Finite differences need O(h^-(d+1)) grid points in d spatial dimensions, so classical solvers die in high dimensions. Sirignano &amp; Spiliopoulos (2018) propose the Deep Galerkin Method (DGM): a deep neural network approximates the PDE solution, and stochastic gradient descent trains it on randomly sampled space-time points to satisfy the differential operator, the initial condition and the boundary conditions simultaneously - no mesh anywhere, which is what makes problems with up to 200 dimensions tractable. This article explains the architecture (a gated, LSTM-like layer structure suited to sequential dependence), the least-squares loss over the PDE residual, and the paper&#x27;s approximation theorem for a class of quasilinear parabolic equations. The numerical evidence spans high-dimensional Hamilton-Jacobi-Bellman equations, Burgers&#x27; equation and the free-boundary PDE of an American option. DGM is the methodological backbone of this site&#x27;s own pairs-trading experiment, where its solution is benchmarked against a verified closed form.</p></div>
 <p><strong>论文</strong>：Justin Sirignano, Konstantinos Spiliopoulos, <em>DGM: A Deep Learning Algorithm for Solving Partial Differential Equations</em>, arXiv:<a href="https://arxiv.org/abs/1708.07469">1708.07469</a> [q-fin.MF], 2018年9月。</p>
 <p>高维偏微分方程是计算金融、物理、工程中的长期难题：有限差分在 $d$ 个空间维上需要 $O(h^{-(d+1)})$ 个网格点，维度稍高即不可行。本文提出<strong>深度伽辽金方法（Deep Galerkin Method, DGM）</strong>：用深度神经网络逼近 PDE 的解，以随机梯度下降在随机采样的时空点上训练网络满足微分算子、初值和边值条件——<strong>无网格（meshfree）</strong>，这是能做到 200 维的关键。论文还证明了神经网络对一类拟线性抛物型 PDE 的逼近能力定理，并在高维美式期权自由边界 PDE、HJB 方程、Burgers 方程上验证了精度。</p>
 <h2>一、问题：高维 PDE 的维度灾难</h2>
@@ -83,19 +83,19 @@ $$</p>
 </ol>
 <hr />
 <p><em>解读人注：arXiv:1708.07469；200维实验基于 Blue Waters 超算。引用公式与定理编号请以原文为准。</em></p>
-<p class="meta">2026-10-13 发布 · 类型：金融建模</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-13 发布 · 类型：金融建模</span><span class="le">Published 2026-10-13 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -123,14 +123,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

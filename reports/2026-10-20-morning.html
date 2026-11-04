@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>美股A股对标映射分析 · DrX Daily</title>
-<link rel="stylesheet" href="../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../assets/style.css?v=20261104a">
 
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
 <h1>美股A股对标映射分析</h1>
 <blockquote>
 <p>数据来源说明：本机无 himalaya，《每日股市与宏观新闻摘要》邮件源已永久退役，<strong>新闻直接在网上搜索做摘要</strong>（国外平台优先，中国国内新闻采信中国网页）。行情：指数基准为美股前一交易日（10月19日周一）收盘（Yahoo 实时 + 多源交叉确认）；大宗商品与外汇为10月20日亚洲早间实时；个股日K滞后指数一根，最近完整收盘为10月16日周五。</p>
@@ -275,19 +275,19 @@
 <p><strong>开盘预测结论</strong>：平开至小幅高开、震荡分化。沪指3730一线企稳（周一收3730.92，站上3700后走强）。科技主线受美股映射高开，重点看半导体能否延续上周五的资金净流入、科创50能否止跌（-2.17%后看企稳）；能源/油气/贵金属/军工偏强（布油109.45美元+地缘升级）；航空/化工/软件承压；金融/地产或受金融街论坛政策信号提振。操作纪律：控仓不追高，军工/题材大涨不追，科技反弹先看企稳不抄底；破位个股按四铁律执行（单日跌超1.5%先降仓到睡得安稳的水平，不开新仓做反弹，绝不越跌越补）。</p>
 <hr />
 <p><em>报告生成时间：2026-10-20 08:30（北京时间） | 数据基准：美股2026年10月19日收盘；大宗商品与外汇为10月20日亚洲早间实时；个股最近完整收盘为10月16日 | 数据来源：Yahoo 实时行情 + 网上新闻搜索摘要 | 免责声明：本报告基于公开数据与新闻整理，仅供研究参考，不构成投资建议。市场有风险，投资需谨慎。</em></p>
-<p class="meta">发布日期：2026-10-20 · 数据基准：2026-10-20 · 类型：早盘</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">发布日期：2026-10-20 · 数据基准：2026-10-20 · 类型：早盘</span><span class="le">Published 2026-10-20 · Data as of 2026-10-20 · Morning</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -315,14 +315,33 @@
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

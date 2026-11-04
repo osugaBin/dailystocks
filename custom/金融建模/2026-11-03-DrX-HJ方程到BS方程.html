@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Lecture 1 of a study series that rebuilds mathematical finance on the variational calculus of Zhang Gongqing&#x27;s Lectures on the Calculus of Variations. The lecture asks a single question: where does the Black-Scholes equation actually come from? Starting from the deterministic Hamilton-Jacobi equation of classical mechanics, it lifts the problem to finance by dynamic programming under geometric Brownian motion: Ito&#x27;s lemma turns the Bellman principle into the Hamilton-Jacobi-Bellman equation, the delta-hedging argument identifies the generalized momentum with the hedge ratio and eliminates the drift, and the Black-Scholes PDE falls out - with the Feynman-Kac formula closing the loop back to a probabilistic representation. A term-by-term table maps every object of the derivation onto its variational counterpart (value function, momentum, Legendre transform), setting up the series&#x27; three-stage plan: classical variational methods and duality, stochastic variational methods and large deviations, and optimal control. Exercises point to the Legendre duality developed later in the course.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
 <blockquote>
 <p>本系列以张恭庆《变分学讲义》为蓝本，沿着一条主线推进：确定性的 Hamilton-Jacobi（H-J）方程，加上布朗运动的二阶扩散项，如何一步步演变为随机最优控制的 Hamilton-Jacobi-Bellman（HJB）方程，并最终在无套利条件下退化为 Black-Scholes（B-S）方程。张恭庆在前言中特意提到"随机变分学（Malliavin Calculus）成为金融数学的重要部分"——本系列正是沿这句话展开。</p>
@@ -151,19 +151,19 @@ $$</p>
 <p>本讲的主线是：<strong>在存在随机扰动的世界里，寻找一个控制变量（$\Delta$），使系统（投资组合）的一阶变分（风险项）为零</strong>——这与变分法求极值曲线的平稳性条件是同一种思想。确定性 H-J 方程经"加扩散项"升维为 HJB 方程，再经 Delta 对冲消去控制与漂移，最终落回线性的 B-S 方程。</p>
 <p><strong>思考题</strong>：第 5 讲中 H-J 方程的解是程函 $g(t,u)$，满足 $\nabla_u g = p$；B-S 方程的解 $V(t,S)$ 满足 $\partial_S V = \Delta$。若把 $V(t,S)$ 看作某种"随机作用量"，它的 Legendre 变换是什么？在金融里对应什么经济学含义？（提示：对应<strong>凸对偶</strong>与<strong>风险中性测度的刻画</strong>，这正是第 14 讲的内容，也是本系列后续讲次的入口。）</p>
 <p><strong>后续讲次预告</strong>：第二讲将二选一推进——(A) Feynman-Kac 公式的严格化：用第 10 讲 Sobolev 空间与第 12 讲半群理论的语言给出证明框架；(B) 回到方案第一阶段，用 E-L 方程求解第 1 讲例 1.6 并对照 Merton 问题。</p>
-<p class="meta">2026-11-03 发布 · 类型：金融建模</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-11-03 发布 · 类型：金融建模</span><span class="le">Published 2026-11-03 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -191,14 +191,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });

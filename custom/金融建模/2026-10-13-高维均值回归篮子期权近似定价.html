@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>高维均值回归资产篮子期权的近似定价方法 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261102b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261104a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<p class="back"><a href="../../index.html">← 全部报告</a></p>
-<p class="actions"><button type="button" onclick="window.print()">下载 PDF / 打印</button> <button type="button" class="theme-toggle">深色模式</button></p>
-<h1>高维均值回归资产篮子期权的近似定价方法</h1>
+<p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle lang-toggle">EN</button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1>高维均值回归资产篮子期权的近似定价方法</h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>A basket option on mean-reverting underlyings - energy, rates, commodities - has no closed-form price, and Monte Carlo is too slow for routine use, worse in high dimensions. Li &amp; Wu (2008, Computers &amp; Operations Research) propose a two-step approximation: moment matching first replaces the high-dimensional basket by a one-dimensional process with matched first two moments, and a Black-Scholes-type formula then prices the option on that surrogate in closed form. Across 2, 4, 6 and 10 dimensions and three mean-reverting models (including exponential Ornstein-Uhlenbeck dynamics), the approximation stays within 1% of Monte Carlo while taking roughly one ten-thousandth of the computing time - and, remarkably, its runtime does not grow with dimension. This study explains why the basket of mean-reverting assets is close enough to lognormal for moment matching to work, where the approximation deteriorates (deep out-of-the-money, long maturities), and what the trick teaches about taming the curse of dimensionality by structure rather than by computation.</p></div>
 <p><strong>论文</strong>：Xun Li, Zhenyu Wu, <em>On an approximation method for pricing a high-dimensional basket option on assets with mean-reverting prices</em>, Computers &amp; Operations Research 35 (2008), 76–89. DOI: <a href="https://doi.org/10.1016/j.cor.2006.02.020">10.1016/j.cor.2006.02.020</a>。</p>
 <p>篮子期权（ payoff 取决于多个标的资产加权平均价格的期权）是经典的高维期权。当标的为能源商品、利率这类<strong>均值回归</strong>资产时，定价尤其困难：既无解析解，蒙特卡洛又太慢，维度越高数值积分越贵。本文提出一个"两步近似法"——先用矩匹配把高维问题降到一维，再用 Black–Scholes 公式给出近似解析解，在 2/4/6/10 维、三种均值回归模型下精度与蒙特卡洛相差不到 1%，耗时仅为蒙特卡洛的约万分之一，且耗时<strong>不随维度增长</strong>。</p>
 <h2>一、问题：高维篮子期权定价的维度灾难</h2>
@@ -125,19 +125,19 @@ $$</p>
 </ol>
 <hr />
 <p><em>解读人注：DOI 10.1016/j.cor.2006.02.020；数值实验基于 2006 年硬件，耗时对比的相对量级仍有参考意义。引用公式时请以原文为准。</em></p>
-<p class="meta">2026-10-13 发布 · 类型：金融建模</p>
-<footer class="site-foot">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</footer>
+<p class="meta"><span class="lz">2026-10-13 发布 · 类型：金融建模</span><span class="le">Published 2026-10-13 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
-  <button id="donatefloat-open" type="button" hidden>赞赏我的开发</button>
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></button>
   <div id="donatefloat-panel">
     <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
-    <div class="donate-title">赞赏我的开发</div>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Support My Work</span></div>
     <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
     <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
-    <div class="donate-label">微信</div>
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
     <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
-    <div class="donate-label">支付宝</div>
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
   </div>
 </div>
 <script>
@@ -165,14 +165,33 @@ $$</p>
     return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   function paint(){
-    var label=effective()==='dark'?'浅色模式':'深色模式';
-    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=label;});
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
   }
+  window.drxPaintTheme=paint;
   document.querySelectorAll('.theme-toggle').forEach(function(b){
     b.addEventListener('click',function(){
       var nxt=effective()==='dark'?'light':'dark';
       document.documentElement.setAttribute('data-theme',nxt);
       try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
       paint();
     });
   });
