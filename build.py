@@ -514,6 +514,10 @@ TYPE_LABEL_EN = {"morning": "Morning", "evening": "Evening", "custom": "Other",
                  "data": "Data Mining", "model": "Financial Modeling"}
 TAB_LABELS_EN = {"daily": "Daily Reports", "data": "Data Mining",
                  "model": "Financial Modeling"}
+DAILY_TITLE_EN = {
+    "美股A股对标映射分析": "US-China Cross-Market Mapping Analysis",
+    "A股收盘技术分析报告": "A-Share Close Technical Analysis Report",
+}
 
 def bi(zh, en):
     """双语 span：默认中文，html[data-lang="en"] 时显示英文（CSS + LANG_SCRIPT）。"""
@@ -759,6 +763,15 @@ def build():
             meta_line = bi(f"发布日期：{pub_date} · 数据基准：{data_date} · 类型：{TYPE_LABEL[rtype]}",
                            f"Published {pub_date} · Data as of {data_date} · {TYPE_LABEL_EN[rtype]}")
         body = md_to_html(body_md)
+        title_html = ""
+        _ten = DAILY_TITLE_EN.get(title)
+        if _ten:
+            title_html = bi(htmlmod.escape(title), htmlmod.escape(_ten))
+            body = re.sub(
+                r"<h1>(.*?)</h1>",
+                lambda m: "<h1>" + bi(m.group(1),
+                                      htmlmod.escape(_ten)) + "</h1>",
+                body, count=1, flags=re.S)
         page = PAGE_TMPL.format(
             title=htmlmod.escape(title), body=body, meta_line=meta_line,
             root="../", mathjax=MATHJAX if "$" in body else "",
@@ -768,7 +781,8 @@ def build():
             f.write(page)
         daily_cards.append((pub_date, card(
             f"reports/{slug}.html", rtype, pub_date, title,
-            excerpt, data_date, news_cfg["note"] if news_cfg else "")))
+            excerpt, data_date, news_cfg["note"] if news_cfg else "",
+            title_html=title_html)))
         print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
 
     tab_cards = {"data": [], "model": []}
