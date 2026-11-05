@@ -848,7 +848,8 @@ def build():
     # 数据掘金置顶：两个每日更新的模拟交易博客固定排在最前（新金路 → 100万组合）
     if data_cards_keyed:
         _pinned = ["2026-10-14-DrX-新金路箱体回归模拟交易",
-                   "2026-10-14-DrX-100万组合模拟仓"]
+                   "2026-10-14-DrX-100万组合模拟仓",
+                   "2026-11-06-Gu-双基金核心卫星模拟仓"]
         _map = dict(data_cards_keyed)
         tab_cards["data"] = ([_map[k] for k in _pinned if k in _map]
                              + [h for k, h in data_cards_keyed
