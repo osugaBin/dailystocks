@@ -786,6 +786,7 @@ def build():
         print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
 
     tab_cards = {"data": [], "model": []}
+    data_cards_keyed = []  # (slug, card_html)，用于数据掘金置顶排序
     for tab_id, subdir, date, name, ext, src in collect_custom():
         if ext == "md":
             text = open(src, encoding="utf-8").read()
@@ -837,10 +838,21 @@ def build():
             upd = last_update_date(src, text, date)
             href = f"custom/{subdir}/{os.path.basename(src)}"
             print(f"file: {href}")
-        tab_cards[tab_id].append(
-            card(href, tab_id, date, title, excerpt, date,
-                 update_date=upd,
-                 title_html=title_html if ext == "md" else ""))
+        _card_html = card(href, tab_id, date, title, excerpt, date,
+                          update_date=upd,
+                          title_html=title_html if ext == "md" else "")
+        tab_cards[tab_id].append(_card_html)
+        if tab_id == "data":
+            data_cards_keyed.append((f"{date}-{name}", _card_html))
+
+    # 数据掘金置顶：两个每日更新的模拟交易博客固定排在最前（新金路 → 100万组合）
+    if data_cards_keyed:
+        _pinned = ["2026-10-14-DrX-新金路箱体回归模拟交易",
+                   "2026-10-14-DrX-100万组合模拟仓"]
+        _map = dict(data_cards_keyed)
+        tab_cards["data"] = ([_map[k] for k in _pinned if k in _map]
+                             + [h for k, h in data_cards_keyed
+                                if k not in _pinned])
 
     panels = {
         "daily": (bi("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析 — 定时任务自动更新",
