@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1><span class="lz">SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测</span><span class="le">SGu Core-Satellite Dual-Fund Strategy: Design, Mathematical Models and Backtest</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This article documents the design of a CNY 1,000,000 simulated core-satellite portfolio for SGu, allocating 70% to China Merchants Quantitative Selection Fund (001917) and 30% to Yongying Technology Select Fund (022364). The core fund, whose detrended cumulative NAV is modelled as an Ornstein-Uhlenbeck process, is traded with a level-triggered Z-score state machine (100% below -2.5 sigma, 80% below -1.8 sigma, 30% above +2.0 sigma, 60% near the mean), guarded by an alpha filter and a CSI 500 circuit breaker. The satellite fund, modelled as a jump-diffusion, is traded with right-side momentum, a -12% drawdown cut and a hard MA60 exit. Portfolio variance is decomposed with an Euler risk attribution, and a two-year backtest on real NAV data with fund-schedule FIFO fees shows the combined state machines reducing maximum drawdown from -34.61% to -17.84% versus buy-and-hold.</p></div>
+<blockquote>
+<p>本文说明一个双基金模拟组合的设计依据、数学模型、交易规则与历史回测结果。组合由招商量化精选股票A（001917）与永赢科技智选混合发起A（022364）构成，虚拟资金 100 万元，按 70% 与 30% 分配，两只基金各用一套交易规则。模拟仓的每日运行记录（操作卡、持仓、成交、权益）见实操篇：<a href="2026-11-06-SGu-双基金核心卫星模拟仓.html">《SGu-双基金核心-卫星模拟仓：每日运行记录》</a>。本文为研究记录，不构成投资建议。</p>
+</blockquote>
+<h2>一、组合构成与设计依据</h2>
+<p>两只基金的收益来源和波动特征不同，因此不使用同一套交易规则。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>001917 招商量化精选股票A</th>
+<th>022364 永赢科技智选混合发起A</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基金经理</td>
+<td>王平（招商量化）</td>
+<td>任桀（永赢基金）</td>
+</tr>
+<tr>
+<td>持仓结构</td>
+<td>分散持有数百只股票，前十大重仓占比通常低于 20%</td>
+<td>集中持有科技股，前十大重仓占比高，单票接近 10% 上限</td>
+</tr>
+<tr>
+<td>收益来源</td>
+<td>多因子选股的超额收益（相对中证500）</td>
+<td>科技硬件行业的景气周期（半导体、电子、AI 算力）</td>
+</tr>
+<tr>
+<td>近两年年化波动</td>
+<td>20.45%</td>
+<td>46.04%</td>
+</tr>
+<tr>
+<td>组合权重</td>
+<td>70%（核心）</td>
+<td>30%（卫星）</td>
+</tr>
+<tr>
+<td>交易规则</td>
+<td>Z-Score 均值回归，带因子失效校验</td>
+<td>右侧动量，带回撤与均线两道限制</td>
+</tr>
+</tbody>
+</table>
+<p>设计依据是规则与收益分布匹配。均值回归规则假设价格偏离是暂时的、会回到中枢；动量规则假设趋势会持续一段时间。对前一只基金用动量、对后一只基金用均值回归，都与各自的分布特征不符，是这类组合常见的失效方式。</p>
+<p>两只基金在数据上有以下实测特征。022364 成立于 2024-10-30，2025 年净值涨幅超过 230%，累计净值在 2026-06-25 达到历史高点 6.3763；此后科技板块回调，至 2026-11-05 累计净值 3.7014，距历史高点 -41.95%，距 60 日高点 -35.62%。001917 近一年净值回报 -7.32%；2026-11-05 累计净值 3.3819，位于其 120 日均线下方，Z-Score 为 -1.30，近 20 日相对中证500 的超额收益为 +3.05%，即下跌主要来自基准而非选股失效。两只基金的当前状态与模拟仓的启动处理见实操篇。</p>
+<p>两袖独立记账，不跨袖调拨：每一袖的买卖只使用本袖资金，70/30 的出资结构在任何时点可核对。</p>
+<h2>二、001917：均值回归模型与 Z-Score 规则</h2>
+<p><strong>模型。</strong> 均值回归过程的标准形式是 Ornstein-Uhlenbeck（O-U）过程：</p>
+<p>$$dX_t = \theta (\mu - X_t) dt + \sigma dW_t$$</p>
+<p>其中 $\mu$ 为长期均衡水平，$\theta &gt; 0$ 为回归速度，$\sigma$ 为瞬时波动，$W_t$ 为标准布朗运动。该过程的平稳分布为正态分布：</p>
+<p>$$X_{\infty} \sim N\left(\mu, \frac{\sigma^2}{2\theta}\right)$$</p>
+<p>即偏离量除以平稳标准差后服从标准正态分布，偏离程度可以直接换算为概率。偏离的半衰期为 $\ln 2 / \theta$。</p>
+<p><strong>指标。</strong> 累计净值本身带长期趋势，不能直接套用 O-U 过程；用 120 日均线代表中枢、120 日滚动标准差代表尺度，定义：</p>
+<p>$$Z_t = \frac{P_t - \text{MA}_{120}(P_t)}{\sigma_{120}(P_t)}$$</p>
+<p>其中 $P_t$ 为累计净值。若偏离近似平稳正态，$Z \le -1.8$ 的概率约为 3.59%，$Z \ge +2.0$ 的概率约为 2.28%，属于低频事件；区间内的日常波动不触发交易。指标必须使用累计净值：单位净值在分红除息日会跳降，用它计算会产生虚假的破位信号。</p>
+<p><strong>因子失效校验。</strong> 净值下跌有两种来源：基准下跌，或选股模型本身失效（因子反转、流动性踩踏等）。后一种情形下中枢 $\mu$ 本身在下移，均值回归的前提不成立，不能按低估处理。为此定义近 20 日超额收益：</p>
+<p>$$\text{Alpha}_{20d} = R_{\text{fund}, 20d} - R_{\text{ZZ500}, 20d}$$</p>
+<p>仅当 $\text{Alpha}_{20d} \ge -1.00\%$ 时允许加仓；当 $\text{Alpha}_{20d} &lt; -3.00\%$ 时判定因子失效，拒绝加仓。另外，中证500 单日跌幅 $\le -3.50\%$ 时冻结全部调整（SYSTEM_HALT）：这类交易日的价格主要由流动性冲击驱动，不用于判断。</p>
+<p><strong>状态机（档位触发）。</strong> 目标仓位只取决于当前所处的档位，同一档位连续多日成立不重复累加：</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>触发条件</th>
+<th>目标仓位（占本袖资金）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SYSTEM_HALT</td>
+<td>中证500 单日跌幅 ≤ -3.50%</td>
+<td>冻结，维持不变</td>
+</tr>
+<tr>
+<td>STRONG_BUY</td>
+<td>$Z \le -2.50$ 且 $\text{Alpha}_{20d} \ge -1.00\%$</td>
+<td>上调至 100%</td>
+</tr>
+<tr>
+<td>BUY</td>
+<td>$Z \le -1.80$ 且 $\text{Alpha}_{20d} \ge -1.00\%$</td>
+<td>上调至 80%（已 ≥ 80% 则不变）</td>
+</tr>
+<tr>
+<td>FACTOR_FAILURE</td>
+<td>$Z \le -1.80$ 且 $\text{Alpha}_{20d} &lt; -3.00\%$</td>
+<td>维持不变</td>
+</tr>
+<tr>
+<td>SELL</td>
+<td>$Z \ge +2.00$</td>
+<td>下调至 30%</td>
+</tr>
+<tr>
+<td>REBASE</td>
+<td>$-0.50 \le Z \le +0.50$ 且仓位 ≠ 60%</td>
+<td>调整为 60%</td>
+</tr>
+<tr>
+<td>NEUTRAL</td>
+<td>其余情形</td>
+<td>维持不变</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="001917 均值回归通道与 Z-Score" src="gu_funds_001917_20261105.png" /></p>
+<h2>三、022364：跳跃扩散模型与动量规则</h2>
+<p><strong>模型。</strong> 赛道基金在周期下行段的净值路径更接近带跳的几何布朗运动（Merton 跳跃扩散）：</p>
+<p>$$\frac{dP_t}{P_{t-}} = \mu dt + \sigma dW_t + J dN_t$$</p>
+<p>在连续扩散之外叠加泊松跳跃项 $J dN_t$，跳跃来源包括业绩低于预期、订单调整、出口管制等事件，收益分布厚尾。另外，产业周期存在正反馈：景气下行时盈利预期被连续下修，净值下跌不蕴含反弹。因此对该基金不使用均值回归规则，只在趋势确立后参与，并用两道限制截断左尾。</p>
+<p><strong>波动尺度。</strong> 场外基金每日只有一个净值，没有日内最高、最低价，真实波幅退化为相邻两日累计净值之差的绝对值：</p>
+<p>$$TR_t = |P_t - P_{t-1}|, \quad \text{ATR}_{20} = \frac{1}{20}\sum_{i=0}^{19} TR_{t-i}$$</p>
+<p>2026-11-05 的 $\text{ATR}_{20}$ 为 0.1375 元，约为当日净值的 3.71%。下文的 -12.00% 回撤线约相当于 3.2 倍 $\text{ATR}_{20}$，明显大于日常波动幅度。</p>
+<p><strong>规则。</strong> MA60 为中期趋势线，其斜率取近 5 日 MA60 的最小二乘拟合斜率。清仓条件满足其一即执行：连续 2 日收于 MA60 下方；或 MA60 斜率小于 0 且净值位于 MA60 下方。减仓条件满足其一即执行：距 60 日高点回撤 $\le -12.00\%$；或连续 3 个交易日单日跌幅超过 $1.5 \times \text{ATR}_{20}$。试仓的止损价为 $\text{MA}_{60} - 1 \times \text{ATR}_{20}$，2026-11-05 的读数为 4.8781（由未舍入的 MA60 与 ATR20 计算）。</p>
+<p><strong>状态机（目标仓位，占本袖资金）</strong></p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>触发条件</th>
+<th>目标仓位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HARD_EXIT</td>
+<td>连续 2 日收于 MA60 下方，或 MA60 斜率 &lt; 0 且净值在 MA60 下方</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>RISK_CUT</td>
+<td>距 60 日高点回撤 ≤ -12.00%，或连续 3 日跌幅 &gt; 1.5 × ATR_{20}</td>
+<td>下调至 ≤ 50%</td>
+</tr>
+<tr>
+<td>RUN</td>
+<td>净值 &gt; MA20 且 MA20 ≥ MA60</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>RE_ENTRY</td>
+<td>MA60 斜率 &gt; 0 且净值回踩 MA20（距离 ≤ 1 × ATR_{20}）</td>
+<td>上调至 60%</td>
+</tr>
+<tr>
+<td>WAIT</td>
+<td>其余情形</td>
+<td>维持不变</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="022364 动量均线与回撤风控" src="gu_funds_022364_20261105.png" /></p>
+<h2>四、组合比例的计算</h2>
+<p>以 2024-11-01 至 2026-11-05 共 487 个交易日的日收益计算：$\sigma_{001917} = 20.45\%$，$\sigma_{022364} = 46.04\%$，相关系数 $\rho = 0.61$。组合方差为：</p>
+<p>$$\sigma_p^2 = w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2 + 2 w_1 w_2 \rho \sigma_1 \sigma_2$$</p>
+<p>代入 $w_1 = 0.70$、$w_2 = 0.30$，三项分别为 0.0205、0.0191、0.0241，组合方差 0.0636，组合波动 $\sigma_p = 25.22\%$。按权重线性加权的波动为 $0.70 \times 20.45\% + 0.30 \times 46.04\% = 28.13\%$，与 25.22% 的差额 2.91 个百分点来自 $\rho &lt; 1$。</p>
+<p>风险归因采用欧拉方差分解（交叉项由两只基金各分摊一半）：卫星仓以 30% 的资金权重贡献组合方差的 48.88%；若将协方差交叉项全部归于卫星仓，则占比为 67.78%。组合风险主要来自卫星仓，这是对它设置更严格规则（-12.00% 减仓、跌破 MA60 清仓）的依据。若比例改为 30/70，组合波动升至 36.29%，风险将由卫星仓主导，不再是核心-卫星结构。</p>
+<p>以上数字由未舍入的日收益序列计算（验算脚本 code/verify_portfolio_math.py）；用文中四舍五入后的输入复算，结果可能相差约 0.02 个百分点。</p>
+<p>注意静态权重与实际权重的差别：两袖独立运作、不做跨袖再平衡，涨幅大的袖实际权重会自然上升。因此下节回测中买入持有组合的实测波动（29.86%）高于此处按期初权重计算的 25.22%，原因是窗口内 022364 涨幅较大，其实际市值权重已高于 30%。</p>
+<h2>五、执行规则与费用</h2>
+<ul>
+<li><strong>信号与成交</strong>：T 日以累计净值计算指标并产生信号，T+1 日按单位净值成交。指标一律使用累计净值，成交一律使用单位净值。</li>
+<li><strong>执行日熔断</strong>（2026-11-06 起）：001917 的挂单在执行日再校验一次 SYSTEM_HALT——若执行日中证500 单日跌幅 $\le -3.50\%$，挂单顺延至下一净值日执行，不撤销、不按当日净值成交。</li>
+<li><strong>费率</strong>：申购费 0.15%；赎回费按 FIFO 逐笔持有天数分档：不足 7 天 1.50%，7 至 180 天 0.50%，超过 180 天 0。</li>
+<li><strong>数据与代码</strong>：基金净值与指数行情经 akshare 公开接口获取（指数走新浪源）；全部代码与材料归档于项目目录，可复现。</li>
+</ul>
+<h2>六、历史回测（2024-11-01 至 2026-11-05）</h2>
+<p>方法：以 akshare 公开接口的真实历史净值回测，窗口 487 个交易日；规则与第二节、第三节完全相同，费率与第五节完全相同（申购 0.15%、赎回 FIFO 分档）；信号于 T 日产生、T+1 日生效。组合层按 70/30 对两袖净值序列加权，两袖不做再平衡。说明：本报告首版（2026-11-06 上午）中，001917 采用按次累加的仓位步进、回测费率采用统一单边费率（0.10%/0.15%），与实盘规则不一致；已于当日修订为档位触发与 FIFO 分档费率，下表为修订后的结果。</p>
+<table>
+<thead>
+<tr>
+<th>策略 / 标的</th>
+<th>累计收益</th>
+<th>年化收益</th>
+<th>最大回撤</th>
+<th>年化波动</th>
+<th>夏普比率</th>
+<th>卡玛比率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001917 买入持有</td>
+<td>+36.16%</td>
+<td>+16.60%</td>
+<td>-21.13%</td>
+<td>20.45%</td>
+<td>0.71</td>
+<td>0.79</td>
+</tr>
+<tr>
+<td>001917 Z-Score 状态机</td>
+<td>+21.72%</td>
+<td>+10.28%</td>
+<td>-11.98%</td>
+<td>12.28%</td>
+<td>0.67</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>022364 买入持有</td>
+<td>+279.01%</td>
+<td>+94.06%</td>
+<td>-45.13%</td>
+<td>46.05%</td>
+<td>2.00</td>
+<td>2.08</td>
+</tr>
+<tr>
+<td>022364 动量+熔断状态机</td>
+<td>+217.90%</td>
+<td>+77.81%</td>
+<td>-23.26%</td>
+<td>36.27%</td>
+<td>2.09</td>
+<td>3.34</td>
+</tr>
+<tr>
+<td>70/30 组合（买入持有）</td>
+<td>+109.02%</td>
+<td>+44.32%</td>
+<td>-34.61%</td>
+<td>29.86%</td>
+<td>1.42</td>
+<td>1.28</td>
+</tr>
+<tr>
+<td>70/30 组合（双状态机）</td>
+<td>+80.57%</td>
+<td>+34.19%</td>
+<td>-17.84%</td>
+<td>18.77%</td>
+<td>1.71</td>
+<td>1.92</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="双状态机两年回测：净值与回撤对比" src="gu_funds_backtest.png" /></p>
+<p>对结果的说明：</p>
+<p>第一，022364 状态机的回撤为 -23.26%，约为买入持有（-45.13%）的一半；代价是累计收益低 61.11 个百分点（+217.90% 对 +279.01%）。夏普比率由 2.00 升至 2.09，卡玛比率由 2.08 升至 3.34。</p>
+<p>第二，001917 状态机的累计收益（+21.72%）低于买入持有（+36.16%），波动由 20.45% 降至 12.28%，回撤由 -21.13% 收窄至 -11.98%；夏普比率 0.67，略低于买入持有的 0.71，卡玛比率 0.86，高于买入持有的 0.79。该窗口内基准以上涨为主，均值回归规则在净值上行至 +2σ 时减仓、在大部分时间只维持 60% 至 80% 仓位，因此收益低于满仓持有。这是该规则在单边上涨窗口中的预期表现。</p>
+<p>第三，组合层双状态机的最大回撤为 -17.84%，约为买入持有（-34.61%）的一半；年化波动由 29.86% 降至 18.77%；夏普比率由 1.42 升至 1.71，卡玛比率由 1.28 升至 1.92。</p>
+<p>局限：回测窗口只有两年，且只包含一轮科技股周期；022364 的历史自其成立日（2024-10-30）起，没有更早的样本。回测按公布净值成交，未考虑申购限额、确认延迟与巨额赎回限制。结果对窗口选择敏感，不应外推为未来收益的估计。</p>
+<p class="meta"><span class="lz">2026-11-06 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-06 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
