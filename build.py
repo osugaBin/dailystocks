@@ -466,9 +466,18 @@ def news_edition_body(md_text, cfg):
 
 
 def extract_excerpt(text, limit=120):
-    for line in text.splitlines()[:80]:
-        s = line.strip()
-        if not s or s[0] in "#>|`-":
+    in_card = False
+    for line in text.splitlines()[:120]:
+        if "DAILY-CARD:START" in line:
+            in_card = True
+            continue
+        if "DAILY-CARD:END" in line:
+            in_card = False
+            continue
+        if in_card:
+            continue
+        s = re.sub(r"<!--.*?-->", "", line).strip()
+        if not s or s[0] in "#>|`-" or s[0] == "<":
             continue
         if s.startswith("**"):
             s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
@@ -849,7 +858,7 @@ def build():
     if data_cards_keyed:
         _pinned = ["2026-10-14-DrX-新金路箱体回归模拟交易",
                    "2026-10-14-DrX-100万组合模拟仓",
-                   "2026-11-06-Gu-双基金核心卫星模拟仓"]
+                   "2026-11-06-SGu-双基金核心卫星模拟仓"]
         _map = dict(data_cards_keyed)
         tab_cards["data"] = ([_map[k] for k in _pinned if k in _map]
                              + [h for k, h in data_cards_keyed
