@@ -479,6 +479,8 @@ def extract_excerpt(text, limit=120):
         s = re.sub(r"<!--.*?-->", "", line).strip()
         if not s or s[0] in "#>|`-" or s[0] == "<":
             continue
+        if s.startswith("!["):
+            continue  # 图片行不是正文，不能当摘要
         if s.startswith("**"):
             s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
         s = re.sub(r"[*_`]", "", s).strip()
