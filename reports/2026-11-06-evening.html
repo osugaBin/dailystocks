@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A股收盘技术分析报告 · DrX Daily</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261104b">
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1><span class="lz">A股收盘技术分析报告</span><span class="le">A-Share Close Technical Analysis Report</span></h1>
+<blockquote>
+<p>本报告于 2026-11-06（周五）晚间生成，数据截至 2026年11月6日收盘。股票池数据经 Tushare Pro 三脚本当日刷新（最新日期 20261106），大盘指数取自新浪财经实时接口，新浪昨收（f2）与 11 月 5 日已核验报告收盘逐点一致，口径同源。同日晨间对标报告（美股A股对标映射分析_20261106）用于交叉验证隔夜美股与当日消息；本日无单独的股票分析晨报文件，以对标映射报告为准。</p>
+</blockquote>
+<h2>一、当日大盘概况</h2>
+<table>
+<thead>
+<tr>
+<th>指数</th>
+<th>收盘</th>
+<th>涨跌幅</th>
+<th>今开</th>
+<th>最高</th>
+<th>最低</th>
+<th>成交额</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上证指数</td>
+<td>3649.18</td>
+<td>-1.10%</td>
+<td>3612.15</td>
+<td>3660.49</td>
+<td>3610.20</td>
+<td>7726.35亿</td>
+</tr>
+<tr>
+<td>深证成指</td>
+<td>11175.78</td>
+<td>-2.57%</td>
+<td>11044.56</td>
+<td>11303.22</td>
+<td>11044.56</td>
+<td>8851.59亿</td>
+</tr>
+<tr>
+<td>创业板指</td>
+<td>2465.23</td>
+<td>-3.96%</td>
+<td>2438.72</td>
+<td>2506.97</td>
+<td>2438.72</td>
+<td>4410.68亿</td>
+</tr>
+<tr>
+<td>科创50</td>
+<td>1253.20</td>
+<td>-2.60%</td>
+<td>1221.67</td>
+<td>1288.38</td>
+<td>1219.53</td>
+<td>896.27亿</td>
+</tr>
+<tr>
+<td>沪深300</td>
+<td>4054.28</td>
+<td>-1.44%</td>
+<td>4017.94</td>
+<td>4069.07</td>
+<td>4013.79</td>
+<td>4788.40亿</td>
+</tr>
+<tr>
+<td>中证500</td>
+<td>6597.35</td>
+<td>-2.13%</td>
+<td>6512.13</td>
+<td>6692.45</td>
+<td>6512.13</td>
+<td>2913.91亿</td>
+</tr>
+</tbody>
+</table>
+<p><strong>定性</strong>：低开低走、全线收跌、成长领跌。隔夜美股暴跌直接传导，六大指数全部低开：上证低开 2.11%，深成低开 3.72%，创业板指低开 4.99%，科创 50 低开 5.05%，中证 500 低开 3.39% 且开盘即当日最低。沪指盘中一度拉升至 3660.49 点后回落，收盘仍跌 1.10%；深成、创业板、科创 50 跌幅均大于沪指，成长方向是当日重灾区。沪深两市合计成交约 1.66 万亿，较昨日约 2.12 万亿缩量约 4601.57 亿，缩量幅度约 21.73%。全市场超 4700 只个股下跌，上涨仅约 758 只。结构分化是当日主线：算力硬件与半导体领跌，银行、电力、农业等防御方向逆势走强，指数跌幅掩盖了主线内部的剧烈分化。</p>
+<h2>二、股票池涨跌统计</h2>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上涨</td>
+<td>3 只</td>
+</tr>
+<tr>
+<td>平盘</td>
+<td>0 只</td>
+</tr>
+<tr>
+<td>下跌</td>
+<td>10 只</td>
+</tr>
+</tbody>
+</table>
+<p><strong>涨幅榜</strong>：长江电力 2.15%、百济神州 1.66%、中芯国际 0.19%。</p>
+<p><strong>跌幅榜</strong>：中际旭创 -9.19%、兆易创新 -8.99%、澜起科技 -8.36%、亨通光电 -6.43%、佰维存储 -5.90%、药明康德 -4.83%、紫金矿业 -4.07%、阳光电源 -3.72%、汇川技术 -2.21%、泽璟制药 -0.49%。</p>
+<p><strong>量能</strong>：全池 13 只中 10 只量比不低于 1.00。百济神州量比 2.05 居首，阳光电源 1.85、中际旭创 1.51、长江电力 1.30、澜起科技 1.27。低于 1.00 的为亨通光电 0.90、佰维存储 0.97、汇川技术 0.65。中际旭创成交额 239.73 亿元，仍居全池首位且为全市场焦点；兆易创新 99.72 亿元、阳光电源 92.43 亿元、紫金矿业 70.82 亿元、药明康德 69.76 亿元。下跌放量集中在算力硬件与半导体方向，池内个股层面的放量与指数层面的缩量形成反差：指数缩量是全市场观望，主线方向抛压仍在释放。</p>
+<h2>三、技术指标分析</h2>
+<h3>3.1 MACD</h3>
+<table>
+<thead>
+<tr>
+<th>股票</th>
+<th>DIF</th>
+<th>DEA</th>
+<th>MACD柱</th>
+<th>金叉/死叉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中芯国际</td>
+<td>-1.79</td>
+<td>-3.70</td>
+<td>3.82</td>
+<td>无</td>
+</tr>
+<tr>
+<td>中际旭创</td>
+<td>-84.29</td>
+<td>-76.62</td>
+<td>-15.34</td>
+<td>无</td>
+</tr>
+<tr>
+<td>阳光电源</td>
+<td>-1.70</td>
+<td>-3.91</td>
+<td>4.43</td>
+<td>无</td>
+</tr>
+<tr>
+<td>亨通光电</td>
+<td>-4.40</td>
+<td>-4.23</td>
+<td>-0.34</td>
+<td>无</td>
+</tr>
+<tr>
+<td>兆易创新</td>
+<td>-25.38</td>
+<td>-25.88</td>
+<td>1.01</td>
+<td>无</td>
+</tr>
+<tr>
+<td>佰维存储</td>
+<td>-18.30</td>
+<td>-17.74</td>
+<td>-1.12</td>
+<td>无</td>
+</tr>
+<tr>
+<td>澜起科技</td>
+<td>-9.68</td>
+<td>-9.06</td>
+<td>-1.24</td>
+<td>无</td>
+</tr>
+<tr>
+<td>长江电力</td>
+<td>0.25</td>
+<td>0.29</td>
+<td>-0.09</td>
+<td>无</td>
+</tr>
+<tr>
+<td>百济神州</td>
+<td>1.33</td>
+<td>-0.79</td>
+<td>4.23</td>
+<td>无</td>
+</tr>
+<tr>
+<td>药明康德</td>
+<td>-2.60</td>
+<td>-3.36</td>
+<td>1.52</td>
+<td>无</td>
+</tr>
+<tr>
+<td>泽璟制药</td>
+<td>-5.38</td>
+<td>-5.46</td>
+<td>0.17</td>
+<td>金叉</td>
+</tr>
+<tr>
+<td>紫金矿业</td>
+<td>-0.69</td>
+<td>-0.87</td>
+<td>0.37</td>
+<td>无</td>
+</tr>
+<tr>
+<td>汇川技术</td>
+<td>0.97</td>
+<td>0.26</td>
+<td>1.43</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<p>MACD 柱红 8 只、绿 5 只，较昨日红 7 只、绿 6 只略有改善，但改善来自医药与防御方向的红柱走强，不是主线修复。中际旭创绿柱 -15.34 为全池最深，较昨日 -11.41 继续加深，空头动能仍在释放；亨通光电、佰维存储、澜起科技绿柱均在 -1.00 上下，算力方向空头动能未见衰减。金叉 1 只（泽璟制药），较昨日 2 只减少 1 只；无死叉新增。</p>
+<h3>3.2 KDJ</h3>
+<table>
+<thead>
+<tr>
+<th>股票</th>
+<th>K</th>
+<th>D</th>
+<th>J</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中芯国际</td>
+<td>77.70</td>
+<td>68.63</td>
+<td>95.83</td>
+</tr>
+<tr>
+<td>中际旭创</td>
+<td>15.90</td>
+<td>18.28</td>
+<td>11.13</td>
+</tr>
+<tr>
+<td>阳光电源</td>
+<td>68.78</td>
+<td>54.89</td>
+<td>96.57</td>
+</tr>
+<tr>
+<td>亨通光电</td>
+<td>23.52</td>
+<td>23.13</td>
+<td>24.30</td>
+</tr>
+<tr>
+<td>兆易创新</td>
+<td>20.89</td>
+<td>24.84</td>
+<td>13.01</td>
+</tr>
+<tr>
+<td>佰维存储</td>
+<td>17.92</td>
+<td>18.77</td>
+<td>16.21</td>
+</tr>
+<tr>
+<td>澜起科技</td>
+<td>32.01</td>
+<td>31.71</td>
+<td>32.61</td>
+</tr>
+<tr>
+<td>长江电力</td>
+<td>67.41</td>
+<td>66.68</td>
+<td>68.87</td>
+</tr>
+<tr>
+<td>百济神州</td>
+<td>57.42</td>
+<td>42.87</td>
+<td>86.53</td>
+</tr>
+<tr>
+<td>药明康德</td>
+<td>61.23</td>
+<td>50.73</td>
+<td>82.23</td>
+</tr>
+<tr>
+<td>泽璟制药</td>
+<td>37.61</td>
+<td>31.10</td>
+<td>50.64</td>
+</tr>
+<tr>
+<td>紫金矿业</td>
+<td>64.71</td>
+<td>55.49</td>
+<td>83.14</td>
+</tr>
+<tr>
+<td>汇川技术</td>
+<td>77.48</td>
+<td>79.58</td>
+<td>73.28</td>
+</tr>
+</tbody>
+</table>
+<p>超买区（J 高于 90）2 只，较昨日 5 只减少 3 只：中芯国际 J=95.83、阳光电源 J=96.57 仍处超买区，紫金矿业 J=83.14、药明康德 J=82.23 由超买区回落至 80 至 90 区间，百济神州 J=86.53 由 75.13 抬升至该区间。超卖区（J 低于 10）无。最低为中际旭创 J=11.13、兆易创新 J=13.01、佰维存储 J=16.21，三只存储与光链龙头 J 值逼近超卖区但未进入，弱势仍在延续而非一日见底。</p>
+<h3>3.3 RSI(14)</h3>
+<table>
+<thead>
+<tr>
+<th>股票</th>
+<th>RSI(14)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中芯国际</td>
+<td>55.25</td>
+</tr>
+<tr>
+<td>中际旭创</td>
+<td>27.37</td>
+</tr>
+<tr>
+<td>阳光电源</td>
+<td>55.64</td>
+</tr>
+<tr>
+<td>亨通光电</td>
+<td>34.22</td>
+</tr>
+<tr>
+<td>兆易创新</td>
+<td>33.22</td>
+</tr>
+<tr>
+<td>佰维存储</td>
+<td>31.27</td>
+</tr>
+<tr>
+<td>澜起科技</td>
+<td>38.57</td>
+</tr>
+<tr>
+<td>长江电力</td>
+<td>57.41</td>
+</tr>
+<tr>
+<td>百济神州</td>
+<td>59.66</td>
+</tr>
+<tr>
+<td>药明康德</td>
+<td>48.32</td>
+</tr>
+<tr>
+<td>泽璟制药</td>
+<td>42.01</td>
+</tr>
+<tr>
+<td>紫金矿业</td>
+<td>44.72</td>
+</tr>
+<tr>
+<td>汇川技术</td>
+<td>57.88</td>
+</tr>
+</tbody>
+</table>
+<p>全池 RSI 均在 30.00 至 70.00 区间内，无超买（高于 70）与超卖（低于 30）。最高为百济神州 59.66、汇川技术 57.88、长江电力 57.41；最低为中际旭创 27.37，贴近超卖线但未跌破，弱势仍在延续而非一日见底。佰维存储 31.27、兆易创新 33.22、亨通光电 34.22 同处 30 至 35 的偏弱区间，算力与半导体方向的 RSI 集体下移。</p>
+<h3>3.4 均线排列</h3>
+<ul>
+<li><strong>多头排列</strong>：无</li>
+<li><strong>交叉/震荡</strong>：中芯国际、阳光电源、长江电力、百济神州、药明康德、紫金矿业、汇川技术（7 只，与昨日相同）</li>
+<li><strong>空头排列</strong>：中际旭创、亨通光电、兆易创新、佰维存储、澜起科技、泽璟制药（6 只，与昨日相同）</li>
+<li><strong>价格在 MA20 上方</strong>：中芯国际、阳光电源、长江电力、百济神州、药明康德、汇川技术（6 只，与昨日数量相同，结构变化：长江电力站回 MA20，紫金矿业跌破 MA20）</li>
+<li><strong>价格在 MA60 上方</strong>：长江电力、百济神州、汇川技术（3 只，与昨日相同）</li>
+</ul>
+<h2>四、距高点回撤筛选结果（价格位置小于 60% 为低吸池）</h2>
+<p>满足小于 60% 分位（12 只，与昨日名单相同）：</p>
+<table>
+<thead>
+<tr>
+<th>股票</th>
+<th>回撤</th>
+<th>价格位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中际旭创</td>
+<td>56.67%</td>
+<td>3.41%</td>
+</tr>
+<tr>
+<td>佰维存储</td>
+<td>51.96%</td>
+<td>3.81%</td>
+</tr>
+<tr>
+<td>亨通光电</td>
+<td>46.43%</td>
+<td>5.57%</td>
+</tr>
+<tr>
+<td>兆易创新</td>
+<td>47.46%</td>
+<td>0.59%</td>
+</tr>
+<tr>
+<td>澜起科技</td>
+<td>35.63%</td>
+<td>7.77%</td>
+</tr>
+<tr>
+<td>百济神州</td>
+<td>11.51%</td>
+<td>52.93%</td>
+</tr>
+<tr>
+<td>泽璟制药</td>
+<td>36.80%</td>
+<td>19.03%</td>
+</tr>
+<tr>
+<td>紫金矿业</td>
+<td>21.01%</td>
+<td>24.04%</td>
+</tr>
+<tr>
+<td>中芯国际</td>
+<td>19.33%</td>
+<td>37.72%</td>
+</tr>
+<tr>
+<td>阳光电源</td>
+<td>32.93%</td>
+<td>33.17%</td>
+</tr>
+<tr>
+<td>药明康德</td>
+<td>15.32%</td>
+<td>36.21%</td>
+</tr>
+<tr>
+<td>汇川技术</td>
+<td>13.50%</td>
+<td>48.00%</td>
+</tr>
+</tbody>
+</table>
+<p>不满足（1 只）：长江电力（回撤 0.63%，价格位置 92.66%）。</p>
+<p><strong>说明</strong>：低吸池名单与昨日相同，仍为 12 只，但位置结构全线下移：算力硬件方向回落最深（中际旭创由 4.22 回落至 3.41、兆易创新由 7.29 回落至 0.59 为全池最低、澜起科技由 18.02 回落至 7.77、佰维存储由 9.39 回落至 3.81、亨通光电由 13.05 回落至 5.57），医药与光伏方向同样回落（药明康德由 59.66 回落至 36.21、紫金矿业由 36.16 回落至 24.04、阳光电源由 38.43 回落至 33.17、汇川技术由 55.53 回落至 48.00）。位置下移是全市场下跌的表征，不等于低吸信号转强：池内仍有 6 只空头排列、10 只在 MA60 下方，低吸池内的下跌只看不买、不追低吸，破位品种反弹只减不加。</p>
+<h2>五、卖出时机建议</h2>
+<h3>需关注的卖出/减仓信号</h3>
+<ul>
+<li><strong>昨日锁定 S4 破线股的收盘验证（今日最优先纪律事件）</strong>：昨日锁定 S4 的 5 只中，2 只新增破线、3 只守住。中际旭创收 448.00，低于昨日锁定 S4 469.50 约 4.58%，且较 11 月 3 日锁定 S4 537.00 低约 16.57%，破线状态加深；兆易创新收 239.49，低于昨日锁定 S4 248.00 约 3.43%，新增破线。澜起科技收 150.10，高于昨日 S4 148.55 约 1.04%，守住但仅高出 1.04 个百分点；佰维存储收 126.00，高于昨日 S4 120.60 约 4.48%；亨通光电收 40.90，高于昨日 S4 38.81 约 5.39%。按纪律，收回不等于破线作废：破线股的反抽只减不加，不以反抽否定破线；中际旭创与兆易创新仍在破线状态，反抽减仓为主。</li>
+<li><strong>逼近硬止损（1 只，进入 3% 临界区）</strong>：兆易创新现价 239.49，距今日重算 S4 238.20 仅 0.54%，为全池唯一逼近股，且已跌破昨日锁定 S4 248.00，临界盯防优先级最高。下一只最近的是中际旭创，现价距今日重算 S4 427.34 约 4.83%，尚未进入临界区。</li>
+<li><strong>KDJ 超买减仓信号（2 只）</strong>：中芯国际 J=95.83、阳光电源 J=96.57 仍处超买区，减仓信号。超买股现价均已高于 T1 短期止盈位，分批止盈锁定利润，不加仓追高。</li>
+<li><strong>MACD 金叉转强信号（1 只）</strong>：泽璟制药新增金叉且红柱转正，但仍在 MA20 与 MA60 下方且为空头排列，金叉只作持有观察、不作加仓依据。</li>
+<li><strong>无新增死叉</strong>：全池无 MACD 死叉新增。</li>
+</ul>
+<h3>MA20 下方弱势股（7 只，与昨日数量相同，结构变化 1 只）</h3>
+<p>中际旭创、亨通光电、兆易创新、佰维存储、澜起科技、泽璟制药、紫金矿业——7 只仍在 MA20 下方，新增紫金矿业（跌破 MA20 28.72），长江电力站回 MA20 退出名单。其中除紫金矿业外均为算力与半导体方向，中线仍转弱，反弹减仓为主，不追高开新仓。</p>
+<h3>止盈/止损参考</h3>
+<table>
+<thead>
+<tr>
+<th>股票</th>
+<th>现价</th>
+<th>T1 短期止盈</th>
+<th>S1 短线止损</th>
+<th>S4 硬止损（今日重算）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中芯国际</td>
+<td>110.90</td>
+<td>103.30</td>
+<td>107.00</td>
+<td>94.80</td>
+</tr>
+<tr>
+<td>中际旭创</td>
+<td>448.00</td>
+<td>604.26</td>
+<td>500.98</td>
+<td>427.34</td>
+</tr>
+<tr>
+<td>阳光电源</td>
+<td>81.97</td>
+<td>74.84</td>
+<td>79.11</td>
+<td>62.00</td>
+</tr>
+<tr>
+<td>亨通光电</td>
+<td>40.90</td>
+<td>46.94</td>
+<td>42.42</td>
+<td>38.81</td>
+</tr>
+<tr>
+<td>兆易创新</td>
+<td>239.49</td>
+<td>277.51</td>
+<td>257.97</td>
+<td>238.20</td>
+</tr>
+<tr>
+<td>佰维存储</td>
+<td>126.00</td>
+<td>150.56</td>
+<td>129.57</td>
+<td>120.60</td>
+</tr>
+<tr>
+<td>澜起科技</td>
+<td>150.10</td>
+<td>168.95</td>
+<td>159.26</td>
+<td>143.10</td>
+</tr>
+<tr>
+<td>长江电力</td>
+<td>29.91</td>
+<td>29.60</td>
+<td>29.64</td>
+<td>27.51</td>
+</tr>
+<tr>
+<td>百济神州</td>
+<td>278.60</td>
+<td>257.96</td>
+<td>261.65</td>
+<td>237.84</td>
+</tr>
+<tr>
+<td>药明康德</td>
+<td>147.00</td>
+<td>146.74</td>
+<td>144.84</td>
+<td>131.90</td>
+</tr>
+<tr>
+<td>泽璟制药</td>
+<td>90.80</td>
+<td>94.60</td>
+<td>88.38</td>
+<td>78.37</td>
+</tr>
+<tr>
+<td>紫金矿业</td>
+<td>28.28</td>
+<td>28.72</td>
+<td>28.26</td>
+<td>25.90</td>
+</tr>
+<tr>
+<td>汇川技术</td>
+<td>56.66</td>
+<td>53.28</td>
+<td>56.80</td>
+<td>48.50</td>
+</tr>
+</tbody>
+</table>
+<p><strong>到价提示</strong>：现价高于 T1 短期止盈位的有 6 只（中芯国际、阳光电源、长江电力、百济神州、药明康德、汇川技术），可分批止盈锁定利润，不加仓追高。现价跌破 S1 短线止损的为 5 只（中际旭创 448.00 低于 S1 500.98、亨通光电 40.90 低于 S1 42.42、兆易创新 239.49 低于 S1 257.97、佰维存储 126.00 低于 S1 129.57、澜起科技 150.10 低于 S1 159.26），按短线纪律减仓或离场观察。紫金矿业现价 28.28 仅高于 S1 28.26 约 0.02，守住但已贴线，列为次优先盯防。按今日重算 S4 衡量无一股跌破，但该口径因昨日新低重算而必然不破线，纪律判断以昨日锁定 S4 的收盘验证为准：中际旭创与兆易创新仍未收回。</p>
+<h2>六、已退场/跟踪股票</h2>
+<p>汇川技术、阳光电源、长江电力为跟踪口径，非正式持仓池。汇川技术今日跌 2.21%，KDJ-J 由 93.43 回落至 73.28 退出超买区，现价高于 T1 53.28 且站上 MA60 56.05，跟踪仓分批止盈不追高；阳光电源今日跌 3.72%，KDJ-J 96.57 仍处超买区，量比 1.85 且放量下跌，仍在 MA60 89.31 下方，跟踪仓不因单日波动加仓；长江电力今日涨 2.15%，站回 MA20 29.60 且仍在 MA60 28.71 上方，现价高于 T1 29.60，是跟踪仓中相对最稳的一只，分批止盈、不加仓。</p>
+<h2>七、当日关键变化总结</h2>
+<ol>
+<li><strong>量能</strong>：沪深两市成交约 1.66 万亿，较昨日约 2.12 万亿缩量约 4601.57 亿，缩量幅度约 21.73%。按信号一，今日是缩量下跌：全市场量能萎缩的同时，池内 10 只量比不低于 1.00，主线方向抛压仍在释放，指数缩量与个股放量并存，定性为外盘传导下的被动下跌、不是资金主动大规模出逃的放量暴跌形态，但缩量不等于抛压衰减完成，明日量能能否继续萎缩企稳、还是放量杀跌，是判断调整性质的下一验证点。</li>
+<li><strong>主线</strong>：半导体/AI 硬件/算力今日是全球同步崩盘的第二日：费城半导体指数隔夜跌 12.25% 至 9011.14 点，创 2020 年 3 月以来最大单日跌幅，直接传导回来：中际旭创跌 9.19% 再创新低、兆易创新跌 8.99%、澜起科技跌 8.36%，池内算力方向全线收跌；日经 225 跌 5.96%、韩国 KOSPI 跌 6.02% 盘中触发熔断、台湾加权跌 4.51%，亚太科技股同步崩盘。按信号二，龙头中际旭创连续三日破线且今日再创新低（距 3M 最高回撤 56.67%），主线破位未修复，赚钱效应由主线转向银行、电力、农业等防御方向，今日不算企稳确认，仓位压到半仓以下、不抄底成长股。</li>
+<li><strong>资金流向</strong>：北向资金当日完整数据未及纳入本报告。主线方向主力资金当日完整数据同样未及纳入，按信号三，加仓的两个先决条件均未确认，加仓条件不齐备。大单口径近似统计显示中际旭创当日净流入约 26.01 亿元，但该口径存在拆单与对倒噪声，且与股价跌 9.19% 并存，不能作为外资回补或主力回流的证据，不改变“只看不动”的判断。</li>
+<li><strong>暴跌四铁律执行</strong>：创业板指今日跌 3.96%、深证成指跌 2.57%，单日跌幅均超过 1.50%，铁律一在成长方向触发：先把仓位降到睡得安稳的水平，保留足够现金应对后续波动，沪指跌 1.10% 未超 1.50%，但不改变成长方向的降仓语境。铁律二，主线破位未企稳前不开新仓、不做短线反弹；铁律三，破线股中际旭创与兆易创新绝不越跌越补摊薄接飞刀；铁律四，不追暴跌中逆势上涨的冷门题材，今日领涨的电力、农业、AI 漫剧等题材轮动是防御与情绪轮动、不是主线企稳，不追高。</li>
+<li><strong>晨间对标验证</strong>：对标报告预计今日“指数大概率低开，结构严重分化；存储与光模块是今日重灾区，防御与油价链相对占优”，方向兑现——三大指数低开后全天低位震荡，存储与光链跌幅居前，银行、电力、农业逆势走强；对标“光伏方向隔夜情绪冲击下能否守住涨幅需看开盘量能”部分兑现——光伏概念反复活跃、永臻股份走出 4 连板，但阳光电源仍跌 3.72%；对标“今晚美国非农数据公布前，市场偏谨慎”兑现——全天成交缩量约 4601.57 亿，观望情绪明显；对标“主线未企稳前不开新仓、不抄底存储与光链，破位品种反弹只减不加”的纪律继续有效。</li>
+<li><strong>硬止损事件的收盘验证是今日第一纪律事实</strong>：昨日锁定 S4 的 5 只今日 2 破 3 守，新增破线 2 只（中际旭创、兆易创新）；兆易创新距今日重算 S4 仅 0.54%，进入 3% 临界区，为全池唯一逼近股；澜起科技守住昨日 S4 但仅高出 1.04 个百分点，同样列为次优先盯防。破线股的反抽只减不加，单日反弹或收回都不算企稳确认。</li>
+<li><strong>单日指数收跌不是抄底信号</strong>：池内仍有 6 只空头排列、10 只在 MA60 下方、7 只在 MA20 下方，低吸池仍有 12 只。按框架，企稳需要龙头站回各自 MA20 加放量反包加资金持续回流三者叠加，今日三者一条都未兑现；中证 500 今日收跌 2.13%，盘中最低 6512.13 点、跌幅一度达 3.39%，接近 -3.50% 一线后收盘回升，未触及该线。明日若主线继续下探今日重算 S4、量能放量杀跌，则今日定性为全球 AI 抛售传导的第二日，仍按纪律处置。</li>
+</ol>
+<h2>当日重要新闻汇总</h2>
+<ol>
+<li><strong>A股 11 月 6 日低开低走、三大指数集体收跌，两市成交 1.66 万亿</strong>：上证跌 1.10% 至 3649.18 点，深成跌 2.57% 至 11175.78 点，创业板指跌 3.96% 至 2465.23 点，科创 50 跌 2.60%；沪深两市成交约 1.66 万亿、较昨日缩量约 4602 亿；全市场超 4700 只个股下跌，涨停 32 家、跌停 15 家；算力硬件股跌幅居前，剑桥科技、澳弘电子跌停；电力、银行、农业板块逆势走强，沪农商行涨超 4%；光伏概念反复活跃，永臻股份走出 4 连板；AI 漫剧题材浙文影业 5 连板。（金融界、财联社、21经济网、连板网，2026-11-06）</li>
+<li><strong>隔夜美股暴跌，纳指进入技术性回调，费城半导体创 2020 年 3 月以来最大单日跌幅</strong>：11 月 5 日美股大跌，标普 500 跌 4.36% 至 7353.73 点，道指跌 3.44% 至 51523.06 点，纳指跌 5.52% 至 24315.00 点、较 10 月 6 日历史收盘高点回落 11.90%，纳斯达克 100 跌 6.36%；费城半导体指数跌 12.25% 至 9011.14 点，30 只成分股全线下跌；闪迪跌 22.26% 为标普 500 当日跌幅最大的成分股，美光跌 17.46%、西数跌 17.35%；VIX 恐慌指数涨 69.66% 至 28.18，创八个月新高；10 年期美债收益率回落至 4.84%。（对标映射报告、多家财经报道，2026-11-06）</li>
+<li><strong>亚太股市同步大跌，日经跌 5.96%、韩国 KOSPI 跌 6.02% 盘中触发熔断</strong>：日经 225 收跌 5.96% 至 57434.77 点，终值跌幅为历史第三，盘中一度跌超 7.00%；韩国 KOSPI 收跌 6.02%，盘中一度跌超 8.00% 并触发熔断、暂停交易 20 分钟；台湾加权指数跌 4.51%，台积电盘中一度触及跌停；恒生指数跌 1.27%、恒生科技跌 1.83%；软银集团跌约 11.60%、SK 海力士跌超 8.00%、三星电子跌约 7.00%。市场解读为 AI 建设放缓与监管预期重估引发的全球科技股连锁抛售。（多家财经报道，2026-11-06）</li>
+<li><strong>光模块“易中天”午间集体公告回应：需求强劲、订单充足</strong>：中际旭创、新易盛、天孚通信 11 月 6 日午间集体发布公告回应市场关切。中际旭创称目前行业需求依然强劲，主要客户订单已基本覆盖 2027 年全年，部分重点客户已给出 2028 年明确需求指引；预计 800G、1.6T 订单需求仍将保持快速增长，NPO、XPO 等下一代光互连产品需求将于明年下半年逐步释放。市场解读为本轮急跌更多源于跨市场情绪与资金扰动，而非订单与交付层面出现逆转。（金融界，2026-11-06）</li>
+<li><strong>今晚 21:30 美国 10 月非农就业报告公布，市场预期新增 5.9 万至 6.5 万人</strong>：道琼斯调查预期新增 5.9 万人，FXStreet 共识预期新增 6.5 万人，前值新增 2.9 万人，失业率预期维持 4.2%；10 月 ADP 新增就业 8.6 万人、好于预期的 6.9 万人。经济学家表示该报告不太可能影响美联储 12 月的利率决议；据 CME“美联储观察”，12 月维持利率不变的概率为 31.30%，加息 25 个基点的概率为 68.70%。报告实际值留待 11 月 7 日晨报核验，本报告不编造数值。（财联社、TradingKey，2026-11-06）</li>
+<li><strong>布伦特收涨 3.88% 至 98.29 美元，油轮在霍尔木兹海峡再遭袭</strong>：周三油价暴跌约 9.00% 后，周四因新的油轮遇袭事件与美伊战争前景重估而反弹；布伦特收涨 3.67 美元至 98.29 美元，WTI 收涨 2.40 美元至 90.52 美元。英国海事机构称自周日以来海湾地区至少已有 5 艘船只报告遇袭；欧亚集团把达成协议的概率从 20.00% 下调至 10.00%，把再度打击伊朗的概率从 65.00% 下调至 60.00%，持续僵局的概率从 15.00% 上调至 30.00%。（路透社经对标映射报告，2026-11-06）</li>
+<li><strong>银行板块午后逆势走强，42 家上市银行三季报全部披露完毕</strong>：11 月 6 日银行板块午后逆势走强，沪农商行涨超 4.00%，苏州银行、建设银行、南京银行涨超 2.00%；消息面上，42 家 A 股上市银行 2026 年三季报已全部披露完毕。（金融界，2026-11-06）</li>
+<li><strong>当日数据未及纳入</strong>：北向资金当日完整数据、主线板块主力资金当日完整数据、11 月 6 日美国 10 月非农报告实际值，留待 11 月 7 日晨报核验，本报告不编造数值。</li>
+</ol>
+<h2>八、明日（下一交易日）关注</h2>
+<ul>
+<li>□ 中际旭创能否收回昨日锁定 S4 469.50（今日收 448.00，仍低约 4.58%），以及能否向 MA20 604.26 靠拢；仍在破线状态，反抽只减不加</li>
+<li>□ 兆易创新距今日重算 S4 238.20 仅 0.54%，能否守住；已跌破昨日锁定 S4 248.00，临界盯防优先级最高</li>
+<li>□ 澜起科技守住昨日 S4 148.55 后的站位（收 150.10，仅高 1.04%），能否向 MA20 168.95 靠拢</li>
+<li>□ KDJ 超买 2 只的消化：中芯国际 J=95.83 与阳光电源 J=96.57，冲高回落还是高位消化，超买股不追高</li>
+<li>□ 沪指能否守住 3649.18 点一线、创业板指能否守住 2465.23 点一线，两市成交能否守住 1.66 万亿、缩量是企稳还是量能枯竭</li>
+<li>□ 主线企稳验证：半导体/AI 硬件/算力龙头能否站回 MA20（中际旭创 604.26、兆易创新 277.51、佰维存储 150.56、澜起科技 168.95、亨通光电 46.94），站上才谈企稳确认</li>
+<li>□ 今日重算 S4 为下一参考线（中际旭创 427.34、兆易创新 238.20、佰维存储 120.60、亨通光电 38.81、澜起科技 143.10），再破新线继续按纪律离场</li>
+<li>□ 紫金矿业跌破 MA20 后的站位（现价 28.28，MA20 28.72），以及现价仅高于 S1 28.26 约 0.02 的贴线状态；长江电力站回 MA20 后能否守住 MA60 28.71</li>
+<li>□ 今晚 21:30 美国 10 月非农报告实际值（预期新增 5.9 万至 6.5 万人、失业率 4.2%），以及 12 月美联储议息路径预期的变化对成长股估值的传导</li>
+<li>□ 北向资金是否结束连续净卖出、主线板块主力资金是否持续净流入（加仓的先决条件）</li>
+</ul>
+<p><em>报告生成时间：2026-11-06 20:30（北京时间） | 数据截至：2026年11月6日收盘 | 基于 Tushare Pro + 新浪财经数据分析</em></p>
+<p class="meta"><span class="lz">发布日期：2026-11-06 · 数据基准：2026-11-06 · 类型：晚间</span><span class="le">Published 2026-11-06 · Data as of 2026-11-06 · Evening</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
