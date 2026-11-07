@@ -705,6 +705,34 @@ def donatefloat_html(root=""):
     return DONATEFLOAT_HTML.replace('src="assets/', 'src="' + root + 'assets/') + THEME_SCRIPT + LANG_SCRIPT
 
 
+_CN_DIGITS = {"一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5,
+              "六": 6, "七": 7, "八": 8, "九": 9}
+
+
+def _cn_num(s):
+    if s == "十":
+        return 10
+    if "十" in s:
+        tens, _, ones = s.partition("十")
+        return (_CN_DIGITS.get(tens, 1) if tens else 1) * 10 + _CN_DIGITS.get(ones, 0)
+    return _CN_DIGITS.get(s, -1)
+
+
+def _custom_sort_key(fname):
+    """同日文章按文件名倒序；带「第X讲」的系列文章先按讲次倒序（新讲在前）。"""
+    m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|html)$", fname)
+    if not m:
+        return ("", -1, fname)
+    lm = re.search(r"第([一二三四五六七八九十两]+|\d+)讲", m.group(2))
+    if not lm:
+        n = -1
+    elif lm.group(1).isdigit():
+        n = int(lm.group(1))
+    else:
+        n = _cn_num(lm.group(1))
+    return (m.group(1), n, fname)
+
+
 def collect_custom():
     items = []  # (tab_id, subdir, date, name, ext, src_path)
     for subdir, tab_id in CUSTOM_DIRS.items():
@@ -712,7 +740,7 @@ def collect_custom():
         if not os.path.isdir(d):
             continue
         names = set(os.listdir(d))
-        for fname in sorted(names, reverse=True):
+        for fname in sorted(names, key=_custom_sort_key, reverse=True):
             m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|html)$", fname)
             if not m:
                 continue
