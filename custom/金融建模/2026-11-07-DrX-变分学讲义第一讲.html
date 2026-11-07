@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-张恭庆《变分学讲义》第一讲：变分学与变分问题——泛函、十个例子与通向随机变分学的地图 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1><span class="lz">DrX-张恭庆《变分学讲义》第一讲：变分学与变分问题——泛函、十个例子与通向随机变分学的地图</span><span class="le">DrX-Zhang Gongqing&#x27;s Lectures on the Calculus of Variations, Lecture 1: Variational Problems and Functionals - Ten Examples and the Road to Stochastic Variational Calculus</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This is the first instalment of a lecture-by-lecture reading of Zhang Gongqing&#x27;s Lectures on the Calculus of Variations, written for senior undergraduates in mathematics with full derivations and added explanations wherever the original text moves quickly. Lecture 1 poses no equations; it defines the object of study - a functional I : M -&gt; R on a set of admissible functions - including the instructive non-example I4(u) = f(u(x)), and lays out ten examples as problem templates: the brachistochrone, geodesics, minimal surfaces, eigenvalue problems and best constants in inequalities via the Rayleigh quotient, the vibrating plate, an optimal-control problem of reinvestment solved in full (a bang-bang strategy switching at T - 1/alpha), Mumford-Shah image segmentation, harmonic maps, the Hamiltonian action as a critical value, and the Einstein-Hilbert action. A synthesis section integrates the companion texts: Oksendal&#x27;s expectation functionals, adapted controls and value function, with a term-by-term match between Zhang&#x27;s reinvestment example and Oksendal&#x27;s optimal portfolio problem, and Nualart&#x27;s Malliavin derivative as the first variation transported to Wiener space, anchored by the Gaussian integration-by-parts formula whose one-dimensional case is Stein&#x27;s lemma. All claims carry explicit citations to the three books.</p></div>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月7日</p>
+<p>本文开始按原书讲次逐讲研读张恭庆《变分学讲义》[1]。这套讲义是作者在北京大学为高年级本科生和低年级研究生开设"变分学"课程的讲稿，要求听课者学过数学分析、高等代数、解析几何，并具备常微分方程、实变函数、泛函分析、微分几何与数学物理方程的初步知识 [1，前言]。本文的写法与之对齐：以数学系高年级本科生的基础为起点，推导一步不跳；凡是原书一笔带过、而初学者容易卡住的地方，都另加"补充讲解"展开。同时，每讲都把 Øksendal《随机微分方程》[2] 与 Nualart《Malliavin 微积分》[3] 的对应内容编织进来：张的书给出变分问题本身，Øksendal 给出它的随机版本，Nualart 给出在随机路径空间上求导的工具，三者合起来才是本系列要走的完整路线（全系列的安排见 <a href="2026-11-03-DrX-变分法学习路径与策略实现规划.html">《DrX-变分法金融数学学习路径》</a>）。正文引用一律标注出处，如 [1，§1.3，例 1.1] 表示张的书第一讲第 3 节例 1.1，文末列出三本书的完整版本信息。</p>
+<p>第一讲的标题是"变分学与变分问题"，全讲四节：§1.1 前言，§1.2 泛函，§1.3 典型例子，§1.4 进一步的例子 [1，目录]。这一讲不推导任何方程，它只做三件事：说明变分学在数学版图中的位置，定义研究对象"泛函"，再用十个例子把问题的谱系一次摆全。读这一讲的正确方式，是把十个例子读成十种"问题模板"：每读一个例子，都追问四件事——自变量是什么，可行集合是什么，泛函是什么，要的是极值还是临界值。本讲之后的所有理论，都是为回答这十个模板而建的。</p>
+<h2>一、§1.1 前言：变分学的版图与全书结构</h2>
+<p>张开篇给变分学的定位是：数学分析的一个重要组成部分，与其他数学分支密切联系、应用广泛 [1，§1.1]。他列出的联系方向，值得逐条对照本书后续讲次与本系列的金融数学主线来读：</p>
+<ul>
+<li>大量数学物理方程、弹性与塑性力学方程、生物薄膜方程、几何中的微分方程，都是某个泛函的 Euler 方程。也就是说，许多偏微分方程不是凭空写下的，而是"某个量取极值"这件事的一阶条件。第二讲的 Euler-Lagrange 方程就是这条联系的入口。</li>
+<li>最优控制理论是一类与传统问题不同的、带约束的变分问题，在工程控制与经济学中经常出现。它对应本书第十九讲，也是 §1.4 例 1.6 的归属，是本系列通向金融最优投资问题的桥。</li>
+<li>变分方法是证明椭圆型偏微分方程解的存在性的主要方法；变分学与偏微分方程关系之密切，可从 Hilbert 第 19 问题与第 20 问题看出。这对应第九讲"直接方法"与第十至十三讲。</li>
+<li>偏微分方程的数值方法、特别是有限元方法，直接来自变分问题；最优化技术的发展使变分极值问题可以直接数值求解。这对应第十八讲，也对应本系列后续把理论落成代码的里程碑。</li>
+<li>拓扑学与变分学结合产生"大范围变分学"，带来临界点理论的大发展；Morse 理论建立了分析与拓扑的联系，Floer 同调也是二者结合的产物。这对应第十四、十五讲。</li>
+<li>变分理论深入 Riemann 几何、Finsler 几何、辛几何与保形几何，测地线、极小曲面、调和映射等问题的研究激发了几何测度论等新理论。这对应第十七讲与 §1.3、§1.4 的几何例子。</li>
+<li>变分方法在 Hamilton 动力系统的周期轨道、Mather 集与混沌研究中起重要作用。这对应第五讲与第十六讲。</li>
+<li>最后一条与本系列关系最直接：作为微积分学与概率论结合之后产生的随机变分学（Malliavin Calculus），成为金融数学的重要部分 [1，§1.1]。张在全书第一讲就点名了这条线；本文第五节正是把这句话展开。</li>
+</ul>
+<p>全书共二十讲：前八讲是经典变分学，第九讲到第十四讲介绍直接方法，这两部分是基本内容；第十五讲到第二十讲是专题介绍，可作选讲；带星号的章节初读可以略去 [1，§1.1]。与传统教科书相比，本书的取舍是：在经典部分重点突出极小点的一阶与二阶条件，对多变量情形花了一定篇幅，增强了 Hamilton-Jacobi 理论与守恒律两节，在经典理论之外着重介绍直接方法与应用，并把特征值问题作为约束极值问题存在性理论的应用来讲 [1，§1.1]。第一讲的十个例子，恰好是这二十讲的"需求清单"：每个例子都对应后面的一块理论，读到后面任何一讲，都可以回到第一讲看它在解决哪一个例子。</p>
+<h2>二、§1.2 泛函：研究对象</h2>
+<h3>2.1 定义与三个正面例子</h3>
+<p>变分学是研究泛函极值（以及更一般的临界值）的数学分支。一般地，从任意集合 $M$ 到实数域 $\mathbb{R}$ 或复数域 $\mathbb{C}$ 的映射通称为泛函；但在变分学中，泛函只取实值，定义域 $M$ 是一个函数集合，即 $I : M \to \mathbb{R}$ [1，§1.2]。</p>
+<p><strong>补充讲解：泛函与本科课程里三个近亲的区别。</strong> 普通多元函数 $f : \mathbb{R}^{n} \to \mathbb{R}$ 的自变量是一个点（有限个坐标）；泛函的自变量是整个函数——无穷多个"坐标"，所以变分学常被形容为"无穷维空间上的微积分"。泛函分析里也讲泛函，但那里默认研究的是线性泛函（对偶空间的元素）；变分学里的泛函一般是非线性的，例如下面的积分泛函对 $u$ 就是非线性的。第三个近亲是"复合函数"：它仍然是函数到函数的映射，输出还是函数，不是数，与泛函不同（见 2.2 的反例）。</p>
+<p>张给出的三个正面例子是（设 $\Omega \subset \mathbb{R}^{n}$ 是有界开集，$x_{0} \in \Omega$ 是固定点，$F \in C(\bar{\Omega})$，$M = C^{1}(\bar{\Omega})$）[1，§1.2]：</p>
+<p>$$
+I_{1}(u) = \max_{x \in \bar{\Omega}} \lvert u(x) \rvert, \qquad I_{2}(u) = u(x_{0}), \qquad I_{3}(u) = \int_{\Omega} \lbrack \lvert \nabla u(x) \rvert^{2} - F(u(x)) \rbrack dx
+$$</p>
+<p>三者都是泛函：输入一个函数 $u$，输出一个数。$I_{1}$ 是 $u$ 的最大值范数；$I_{2}$ 是"在固定点取值"，称为点值泛函；$I_{3}$ 是积分型泛函，也是全书的主角类型。</p>
+<p><strong>补充讲解：$I_{2}$ 藏着一个关于"空间与拓扑"的伏笔。</strong> 点值泛函是否连续，取决于 $M$ 上装什么拓扑：在一致范数（即 $I_{1}$ 给出的范数）下它连续，因为 $\lvert u(x_{0}) - v(x_{0}) \rvert \le \max_{x} \lvert u - v \rvert$；但在 $L^{2}$ 范数下它不连续——可以在 $x_{0}$ 附近放一个又高又窄的"尖峰"函数，$L^{2}$ 范数任意小，点值却任意大。这说明在变分学里，"在哪个函数空间上、用什么收敛性讨论极值"不是技术细节，而是问题的一部分。第十讲的 Sobolev 空间与嵌入定理，正是用来系统处理这件事的：嵌入定理会告诉我们，在足够好的 Sobolev 空间里点值重新变得连续。本讲先把这个伏笔记住。</p>
+<h3>2.2 一个反例：为什么 $I_{4}(u) = f(u(x))$ 不是泛函</h3>
+<p>张紧接着强调：不论 $M$ 取什么、一元函数 $f$ 取什么，复合函数 $I_{4}(u) = f(u(x))$ 都不是泛函 [1，§1.2]。</p>
+<p><strong>补充讲解：这个反例卡住过不少初学者，值得说透。</strong> 问题出在右端的 $x$ 没有被"处理掉"：$f(u(x))$ 随着 $x$ 的不同取不同的值，它是 $x$ 的函数，即输出仍是一个函数（复合函数 $f \circ u$），而不是一个数。泛函的定义要求输出落在 $\mathbb{R}$ 里。要把它改造成泛函，必须再对 $x$ 做一次"消元"：固定 $x = x_{0}$ 取值，得到 $I_{2}$；对 $x$ 取最大值，得到 $I_{1}$；对 $x$ 积分，得到 $I_{3}$ 型。换句话说，一个表达式要成为泛函，自变量函数 $u$ 的每一个"自由度"都必须被取值、求极值或积分这类操作消耗完。这个判别法在第五节读 Nualart 时还会用到：随机泛函 $F(\omega)$ 输出的是随机变量，要再取期望才得到数——期望就是概率空间上的"积分消元"。</p>
+<h3>2.3 变分学主要研究的泛函形式</h3>
+<p>给定 $L \in C^{1}(\bar{\Omega} \times \mathbb{R}^{N} \times \mathbb{R}^{nN})$，变分学主要研究如下形式的泛函 [1，§1.2]：</p>
+<p>$$
+I(u) = \int_{\Omega} L(x, u(x), \nabla u(x)) \, dx
+$$</p>
+<p>其中 $M$ 是连续可微函数类 $C^{1}(\bar{\Omega})$ 的子集，或者某种广义可微函数类的子集，它由一些限制条件——积分形式的、逐点的、带微分的、不带微分的边值条件与约束条件——所规定；有时积分中还可以含有高阶导数项，$M$ 也应做相应改变 [1，§1.2]。</p>
+<p><strong>补充讲解：把这个公式读出结构。</strong> $L$ 称为被积函数，有时也叫 Lagrange 函数或"密度"：泛函的值是密度沿区域的累积，密度在每一点 $x$ 只依赖三样东西——位置 $x$、函数值 $u(x)$、梯度 $\nabla u(x)$。一元情形下这就是第二讲要处理的 $I(u) = \int_{a}^{b} L(x, u, u') dx$。注意 $M$ 与 $I$ 是两个独立的成分：同一个泛函换一个 $M$（比如换一组边值条件）就是另一个问题。以后每遇到一个变分问题，先按四要素拆开：未知函数取自哪个类、泛函是什么、可行集 $M$ 由哪些条件界定、求极小值、极大值还是临界值。第三节与第四节的十个例子，全部按这张清单拆解，最后汇总成一张总表。</p>
+<h2>三、§1.3 典型例子</h2>
+<h3>例 1.1 最速降线：时间是曲线的泛函</h3>
+<p>在垂直平面上给定两点 $A = (x_{1}, y_{1})$ 与 $B = (x_{2}, y_{2})$，其中 $x_{1} &lt; x_{2}$，$y_{1} &gt; y_{2}$。一个质点沿连接这两点的光滑曲线仅借重力下滑，初速度为零，问沿怎样的曲线滑行时间最短 [1，§1.3，例 1.1]。</p>
+<p>建模分三步，每一步都是高中物理加微积分。设曲线为 $y = u(x)$，质点在高度 $u(x)$ 处的下落距离是 $h = y_{1} - u(x)$。由能量守恒 $\frac{1}{2} m v^{2} = m g h$，得速率</p>
+<p>$$
+v = \sqrt{2 g (y_{1} - u(x))}
+$$</p>
+<p>弧长微元 $ds = \sqrt{1 + \lvert u'(x) \rvert^{2}} \, dx$，而 $dt = ds / v$，所以总时间是</p>
+<p>$$
+T(u) = \frac{1}{\sqrt{2 g}} \int_{x_{1}}^{x_{2}} \sqrt{\frac{1 + \lvert u'(x) \rvert^{2}}{y_{1} - u(x)}} \, dx, \qquad M = \lbrace u \in C^{1}(\lbrack x_{1}, x_{2} \rbrack) \mid u(x_{i}) = y_{i}, \ i = 1, 2 \rbrace
+$$</p>
+<p>$T$ 是曲线 $u$ 的泛函，要在 $M$ 中求使 $T$ 极小的 $u$ [1，§1.3，例 1.1]。</p>
+<p><strong>补充讲解：这个例子的两个难点。</strong> 其一，被积函数在起点处奇异：$x = x_{1}$ 时分母 $y_{1} - u(x) = 0$，被积函数趋于无穷（但总时间的积分仍然收敛，奇异性是可积的）。这不是疏漏，而是问题的本质——最优曲线在 $A$ 点的切线是竖直的，质点先近乎自由落体地加速，再借速度滑向 $B$；"先陡后缓" beat 了直线，这正是这个问题 1696 年由 Johann Bernoulli 提出挑战、牛顿等人应战的历史名题。其二，它的答案是摆线（旋轮线），一条在本科微积分里见过的曲线如何从"时间最短"里被变分法重新解出，要等第二讲 Euler-Lagrange 方程与一阶积分就位之后才能完成，本讲只把问题提准。给金融读者的一个类比（只是结构类比）：交易执行中的"总冲击成本"是交易速率轨迹的积分泛函，与 $T(u)$ 同属"沿一条待选轨迹累积密度"的类型。</p>
+<h3>例 1.2 测地线：弧长是曲线函数的泛函</h3>
+<p>在单位球面 $S^{2}$ 上给定两点 $P_{0}$ 与 $P_{1}$，求连接两点的弧长最短的曲线 [1，§1.3，例 1.2]。采用球面坐标 $v = (\theta, \varphi) \in \lbrack -\frac{\pi}{2}, \frac{\pi}{2} \rbrack \times \lbrack 0, 2\pi)$，三个坐标函数为 $x_{1} = \cos\theta \cos\varphi$，$x_{2} = \cos\theta \sin\varphi$，$x_{3} = \sin\theta$。设 $M$ 为连接两端点参数值的 $C^{1}$ 曲线函数 $v(t) = (\theta(t), \varphi(t))$ 的集合，弧元平方是</p>
+<p>$$
+ds^{2} = dx_{1}^{2} + dx_{2}^{2} + dx_{3}^{2} = d\theta^{2} + \cos^{2}\theta \, d\varphi^{2} = \lbrack \theta'(t)^{2} + \cos^{2}\theta(t) \, \varphi'(t)^{2} \rbrack dt^{2}
+$$</p>
+<p>故弧长泛函为</p>
+<p>$$
+L(v) = \int_{0}^{1} \sqrt{\theta'(t)^{2} + \cos^{2}\theta(t) \, \varphi'(t)^{2}} \, dt
+$$</p>
+<p>要在 $M$ 中求 $v$ 使 $L(v)$ 极小 [1，§1.3，例 1.2]。</p>
+<p><strong>补充讲解：弧元公式的验算与两条伏笔。</strong> 验算只需对三个坐标求微分再平方求和：$d\theta$ 的系数收集得 $\sin^{2}\theta \cos^{2}\varphi + \sin^{2}\theta \sin^{2}\varphi + \cos^{2}\theta = 1$；$d\varphi$ 的系数收集得 $\cos^{2}\theta (\sin^{2}\varphi + \cos^{2}\varphi) = \cos^{2}\theta$；交叉项两两抵消。伏笔一：被积函数不显含参数 $t$，且对 $(\theta', \varphi')$ 是一次齐次的——这反映弧长与参数选取无关；这类结构在第二讲会给出一个一阶积分，在第八讲会看到它是 Noether 定理的一个特例。伏笔二：极小元是大圆的劣弧，这件事用变分法严格证明并不平凡（要排除绕远的路径、处理坐标在两极的奇异性），张把完整的测地线讨论放在第十七讲。本讲只需注意问题模板：未知量是向量值函数 $v(t)$，泛函只依赖它和它的导数，约束只有端点条件。</p>
+<h3>例 1.3 极小曲面：面积是曲面函数的泛函</h3>
+<p>在空间 $\mathbb{R}^{3}$ 中给定一条 Jordan 曲线 $\Gamma$，能否找到一个盘状曲面 $S$ 张在 $\Gamma$ 上使其面积达到极小值 [1，§1.3，例 1.3]？用参数方程描写 $S$：映射 $Z : (u, v) \mapsto (x, y, z)$，定义域 $D$ 是单位圆盘。曲面的面积是</p>
+<p>$$
+A(Z) = \int_{D} \lvert Z_{u} \times Z_{v} \rvert \, du \, dv = \int_{D} \sqrt{(x_{u} y_{v} - y_{u} x_{v})^{2} + (y_{u} z_{v} - z_{u} y_{v})^{2} + (z_{u} x_{v} - x_{u} z_{v})^{2}} \, du \, dv
+$$</p>
+<p>面积 $A$ 是曲面函数 $Z$ 的泛函；取 $M$ 为边界像恰为 $\Gamma$ 的 $C^{1}$ 映射的集合，在 $M$ 中求 $Z$ 使 $A(Z)$ 极小 [1，§1.3，例 1.3]。这就是 Plateau 问题，肥皂膜实验是它的物理版本：铁丝圈蘸肥皂液张出的膜，就是自然界给出的近似极小曲面。</p>
+<p><strong>补充讲解：与前两个例子的结构差异。</strong> 未知函数 $Z$ 有两个自变量 $(u, v)$，是"多重积分的变分问题"，对应第六讲；被积函数 $\lvert Z_{u} \times Z_{v} \rvert$ 还可以写成第一基本形式的 $\sqrt{E G - F^{2}}$，其中 $E = \lvert Z_{u} \rvert^{2}$，$F = Z_{u} \cdot Z_{v}$，$G = \lvert Z_{v} \rvert^{2}$——本科微分几何里学过的量，在这里第一次以"被积密度"的身份出现。还要注意 $M$ 的条件不是逐点边值，而是"边界像等于给定曲线"这一整体性条件；极小曲面的存在性在历史上非常困难，它提醒读者：把问题写成泛函极小只是第一步，极小值是否达到是另一回事（第九讲直接方法的主题）。</p>
+<h3>例 1.4 特征值问题与不等式：约束极值</h3>
+<p>给定 $\mathbb{R}^{n}$ 中的有界区域 $\Omega$，对 $u \in H_{0}^{1}(\Omega)$（边值为零的 Sobolev 空间，第十讲详述）定义能量与约束</p>
+<p>$$
+E(u) = \int_{\Omega} \lvert \nabla u(x) \rvert^{2} dx, \qquad G(u) = \int_{\Omega} \lvert u(x) \rvert^{2} dx = 1, \qquad M = \lbrace u \in H_{0}^{1}(\Omega) \mid G(u) = 1 \rbrace
+$$</p>
+<p>在 $M$ 中求 $u_{1}$ 使 $E$ 达到极小，这个极小值 $\lambda_{1} = \min \lbrace E(u) \mid G(u) = 1 \rbrace$ 称为第一特征值，$u_{1}$ 称为第一特征函数，在几何、物理与工程中都有重要意义。许多分析与几何上的不等式也可以提成变分问题求解，例如 Sobolev 不等式中的最佳常数 $S_{N}$，就可以化成在约束 $\int_{\mathbb{R}^{N}} \lvert u \rvert^{2N/(N-2)} dx = 1$ 下求 $I(u) = \int_{\mathbb{R}^{N}} \lvert \nabla u \rvert^{2} dx$ 的极大值来得到；极大值存在且等于 $S_{N}$，就同时表明 $S_{N}$ 是使不等式成立的最佳常数 [1，§1.3，例 1.4]。</p>
+<p><strong>补充讲解：为什么"极小值"就是"特征值"——这是本讲最值得展开的推理。</strong> 先看无约束的比值形式。定义 Rayleigh 商 $R(u) = E(u) / G(u)$（$u \ne 0$）。$R$ 是零次齐次的：$R(c u) = R(u)$ 对任何非零常数 $c$ 成立，所以在 $R$ 上求极小与在约束面 $G(u) = 1$ 上求 $E$ 的极小完全等价，约束只是把尺度固定下来。设极小在 $u_{1}$ 达到。对约束极值用 Lagrange 乘子法（第七讲 §7.1 的逐点版本、第十二讲的系统处理）：存在乘子 $\lambda$ 使 $E$ 与 $G$ 的一阶变分满足 $\delta E = \lambda \, \delta G$。而 $\delta E$ 对应的 Euler 方程是 $-2 \Delta u$，$\delta G$ 对应 $2 u$，于是极小元满足</p>
+<p>$$
+\Delta u_{1} + \lambda_{1} u_{1} = 0 \quad (\Omega \text{ 内}), \qquad u_{1} = 0 \quad (\partial \Omega \text{ 上})
+$$</p>
+<p>再把方程与 $u_{1}$ 做内积（两边乘 $u_{1}$ 积分、分部积分），得到 $\lambda = E(u_{1}) / G(u_{1}) = E(u_{1})$，即乘子恰好是极小值本身。于是"求能量的约束极小"与"求 $-\Delta$ 的最小特征值"是同一件事的两种说法；Poincaré 不等式 $\int \lvert u \rvert^{2} \le \lambda_{1}^{-1} \int \lvert \nabla u \rvert^{2}$ 中的最佳常数也随之被这个变分问题定死。本科阶段只需把这条推理链走通：齐次性 $\to$ 约束归一化 $\to$ 乘子法 $\to$ 特征方程。给金融读者的结构类比：最大化组合方差 $\sigma^{2} = w^{\top} \Sigma w$ 在 $\lvert w \rvert = 1$ 下的解是协方差矩阵的主特征向量（主成分分析）——有限维的 Rayleigh 商与这里是同一个模板。</p>
+<h3>例 1.5 薄板的平衡：含二阶导数的泛函</h3>
+<p>弹性薄板受外力振动的问题中，设薄板占有平面区域 $\Omega$，用 $w(x, y)$ 表示位移。由应力应变关系产生的位能密度依赖于 $w$ 的 Hesse 矩阵；任何物理量与坐标选取无关，所以这部分位能密度只依赖于 $w_{xx} + w_{yy}$ 与 $w_{xx} w_{yy} - w_{xy}^{2}$ 这两个量。把作用在 $\Omega$ 上的外力密度 $f(x, y)$ 产生的外力功计入，总位能是</p>
+<p>$$
+U(w) = \int_{\Omega} \lbrace \frac{1}{2} \lbrack (w_{xx} + w_{yy})^{2} - 2 (1 - \mu) (w_{xx} w_{yy} - w_{xy}^{2}) \rbrack + f(x, y) w(x, y) \rbrace dx \, dy
+$$</p>
+<p>其中 $\mu$ 是由材料决定的 Poisson 比。固定边界 $w \vert_{\partial \Omega} = \varphi$ 后，取 $M = \lbrace w \in C^{2}(\bar{\Omega}) \mid w \vert_{\partial \Omega} = \varphi \rbrace$，则 $U$ 是 $M$ 上位移函数 $w$ 的泛函；力学原理告诉我们，薄板的平衡位置正是使总位能泛函 $U$ 达到极小的位移函数 [1，§1.3，例 1.5]。</p>
+<p><strong>补充讲解：两个"为什么"。</strong> 为什么位能密度只能依赖那两个量？Hesse 矩阵是 $2 \times 2$ 对称矩阵，坐标旋转下它的不变量只有迹与行列式：迹是 $w_{xx} + w_{yy} = \Delta w$，行列式是 $w_{xx} w_{yy} - w_{xy}^{2}$（恰好是图象曲面的 Gauss 曲率的分子）。物理量不依赖于坐标系的人为选取，所以密度函数只能通过这两个不变量依赖 Hesse 矩阵——这是"不变性决定函数形式"的一个干净例子，与例 1.2 中弧长密度由度量决定是同一种推理。为什么这个例子放在典型例子最后？因为它的被积函数含二阶导数，超出了 2.3 节的标准形式；其 Euler 方程将是四阶的（双调和型），$M$ 也要相应地取 $C^{2}$ 类。张用它提示：标准形式只是起点，$L$ 依赖高阶导数的情形从一开始就在视野内。</p>
+<h2>四、§1.4 进一步的例子：自变量的五次推广</h2>
+<p>§1.4 的开场白是：除了典型的例子外，还有一些问题，从表面上看似乎与泛函极值联系不起来，但经过一定的转化，仍可归为变分问题 [1，§1.4]。这一节的五个例子，每个都把"自变量"的概念往外推一步，是全讲最见功力的部分。</p>
+<h3>例 1.6 商品的再投资：最优控制问题（本系列的金融主线）</h3>
+<p>生产一种商品，单位时间产出率为 $q = q(t)$，生产增长的速度 $\dot{q}$ 与产品的再投资百分比 $u(t)$ 成正比，即 $\dot{q} = \alpha u q$，其中 $\alpha &gt; 0$ 是常数。因此在时间区间 $\lbrack 0, T \rbrack$ 内投放市场的总商品量是</p>
+<p>$$
+J(u, q) = \int_{0}^{T} (1 - u(t)) q(t) dt
+$$</p>
+<p>已知 $q(0) = q_{0}$，怎样选择再投资百分比 $u(t)$ 使总商品量达到极大值？取</p>
+<p>$$
+M = \lbrace (u, q) \in C\lbrack 0, T \rbrack \times C^{1}\lbrack 0, T \rbrack \mid 0 \le u(t) \le 1, \ \dot{q} = \alpha u q, \ q(0) = q_{0} \rbrace
+$$</p>
+<p>则 $(u, q) \mapsto J(u, q)$ 是 $M$ 上的泛函。这是一个最优控制问题：$u$ 与 $q$ 的地位不平等，$u$ 称为控制变量，$q$ 称为状态变量，$J$ 称为目标泛函 [1，§1.4，例 1.6]。</p>
+<p><strong>补充讲解之一：为什么 Euler-Lagrange 方程在这里不够用。</strong> 与前面例子不同，$u$ 不是自由地出现在被积函数里，而是先通过微分方程 $\dot{q} = \alpha u q$ 决定状态 $q$，再由 $q$ 进入目标。把 $q$ 解出来代入当然可以（$q(t) = q_{0} \exp(\alpha \int_{0}^{t} u(s) ds)$），但得到的泛函对 $u$ 是非局部的（$t$ 时刻的被积项依赖 $u$ 在 $\lbrack 0, t \rbrack$ 上的全部历史），不再是 2.3 节的标准形式。加上约束 $0 \le u \le 1$ 是本质性的（比例只能在 0 与 1 之间），极大点大概率落在控制集的边界上，而不是让某个一阶变分为零的内点。这正是第十九讲 Pontryagin 最大值原理要处理的情形。</p>
+<p><strong>补充讲解之二：这个例子可以完整解出来（用第十九讲的框架预解）。</strong> 构造 Hamilton 函数 $H = (1 - u) q + \lambda \alpha u q = q + u q (\alpha \lambda - 1)$，其中协态变量 $\lambda(t)$ 满足 $\dot{\lambda} = - \partial H / \partial q = - (1 - u) - \alpha \lambda u$ 与终端条件 $\lambda(T) = 0$（终端无残值）。$H$ 对 $u$ 是线性的，系数（开关函数）为 $q (\alpha \lambda - 1)$，$q &gt; 0$，所以最优控制是 bang-bang 型的：$\alpha \lambda &gt; 1$ 时取 $u = 1$（全部再投资），$\alpha \lambda &lt; 1$ 时取 $u = 0$（全部投放市场）；奇异情形 $\alpha \lambda \equiv 1$ 不可能出现，因为那要求 $\dot{\lambda} = 0$，而由协态方程 $\dot{\lambda} = - (1 - u) - \alpha \lambda u = -1 \ne 0$。再从终端倒推 $\lambda$ 的形状：在末段若 $u = 0$，则 $\dot{\lambda} = -1$，结合 $\lambda(T) = 0$ 得 $\lambda(t) = T - t$；它在 $t^{\ast} = T - 1/\alpha$ 处穿过 $1/\alpha$。在 $t^{\ast}$ 之前若 $u = 1$，则 $\dot{\lambda} = - \alpha \lambda$，得 $\lambda(t) = (1/\alpha) e^{\alpha (t^{\ast} - t)} \ge 1/\alpha$，开关函数非负，自洽。结论：</p>
+<ul>
+<li>若 $T &gt; 1/\alpha$：$u^{\ast} = 1$ 于 $\lbrack 0, T - 1/\alpha)$，$u^{\ast} = 0$ 于 $(T - 1/\alpha, T \rbrack$——先全力扩张产能，最后 $1/\alpha$ 的时间里停投、把存量产能的产出全部投放市场；</li>
+<li>若 $T \le 1/\alpha$：$u^{\ast} \equiv 0$——时限太短，再投资来不及产生回报，不如全部投放。</li>
+</ul>
+<p>经济直觉与数学完全吻合：再投资的回报需要时间复利，越接近终点，再投资一单位所能换回的产出越少，恰好在"剩余时间等于 $1/\alpha$"时收益与直接投放持平。这个例子的结构——线性控制、终端时刻临近时转向收割——会在第五节与 Øksendal 的最优投资组合问题逐项对上。</p>
+<h3>例 1.7 图像分割：自变量里可以有"集合"</h3>
+<p>要从一张可能有污损的照片中查明人像的边缘：图形占有区域 $\Omega \subset \mathbb{R}^{2}$，用 $g : \Omega \to \mathbb{R}$ 表示原图，寻求函数 $u$ 使它在边缘处与原图尽量吻合、其余处尽量平滑。为描写边缘，引入具有有限一维 Hausdorff 测度的闭子集 $K \subset \bar{\Omega}$，定义</p>
+<p>$$
+I(K, u) = \int_{\Omega \setminus K} \lvert \nabla u \rvert^{2} dx \, dy + \mu \int_{\Omega \setminus K} \lvert u - g \rvert^{2} dx \, dy + \lambda H^{1}(K)
+$$</p>
+<p>其中 $\lambda, \mu &gt; 0$ 是可调节的参数。这里 $I$ 不仅依赖函数 $u$，还依赖闭子集 $K$；虽然未知变量 $K$ 是集合而不是函数，但可以用它的示性函数 $\chi_{K}$（$\chi_{K}(x) = 1$ 当 $x \in K$，$\chi_{K}(x) = 0$ 当 $x \in \Omega \setminus K$）来替代，于是 $I$ 照样可以看成依赖于 $\chi_{K}$ 与 $u$ 的泛函。在自变量集合 $M$（由 $H^{1}(K) &lt; \infty$ 与能量有限等条件界定）中求 $(K, u)$ 使 $I$ 极小，就是图像分割问题 [1，§1.4，例 1.7]。这就是 Mumford-Shah 泛函。</p>
+<p><strong>补充讲解：三项各管一件事，$H^{1}$ 是什么。</strong> 第一项是平滑项：在边缘之外罚梯度，迫使复原图分片光滑；第二项是保真项：罚复原图与原图的偏差；第三项罚边缘集 $K$ 的"长度"，防止把噪声误判为边缘——$H^{1}$ 是一维 Hausdorff 测度，对光滑曲线它恰好等于曲线的长度，对一般的集它是长度概念的推广。所以这个泛函是"平滑 + 保真 + 复杂度惩罚"的三方权衡，与统计学习里"拟合误差 + 正则项"是同一个设计模式。真正的难点是 $K$ 自由变动：这是"自由间断问题"，极小元的正则性理论很深，其函数空间语言要等第二十讲的有界变差函数。本讲记住模板即可：变分问题的自变量可以包含几何对象本身。</p>
+<h3>例 1.8 调和映射：自变量是"映射"</h3>
+<p>设 $(M, g)$ 与 $(N, h)$ 是两个紧 Riemann 流形，给定映射 $u \in C^{1}(M, N)$，其微分 $du$ 是乘积向量丛的截面。用局部坐标 $x = (x^{1}, \cdots, x^{m})$ 与 $u = (u^{1}, \cdots, u^{n})$ 定义能量密度</p>
+<p>$$
+L(x, u, du) = \frac{1}{2} \lvert du(x) \rvert_{h}^{2} = \frac{1}{2} \sum_{i, j = 1}^{n} \sum_{\alpha, \beta = 1}^{m} h_{ij}(u(x)) g^{\alpha \beta}(x) \frac{\partial u^{i}}{\partial x^{\alpha}} \frac{\partial u^{j}}{\partial x^{\beta}}
+$$</p>
+<p>能量 $E(u) = \int_{M} L(x, u(x), du(x)) dV_{g}$ 是映射 $u$ 的泛函；映射本身可以看成一种"函数"，取 $\mathcal{M} = C^{1}(M, N)$，则 $E : \mathcal{M} \to \mathbb{R}$，使 $E$ 达到极小的映射称为调和映射，在微分几何中有重要意义 [1，§1.4，例 1.8]。</p>
+<p><strong>补充讲解：把抽象公式锚回熟悉对象。</strong> 当目标流形 $N$ 是欧氏空间 $\mathbb{R}^{n}$（$h_{ij} = \delta_{ij}$）、源流形是欧氏区域（$g^{\alpha \beta} = \delta^{\alpha \beta}$）时，能量密度退化为 $\frac{1}{2} \sum_{i} \lvert \nabla u^{i} \rvert^{2}$，即每个分量的 Dirichlet 能量之半，其极小元满足 $\Delta u^{i} = 0$——调和映射就是"调和函数"的几何推广：把值域从数轴弯成流形，把定义域也弯成流形，仅此而已。公式里的 $h_{ij}(u(x))$ 表示目标的度量要在像点处取值，$g^{\alpha \beta}$ 是源度量的逆矩阵，二者是微分几何课上"度量决定一切"的又一次露面。本讲不要求会算，只要求认出模板：积分型泛函、被积密度由两个度量拼出、极小元有专门名字。</p>
+<h3>例 1.9 Hamilton 方程组：变分问题也可以求"临界值"</h3>
+<p>给定函数 $H \in C^{1}(\mathbb{R}^{1} \times \mathbb{R}^{n} \times \mathbb{R}^{n})$，记 $x = (x_{1}, \cdots, x_{n})$，$p = (p_{1}, \cdots, p_{n})$。当 $x, p$ 都是 $t$ 的向量值函数时，Hamilton 方程组为 $\dot{x} = H_{p}(t, x, p)$，$\dot{p} = - H_{x}(t, x, p)$。引入适当的函数类 $\mathcal{M}$ 并对 $H$ 加适当限制，使作用量</p>
+<p>$$
+I(x, p) = \int_{\mathbb{R}^{1}} \lbrack (\dot{x}, p)_{\mathbb{R}^{n}} - H(t, x, p) \rbrack dt, \qquad (\dot{x}, p)_{\mathbb{R}^{n}} = \sum_{i = 1}^{n} \dot{x}_{i} p_{i}
+$$</p>
+<p>是 $\mathcal{M}$ 上定义的泛函。显然 $I$ 既无上界又无下界，所以既没有极大值也没有极小值；但在下几讲中将看到：对适当的 $\mathcal{M}$，使 $I$ 达到临界值（又称为稳定值）的函数 $(x(t), p(t))$ 正是 Hamilton 方程组的解 [1，§1.4，例 1.9]。</p>
+<p><strong>补充讲解：这一例是全讲的观念转折点。</strong> 前八例都在求极值，本例宣告：变分学的真正对象是"临界值"——一阶变分为零的点，其中极大、极小只是两种特殊情形，鞍点同样重要。作用量沿 $p$ 方向可以任意放大缩小，所以无界；但它的驻点恰好编码了整个 Hamilton 系统：一旦把"令一阶变分为零"对 $(x, p)$ 分别执行，得到的正是 $\dot{x} = H_{p}$ 与 $\dot{p} = - H_{x}$（第二、五讲展开）。这也解释了全书为什么从极值问题一路走到第十四、十五讲的临界点理论：在许多问题里解根本不是极值点，而是鞍点。金融里同样的结构反复出现：对偶定价是鞍点问题（原问题取极小、对偶变量取极大），稳健定价更是 $\sup$ 与 $\inf$ 的博弈。看到无界的作用量不要慌，要问的是驻点在哪里。</p>
+<h3>例 1.10 Einstein 方程：自变量是"度量本身"</h3>
+<p>在广义相对论中，用空间 $\mathbb{R}^{4}$ 的一个 Lorentz 型度量 $(g_{ij})$ 描写重力场，它是取值于符号为 $(1, -1, -1, -1)$ 的对称矩阵函数。Einstein 引入的作用量 $S = S(g)$ 由两部分组成：$S = S_{g} + S_{m}$，其中场的 Hilbert 作用量与物质的贡献分别是</p>
+<p>$$
+S_{g} = \int R \, d\Omega, \qquad d\Omega = \sqrt{\lvert \det (g_{ij}) \rvert} \, d^{4} x, \qquad S_{m} = \frac{1}{c} \int \Lambda \sqrt{- \det (g_{ij})} \, d^{4} x
+$$</p>
+<p>$R$ 是由度量经联络与曲率张量算出的数量曲率，$\Lambda$ 由物质与度量决定。这里度量 $g$ 是自变量，它是非退化对称的矩阵值函数，作用量 $S = S(g)$ 是 $g$ 的泛函；物质的运动遵从变分原理，即重力场——Lorentz 度量——使作用量 $S$ 达到稳定值 [1，§1.4，例 1.10]。</p>
+<p><strong>补充讲解：这一例只读结构，不逐项学曲率公式。</strong> 需要带走的只有三点：第一，自变量推广到了矩阵值函数（度量场），泛函的"自变量可以是什么"到此几乎没有边界；第二，场方程（Einstein 方程）是作用量对 $g$ 变分的 Euler 方程，与例 1.3 极小曲面的 Euler 方程、例 1.8 调和映射的 Euler 方程是同一模式在不同对象上的重复——"自然规律写成某个作用量的驻点条件"，是 §1.4 结尾张的总结：从经典力学到规范场论，物质运动的规律遵从变分原理 [1，§1.4 结尾]；第三，"稳定值"一词与例 1.9 的"临界值"呼应：引力作用量同样不是求极小，而是求驻点。</p>
+<p>十个例子汇总成一张表（"求什么"一栏中，临界值指一阶变分为零的驻点）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">例子</th>
+<th style="text-align: left;">自变量</th>
+<th style="text-align: left;">泛函</th>
+<th style="text-align: left;">主要约束</th>
+<th style="text-align: left;">求什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1.1 最速降线</td>
+<td style="text-align: left;">曲线 $u(x)$</td>
+<td style="text-align: left;">下滑时间 $T(u)$</td>
+<td style="text-align: left;">两端点固定</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.2 测地线</td>
+<td style="text-align: left;">曲线函数 $v(t)$</td>
+<td style="text-align: left;">弧长 $L(v)$</td>
+<td style="text-align: left;">两端点固定</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.3 极小曲面</td>
+<td style="text-align: left;">曲面映射 $Z(u, v)$</td>
+<td style="text-align: left;">面积 $A(Z)$</td>
+<td style="text-align: left;">边界像为给定曲线</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.4 特征值问题</td>
+<td style="text-align: left;">函数 $u \in H_{0}^{1}(\Omega)$</td>
+<td style="text-align: left;">能量 $E(u)$</td>
+<td style="text-align: left;">$\int \lvert u \rvert^{2} = 1$</td>
+<td style="text-align: left;">约束极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.5 薄板</td>
+<td style="text-align: left;">位移 $w(x, y)$</td>
+<td style="text-align: left;">总位能 $U(w)$</td>
+<td style="text-align: left;">边界位移给定</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.6 再投资</td>
+<td style="text-align: left;">控制 $u$ 与状态 $q$</td>
+<td style="text-align: left;">总投放量 $J(u, q)$</td>
+<td style="text-align: left;">状态方程与 $0 \le u \le 1$</td>
+<td style="text-align: left;">极大值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.7 图像分割</td>
+<td style="text-align: left;">集合 $K$ 与函数 $u$</td>
+<td style="text-align: left;">Mumford-Shah 泛函 $I(K, u)$</td>
+<td style="text-align: left;">$H^{1}(K)$ 与能量有限</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.8 调和映射</td>
+<td style="text-align: left;">映射 $u : M \to N$</td>
+<td style="text-align: left;">能量 $E(u)$</td>
+<td style="text-align: left;">无（或边值）</td>
+<td style="text-align: left;">极小值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.9 Hamilton 系统</td>
+<td style="text-align: left;">轨线对 $(x(t), p(t))$</td>
+<td style="text-align: left;">作用量 $I(x, p)$</td>
+<td style="text-align: left;">适当函数类</td>
+<td style="text-align: left;">临界值</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.10 Einstein 方程</td>
+<td style="text-align: left;">度量 $g$</td>
+<td style="text-align: left;">作用量 $S(g)$</td>
+<td style="text-align: left;">非退化对称</td>
+<td style="text-align: left;">临界值</td>
+</tr>
+</tbody>
+</table>
+<h2>五、三本书合读：随机化以后，泛函变成什么</h2>
+<p>张在 §1.1 已经埋下伏笔：微积分学与概率论结合之后产生的随机变分学（Malliavin Calculus）成为金融数学的重要部分 [1，§1.1]。本节把这句话拆开。随机化分两种不同的做法，恰好对应另外两本书：Øksendal 的做法是把"待选的轨迹"换成受控随机过程，把积分泛函换成它的期望，极值条件变成 Hamilton-Jacobi-Bellman 方程 [2]；Nualart 的做法是把路径空间 $\Omega$ 本身当作无穷维的"定义域"，在其上建立微分学，泛函的一阶变分变成 Malliavin 导数 [3]。下面分别展开。</p>
+<h3>5.1 Øksendal：期望泛函与随机最优控制</h3>
+<p>Øksendal 的第一章用七个问题开场，其中三个与第一讲直接呼应 [2，Ch. 1]：</p>
+<ul>
+<li>§1.3 的问题 4 是 Dirichlet 问题：给定区域 $U$ 与边值 $f$，求调和函数 $\tilde{f}$（即 $\Delta \tilde{f} = 0$ 于 $U$ 内、$\tilde{f} = f$ 于 $\partial U$ 上）。Kakutani 1944 年证明，解可以用 Brown 运动表示：$\tilde{f}(x) = \mathbb{E}^{x} \lbrack f(B_{\tau}) \rbrack$，其中 $B_{\tau}$ 是从 $x$ 出发的 Brown 运动首次跑出 $U$ 的位置 [2，§1.3]。与张的例 1.4 对照：调和函数是 Dirichlet 能量 $\int \lvert \nabla u \rvert^{2}$ 在给定边值下的极小元（例 1.4 的无约束版本），而 Øksendal 给出同一个极小元的路径表示——左边是泛函的极小元，右边是随机路径的期望，两种语言在同一个对象上相遇。这条线将在后续讲 Feynman-Kac 公式（[2，§8.2]）时系统展开。</li>
+<li>§1.4 的问题 5 是最优停止：资产价格服从带噪声的微分方程，持有者要在折现意义下选一个卖出时刻使期望收益最大；其解可以表述为一个自由边值问题，进而表述为一组变分不等式 [2，§1.4]。这是张 §7.3 障碍问题在随机世界的版本，本系列已用它完整处理过美式期权（见 <a href="2026-11-03-DrX-美式期权变分不等式与自由边界.html">《DrX-美式期权的变分不等式与自由边界》</a>）。</li>
+<li>§1.5 的问题 6 是最优投资组合，与张的例 1.6 是同一个问题的随机版，值得逐项对照。投资者在风险资产（价格满足带噪声的增长方程）与无风险资产（价格按 $e^{b t}$ 增长）之间分配财富，$u_{t} \in \lbrack 0, 1 \rbrack$ 是 $t$ 时刻投在风险资产上的财富比例，目标是极大化终端财富的期望效用 $\max \mathbb{E} \lbrack U(X_{T}^{(u)}) \rbrack$ [2，§1.5，式 (1.5.1)–(1.5.3)]。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">要素</th>
+<th style="text-align: left;">张 例 1.6（确定性）</th>
+<th style="text-align: left;">Øksendal 问题 6（随机）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态</td>
+<td style="text-align: left;">产出率 $q(t)$，$\dot{q} = \alpha u q$</td>
+<td style="text-align: left;">财富 $X_{t}$，满足带噪声项的随机微分方程</td>
+</tr>
+<tr>
+<td style="text-align: left;">控制</td>
+<td style="text-align: left;">再投资比例 $u(t)$，$0 \le u \le 1$</td>
+<td style="text-align: left;">风险资产比例 $u_{t}$，$0 \le u_{t} \le 1$</td>
+</tr>
+<tr>
+<td style="text-align: left;">目标泛函</td>
+<td style="text-align: left;">总投放量 $\int_{0}^{T} (1 - u) q \, dt$ 取极大</td>
+<td style="text-align: left;">期望终端效用 $\mathbb{E} \lbrack U(X_{T}) \rbrack$ 取极大</td>
+</tr>
+<tr>
+<td style="text-align: left;">随机性</td>
+<td style="text-align: left;">无</td>
+<td style="text-align: left;">漂移中加白噪声，状态是随机过程</td>
+</tr>
+<tr>
+<td style="text-align: left;">求解工具</td>
+<td style="text-align: left;">最大值原理（张 第十九讲）</td>
+<td style="text-align: left;">Hamilton-Jacobi-Bellman 方程（[2，Ch. 11]）</td>
+</tr>
+</tbody>
+</table>
+<p>Øksendal 第 11 章给出随机控制问题的一般形式。状态是受控 Itô 过程 $dX_{t} = b(t, X_{t}, u_{t}) dt + \sigma(t, X_{t}, u_{t}) dB_{t}$，绩效泛函（performance functional）定义为 [2，§11.1，式 (11.1.5)、(11.1.8)、(11.1.9)]</p>
+<p>$$
+J^{u}(s, x) = \mathbb{E}^{s, x} \left\lbrack \int_{s}^{T_{b}} F(r, X_{r}, u_{r}) \, dr + K(T_{b}, X_{T_{b}}) \right\rbrack, \qquad \Phi(y) = \sup_{u} J^{u}(y)
+$$</p>
+<p>其中 $F$ 是运行收益率、$K$ 是终端收益、$T_{b}$ 是状态首次离开给定区域的时刻、$\Phi$ 称为值函数（最优绩效）。把它与张的标准形式 $I(u) = \int_{\Omega} L(x, u, \nabla u) dx$ 并排看，随机化做了三处替换：积分 $\int L \, dt$ 变成期望 $\mathbb{E} \lbrack \int F \, dt + K \rbrack$（多出一个终端项）；被积的确定性轨迹 $u(x)$ 换成随机轨迹 $X_{r}(\omega)$；对轨迹取极小换成在控制策略的集合上取 $\sup$。形式几乎未动，内涵的困难却多了一层——这正是下面的补充讲解。</p>
+<p><strong>补充讲解：随机控制多出的一条约束——适应性。</strong> Øksendal 在陈述问题时特别强调：$t$ 时刻的决策只能依据到 $t$ 为止已经发生的事情，因此过程 $u_{t} = u(t, \omega)$ 必须对信息流 $\mathcal{F}_{t}^{(m)}$ 适应，即对每个固定的 $t$，映射 $\omega \mapsto u(t, \omega)$ 只能依赖 Brown 运动在 $\lbrack 0, t \rbrack$ 上的路径，不能依赖未来的增量 [2，§11.1]。用本科语言说：$\mathcal{F}_{t}$ 是"到时刻 $t$ 为止可获得的全部信息"构成的 $\sigma$-代数，适应性就是"决策是已获信息的函数"。确定性变分的可行集 $M$ 里没有这条约束——那里的轨迹可以事后整体挑选；随机世界里控制必须"在线"生成。这一条是确定性变分与随机变分最实质的差别之一，它也是后来动态规划原理必须小心处理停时的原因。Øksendal 还区分了开环控制（$u$ 只依赖 $t$）、反馈（Markov）控制（$u$ 只依赖当前状态 $(t, X_{t})$）等类型 [2，§11.1 末]，分别对应不同的可行集 $M$——再次印证 2.3 节的清单：先问可行集是什么，再谈极值。</p>
+<h3>5.2 Nualart：在 Wiener 空间上求导——泛函的一阶变分搬进路径空间</h3>
+<p>Nualart 的书开宗明义：Malliavin 微积分又称随机变分学（stochastic calculus of variations），是 Wiener 空间上的无穷维微分学，目的是研究 Wiener 泛函（例如随机微分方程的解）的分布的正则性；这套理论由 Malliavin 创立，Stroock、Bismut、Watanabe 等人发展，其最初的动机与最重要的应用是给出 Hörmander 平方和定理的概率证明。整套理论有两部分：一是定义在 Wiener 泛函的 Sobolev 空间上的微分算子理论，关键事实是联系导数算子与 Skorohod 积分的分部积分公式；二是借助 Malliavin 协方差矩阵给出随机向量具有（光滑）密度的判别准则 [3，Introduction]。</p>
+<p>与张的第一讲对接，只需要抓住第 1 章 §1.2 的导数算子。设 $W = \lbrace W(h), h \in H \rbrace$ 是与 Hilbert 空间 $H$ 相联系的等距正态高斯过程。先在光滑柱泛函上定义导数：若 $F = f(W(h_{1}), \cdots, W(h_{n}))$，其中 $f$ 是各阶偏导数多项式增长的光滑函数，则 $F$ 的（Malliavin）导数是取值于 $H$ 的随机变量 [3，§1.2，定义 1.2.1，式 (1.29)]</p>
+<p>$$
+D F = \sum_{i = 1}^{n} \partial_{i} f(W(h_{1}), \cdots, W(h_{n})) \, h_{i}
+$$</p>
+<p>特别地 $D W(h) = h$。在白噪声情形 $H = L^{2}\lbrack 0, T \rbrack$ 时，$D F$ 可以等同于一个随机过程 $\lbrace D_{t} F, t \in \lbrack 0, T \rbrack \rbrace$ [3，§1.2.1]；例如取 $h = \mathbf{1}_{\lbrack 0, s \rbrack}$ 得 $W_{s} = W(h)$，于是 $D_{t} W_{s} = 1$ 当 $t \le s$、$D_{t} W_{s} = 0$ 当 $t &gt; s$——Brown 运动在 $s$ 时刻的值，只对 $s$ 之前的噪声扰动有响应，因果性一目了然。</p>
+<p><strong>补充讲解：$\langle D F, h \rangle_{H}$ 就是张的一阶变分，换了一个空间。</strong> 张的第二讲将定义曲线泛函的一阶变分：$\delta I(u; \eta) = \frac{d}{d\varepsilon} I(u + \varepsilon \eta) \vert_{\varepsilon = 0}$，即沿方向 $\eta$ 扰动曲线 $u$、看泛函的变化率。Nualart 给出完全平行的解释：对任何 $h \in H$，内积 $\langle D F, h \rangle_{H}$ 等于 $F$ 沿 Cameron-Martin 方向 $h$ 的方向导数，也就是把 Brown 路径 $\omega$ 平移为 $\omega + \varepsilon \int_{0}^{\cdot} h(s) ds$ 时 $F$ 的变化率 [3，§1.2 及 §1.2.1 例 1.2.1]。把两边并排：扰动对象从曲线 $u(x)$ 换成 Brown 路径 $\omega$；方向从任意光滑函数 $\eta$ 换成 Cameron-Martin 空间的元素（绝对连续、导数平方可积的路径）；导数从一个数 $\delta I$ 换成一个 $H$ 值随机变量 $D F$。思想是同一个：泛函对自变量求导。张的书在 Sobolev 空间上完成这件事（第十讲），Nualart 在 Wiener 空间上完成这件事，其范数 $\lVert F \rVert_{1, p} = (\mathbb{E} \lvert F \rvert^{p} + \mathbb{E} \lVert D F \rVert_{H}^{p})^{1/p}$ 完备化出的空间 $\mathbb{D}^{1, p}$ 也叫 Sobolev 空间 [3，§1.2 末与 §1.5]——连名字都相同，不是巧合，是同一套"用导数范数完备化光滑对象"的方案在两个世界里的实现。</p>
+<p>分部积分公式是这套微分学的发动机。Nualart 的引理 1.2.1 说，对光滑泛函 $F$ 与 $h \in H$，有 [3，§1.2，引理 1.2.1，式 (1.30)]</p>
+<p>$$
+\mathbb{E} \lbrack \langle D F, h \rangle_{H} \rbrack = \mathbb{E} \lbrack F \, W(h) \rbrack
+$$</p>
+<p><strong>补充讲解：先在一维看懂它，再升维。</strong> 取 $H = \mathbb{R}$、$\xi$ 为标准正态随机变量、$F = f(\xi)$，上式化为 $\mathbb{E} \lbrack f'(\xi) \rbrack = \mathbb{E} \lbrack \xi f(\xi) \rbrack$，即 Stein 引理，一行分部积分可证：正态密度 $\phi$ 满足 $\phi'(x) = - x \phi(x)$，于是 $\int f'(x) \phi(x) dx = \lbrack f \phi \rbrack - \int f(x) \phi'(x) dx = \int x f(x) \phi(x) dx$（边界项在 $f$ 多项式增长时消失）。Nualart 的公式正是这条恒等式在无穷维高斯空间上的版本：左边出现导数、右边导数消失、代价是多乘一个高斯因子 $W(h)$。金融上它立竿见影的用途是计算灵敏度（Greeks）：当收益函数不可微（例如数字期权的示性函数）时，$\partial / \partial x$ 无法直接作用于收益，但分部积分把导数转移到权重上，期望照样可算——这是本系列后续里程碑 M2（Malliavin 权重法 Greeks 引擎）的数学核心，本讲先把公式与一维原型钉住，细节留待读到 [3，第 6 章] 的金融应用时展开。</p>
+<h3>5.3 三本书的总对照</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">张《变分学讲义》</th>
+<th style="text-align: left;">Øksendal《随机微分方程》</th>
+<th style="text-align: left;">Nualart《Malliavin 微积分》</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">自变量</td>
+<td style="text-align: left;">函数、曲线、映射、集合、度量</td>
+<td style="text-align: left;">受控随机过程与适应控制</td>
+<td style="text-align: left;">Wiener 泛函 $F(\omega)$</td>
+</tr>
+<tr>
+<td style="text-align: left;">泛函</td>
+<td style="text-align: left;">$\int L(x, u, \nabla u) dx$</td>
+<td style="text-align: left;">$\mathbb{E} \lbrack \int F \, dt + K \rbrack$</td>
+<td style="text-align: left;">$F : \Omega \to \mathbb{R}$ 本身</td>
+</tr>
+<tr>
+<td style="text-align: left;">求导方式</td>
+<td style="text-align: left;">一阶变分 $\delta I$（第二讲）</td>
+<td style="text-align: left;">值函数满足 HJB 方程（Ch. 11）</td>
+<td style="text-align: left;">Malliavin 导数 $D F$（§1.2）</td>
+</tr>
+<tr>
+<td style="text-align: left;">关键恒等式</td>
+<td style="text-align: left;">Euler-Lagrange 方程</td>
+<td style="text-align: left;">Feynman-Kac 公式（§8.2）</td>
+<td style="text-align: left;">分部积分 $\mathbb{E} \langle D F, h \rangle = \mathbb{E} \lbrack F W(h) \rbrack$</td>
+</tr>
+<tr>
+<td style="text-align: left;">完备化空间</td>
+<td style="text-align: left;">Sobolev 空间（第十讲）</td>
+<td style="text-align: left;">扩散过程的状态空间</td>
+<td style="text-align: left;">Wiener-Sobolev 空间 $\mathbb{D}^{1, p}$</td>
+</tr>
+<tr>
+<td style="text-align: left;">与第一讲的接口</td>
+<td style="text-align: left;">全讲即原文</td>
+<td style="text-align: left;">例 1.6 $\leftrightarrow$ 问题 6；例 1.4 $\leftrightarrow$ 问题 4</td>
+<td style="text-align: left;">§1.1 点名的随机变分学</td>
+</tr>
+</tbody>
+</table>
+<p>一句话概括三者分工：张提出问题并给出确定性解法，Øksendal 把问题搬到随机过程上并给出期望意义下的极值理论，Nualart 在随机路径构成的空间上重建微分学本身。本系列后续每一讲都会回到这张表：读张的第 $k$ 讲时，先问它的 Øksendal 对应（随机化）是什么，再问它的 Nualart 对应（路径求导）是什么。</p>
+<h2>六、小结、习题与下一讲预告</h2>
+<p><strong>小结。</strong> 第一讲的全部内容可以收成三句。第一，变分学的研究对象是泛函 $I : M \to \mathbb{R}$，一个变分问题由泛函与可行集 $M$ 共同刻画，脱离 $M$ 谈极值没有意义。第二，十个例子给出的谱系表明：自变量可以是曲线、曲面、函数、控制与状态、集合、映射乃至度量；被积密度可以含一阶、二阶导数乃至流形上的度量结构。第三，变分问题不止求极值：Hamilton 作用量与 Einstein 作用量都无界，要的是临界值——这条线把全书从极值理论推向临界点理论，也把本系列推向随机变分学：在那里，泛函变成期望泛函，一阶变分变成 Malliavin 导数。</p>
+<p><strong>习题</strong>（均以第一讲与本科课程为限，附提示或答案）。</p>
+<ol>
+<li>判别下列各式是否为 $\lbrack 0, 1 \rbrack$ 上 $C^{1}$ 函数 $u$ 的泛函，并说明理由：(a) $J(u) = u(1/2)^{2} + \int_{0}^{1} \lvert u'(x) \rvert dx$；(b) $J(u)(x) = \int_{0}^{x} u(s) ds$；(c) $J(u) = \max u - \min u$。提示：对照 2.2 的"消元"判别法；(b) 的输出仍是函数，与例中 $I_{4}$ 同病；(c) 是泛函但不可微，极值问题仍然有意义。</li>
+<li>验算例 1.2 的弧元公式：由 $x_{1} = \cos\theta \cos\varphi$，$x_{2} = \cos\theta \sin\varphi$，$x_{3} = \sin\theta$ 出发，计算 $dx_{1}^{2} + dx_{2}^{2} + dx_{3}^{2}$ 并确认交叉项抵消、结果为 $d\theta^{2} + \cos^{2}\theta \, d\varphi^{2}$。</li>
+<li>证明 Rayleigh 商 $R(u) = E(u) / G(u)$ 满足 $R(c u) = R(u)$（$c \ne 0$），并由此说明例 1.4 中"在 $G(u) = 1$ 上极小化 $E$"与"在一切非零 $u$ 上极小化 $R$"等价。再用乘子法写出极小元满足的方程。提示：乘子恰等于极小值，验算用内积。</li>
+<li>例 1.6 的数值版：取 $\alpha = 0.50$，$T = 3.00$，$q_{0} = 100.00$。按 1.6 的补充求解，开关时刻 $t^{\ast} = T - 1/\alpha = 1.00$：$\lbrack 0, 1.00)$ 上 $u^{\ast} = 1$，$(1.00, 3.00 \rbrack$ 上 $u^{\ast} = 0$。试算出 $q(T)$ 与最优总投放量 $J^{\ast}$，并与"全程不投资"（$J = 300.00$）比较。答案：$q$ 在第一段按 $e^{0.50 t}$ 增长到 $q(1.00) = 164.87$，之后保持不变，故 $q(T) = 164.87$；$J^{\ast} = 164.87 \times 2.00 = 329.74$，比不投资多 29.74，即多 9.91%。</li>
+<li>证明 Stein 引理：设 $\xi$ 为标准正态随机变量，$f$ 光滑且多项式增长，证明 $\mathbb{E} \lbrack f'(\xi) \rbrack = \mathbb{E} \lbrack \xi f(\xi) \rbrack$；再取 $f(x) = x^{3}$ 推出 $\mathbb{E} \lbrack \xi^{4} \rbrack = 3.00$。提示：用 $\phi'(x) = - x \phi(x)$ 分部积分；第二步用 $\mathbb{E} \lbrack \xi^{2} \rbrack = 1.00$。</li>
+</ol>
+<p><strong>下一讲预告。</strong> 第二讲进入计算：从函数极值的必要条件出发，定义一阶变分，用变分学基本引理推出 Euler-Lagrange 方程，并系统处理边值条件（固定边值与自然边值）。届时回头求解例 1.1 与例 1.2，并检验例 1.6 的补充求解为什么不能由 Euler-Lagrange 方程直接给出。伴随阅读：Øksendal 第 2 章的 Brown 运动构造，为后续讲的随机化备好语言。</p>
+<h2>参考文献</h2>
+<p>[1] 张恭庆. 变分学讲义. 北京: 高等教育出版社, 2011. ISBN 978-7-04-031958-3.（本文依据第一讲，pp. 1–11，及前言、目录）</p>
+<p>[2] Øksendal, B. Stochastic Differential Equations: An Introduction with Applications. 5th edition. Berlin: Springer, 1998（2000 年修正印次）.（本文引用 Ch. 1, §§1.3–1.5 与 Ch. 11, §11.1；另及 §8.2）</p>
+<p>[3] Nualart, D. The Malliavin Calculus and Related Topics. 2nd edition. Berlin: Springer, 2006.（本文引用 Introduction 与 Ch. 1, §1.2、§1.2.1、§1.5）</p>
+<p class="meta"><span class="lz">2026-11-07 发布 · 类型：金融建模</span><span class="le">Published 2026-11-07 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
