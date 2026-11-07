@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>均值回归低买高卖：双阈值最优法则的解析解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-12-可切换均值回归最优交易规则.html" title="可切换均值回归下的最优交易规则：买低卖高的阈值解"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/金融建模/2026-10-12-均值回归四阈值交易规则.html" title="做空与滑点下的均值回归交易：四阈值最优规则"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">均值回归低买高卖：双阈值最优法则的解析解</span><span class="le">Buying Low and Selling High in a Mean-Reverting Market: The Analytic Two-Threshold Rule</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Zhang &amp; Zhang (2008, Automatica) gave the buy-low-sell-high problem its first fully rigorous treatment. Earlier work had solved only the selling side; the buying side - when to enter a mean-reverting asset - had no rigorous analysis. Using dynamic programming, the authors characterize the value function through a Hamilton-Jacobi-Bellman quasi-variational inequality and prove that the optimal strategy is a two-threshold rule: buy when the price falls to x1, sell when it rises to x2, and do nothing in between. Better still, the thresholds are not implicit PDE objects - smooth-fit conditions reduce their determination to two quasi-algebraic equations that can be solved numerically in milliseconds. This article unpacks the model (an Ornstein-Uhlenbeck price with proportional transaction costs), the free-boundary structure of the solution, the verification theorem, and the sensitivity of the thresholds to mean-reversion speed, volatility and cost - the reference point for the whole optimal-trading-rule literature that followed.</p></div>
 <p>这是"低买高卖"问题第一次得到<strong>严格的数学 treatment</strong>：此前文献只有最优卖出（sell-side）的结果，买入端一直没有 rigorous 的分析。Zhang &amp; Zhang (2008, <em>Automatica</em>) 用动态规划 + HJB拟变分不等式证明：最优买卖策略就是<strong>两个阈值</strong>——价格跌破 $x_1$ 买入、涨超 $x_2$ 卖出；而求这两个阈值，只需求解<strong>两个拟代数方程</strong>。本文解读其核心公式与验证定理。</p>
 <blockquote>

@@ -176,6 +176,11 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .actions button{border:1px solid var(--line);background:#fff;border-radius:8px;
   padding:6px 14px;font-size:.85rem;cursor:pointer;color:var(--accent)}
 .actions button:hover{border-color:var(--accent)}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prevnext{margin-left:auto;display:flex;gap:8px}
+.prevnext a{border:1px solid var(--line);background:#fff;border-radius:8px;
+  padding:5px 12px;font-size:.85rem;color:var(--ink);text-decoration:none;white-space:nowrap}
+.prevnext a:hover{border-color:var(--accent)}
 /* 深色配色：系统自适应 + 手动切换（data-theme 由切换按钮写入、优先于系统；两组规则内容相同，改一处须同步另一组） */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d;color-scheme:dark}
@@ -190,6 +195,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
   :root:not([data-theme="light"]) .card p.excerpt{color:#a5b0bf}
   :root:not([data-theme="light"]) .tab{background:var(--bg)}
   :root:not([data-theme="light"]) .actions button{background:var(--bg)}
+  :root:not([data-theme="light"]) .prevnext a{background:var(--bg);color:var(--ink)}
   :root:not([data-theme="light"]) #msgfloat-panel{background:var(--bg)}
   :root:not([data-theme="light"]) .msgfloat-list a:hover{background:#1a2436}
   :root:not([data-theme="light"]) .msgfloat-list .t{color:var(--ink)}
@@ -212,6 +218,7 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 :root[data-theme="dark"] .card p.excerpt{color:#a5b0bf}
 :root[data-theme="dark"] .tab{background:var(--bg)}
 :root[data-theme="dark"] .actions button{background:var(--bg)}
+:root[data-theme="dark"] .prevnext a{background:var(--bg);color:var(--ink)}
 :root[data-theme="dark"] #msgfloat-panel{background:var(--bg)}
 :root[data-theme="dark"] .msgfloat-list a:hover{background:#1a2436}
 :root[data-theme="dark"] .msgfloat-list .t{color:var(--ink)}
@@ -253,7 +260,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261104b">
+<link rel="stylesheet" href="assets/style.css?v=20261107a">
 {themeinit}
 </head>
 <body>
@@ -276,11 +283,15 @@ INDEX_TMPL = """<!DOCTYPE html>
     ['daily','data','model'].forEach(function(n){
       document.getElementById('tab-'+n).hidden=(n!==name);
     });
+    try{localStorage.setItem('drx_tab',name)}catch(e){}
     try{history.replaceState(null,'','#'+name)}catch(e){}
   }
   tabs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.tab)})});
   var h=(location.hash||'').replace('#','');
-  if(h==='data'||h==='model') show(h);
+  var saved='';
+  try{saved=localStorage.getItem('drx_tab')||''}catch(e){}
+  if(h==='daily'||h==='data'||h==='model') show(h);
+  else if(saved==='data'||saved==='model') show(saved);
 })();
 </script>
 {msgfloat}
@@ -303,14 +314,14 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261104b">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261107a">
 {mathjax}
 {themeinit}
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="{root}index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="{root}index.html{backhash}">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext">{prevnext}</span></p>
 {body}
 <p class="meta">{meta_line}</p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
@@ -573,7 +584,8 @@ def build_messages_page(messages):
         title="及时快讯", body=content,
         meta_line=bi(f"共 {len(messages)} 条 · 按时间倒序",
                      f"{len(messages)} alerts - newest first"), root="", mathjax="",
-        themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
+        themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+        backhash="", prevnext="")
     with open(os.path.join(SITE, "messages.html"), "w",
               encoding="utf-8") as f:
         f.write(page)
@@ -771,6 +783,22 @@ def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
         excerpt_html=excerpt_html, meta=meta)
 
 
+def prevnext_html(order, idx, root):
+    """文章页打印行右侧的前一篇/后一篇按钮。order 为栏目内展示顺序
+    （新→旧）的 (href, title) 列表：前一篇=时间上的前一篇（更旧，idx+1），
+    后一篇=时间上的后一篇（更新，idx-1）。"""
+    parts = []
+    if 0 <= idx + 1 < len(order):
+        href, title = order[idx + 1]
+        parts.append(f'<a href="{root}{href}" title="{htmlmod.escape(title)}">'
+                     + bi("← 前一篇", "← Prev") + "</a>")
+    if 0 <= idx - 1 < len(order):
+        href, title = order[idx - 1]
+        parts.append(f'<a href="{root}{href}" title="{htmlmod.escape(title)}">'
+                     + bi("后一篇 →", "Next →") + "</a>")
+    return "".join(parts)
+
+
 def build():
     messages = collect_messages()
     build_messages_page(messages)
@@ -781,6 +809,7 @@ def build():
         f.write(CSS)
 
     daily_cards = []
+    daily_pages = []  # 待写页面（先收集，齐全后按栏目顺序补前一篇/后一篇再写）
     for rtype, pub_date, src in collect_daily():
         text = open(src, encoding="utf-8").read()
         h1 = extract_h1(text)
@@ -811,21 +840,34 @@ def build():
                 lambda m: "<h1>" + bi(m.group(1),
                                       htmlmod.escape(_ten)) + "</h1>",
                 body, count=1, flags=re.S)
-        page = PAGE_TMPL.format(
-            title=htmlmod.escape(title), body=body, meta_line=meta_line,
-            root="../", mathjax=MATHJAX if "$" in body else "",
-            themeinit=THEME_INIT, donatefloat=donatefloat_html("../"))
-        with open(os.path.join(SITE, "reports", slug + ".html"), "w",
-                  encoding="utf-8") as f:
-            f.write(page)
+        daily_pages.append({
+            "slug": slug, "title": title, "body": body,
+            "meta_line": meta_line, "src": src})
         daily_cards.append((pub_date, card(
             f"reports/{slug}.html", rtype, pub_date, title,
             excerpt, data_date, news_cfg["note"] if news_cfg else "",
             title_html=title_html)))
-        print(f"page: reports/{slug}.html  <- {os.path.basename(src)}")
+
+    _daily_order = [(f"reports/{p['slug']}.html", p["title"])
+                    for p in daily_pages]
+    for _i, p in enumerate(daily_pages):
+        page = PAGE_TMPL.format(
+            title=htmlmod.escape(p["title"]), body=p["body"],
+            meta_line=p["meta_line"],
+            root="../", mathjax=MATHJAX if "$" in p["body"] else "",
+            themeinit=THEME_INIT, donatefloat=donatefloat_html("../"),
+            backhash="#daily",
+            prevnext=prevnext_html(_daily_order, _i, "../"))
+        with open(os.path.join(SITE, "reports", p["slug"] + ".html"), "w",
+                  encoding="utf-8") as f:
+            f.write(page)
+        print(f"page: reports/{p['slug']}.html  <- {os.path.basename(p['src'])}")
 
     tab_cards = {"data": [], "model": []}
     data_cards_keyed = []  # (slug, card_html)，用于数据掘金置顶排序
+    data_order_keyed = []  # (slug, (href, title))，与 data_cards_keyed 同步置顶
+    tab_order = {"data": [], "model": []}  # 各栏目展示顺序 (href, title)
+    custom_pages = []  # md 文章页先收集，齐全后补前一篇/后一篇再写
     for tab_id, subdir, date, name, ext, src in collect_custom():
         if ext == "md":
             text = open(src, encoding="utf-8").read()
@@ -859,17 +901,12 @@ def build():
             if upd > date:
                 meta_line = bi(f"{date} 发布 · {upd} 更新 · 类型：{TAB_LABELS[tab_id]}",
                                f"Published {date} · Updated {upd} · {TAB_LABELS_EN[tab_id]}")
-            page = PAGE_TMPL.format(
-                title=htmlmod.escape(title), body=body,
-                meta_line=meta_line,
-                root="../../", mathjax=MATHJAX if "$" in body else "",
-                themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"))
-            with open(os.path.join(CUSTOM_DIR, subdir, slug + ".html"), "w",
-                      encoding="utf-8") as f:
-                f.write(page)
             href = f"custom/{subdir}/{slug}.html"
-            print(f"page: custom/{subdir}/{slug}.html"
-                  f"  <- {os.path.basename(src)}")
+            custom_pages.append({
+                "tab_id": tab_id, "href": href, "title": title,
+                "body": body, "meta_line": meta_line,
+                "out": os.path.join(CUSTOM_DIR, subdir, slug + ".html"),
+                "src": src})
         else:  # html：自带样式，原样上架
             text = open(src, encoding="utf-8").read()
             title = extract_html_title(text) or name
@@ -881,8 +918,10 @@ def build():
                           update_date=upd,
                           title_html=title_html if ext == "md" else "")
         tab_cards[tab_id].append(_card_html)
+        tab_order[tab_id].append((href, title))
         if tab_id == "data":
             data_cards_keyed.append((f"{date}-{name}", _card_html))
+            data_order_keyed.append((f"{date}-{name}", (href, title)))
 
     # 数据掘金置顶：两个每日更新的模拟交易博客固定排在最前（新金路 → 100万组合）
     if data_cards_keyed:
@@ -893,6 +932,24 @@ def build():
         tab_cards["data"] = ([_map[k] for k in _pinned if k in _map]
                              + [h for k, h in data_cards_keyed
                                 if k not in _pinned])
+        _omap = dict(data_order_keyed)
+        tab_order["data"] = ([_omap[k] for k in _pinned if k in _omap]
+                             + [h for k, h in data_order_keyed
+                                if k not in _pinned])
+
+    for p in custom_pages:
+        _order = tab_order[p["tab_id"]]
+        _idx = [h for h, _ in _order].index(p["href"])
+        page = PAGE_TMPL.format(
+            title=htmlmod.escape(p["title"]), body=p["body"],
+            meta_line=p["meta_line"],
+            root="../../", mathjax=MATHJAX if "$" in p["body"] else "",
+            themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"),
+            backhash="#" + p["tab_id"],
+            prevnext=prevnext_html(_order, _idx, "../../"))
+        with open(p["out"], "w", encoding="utf-8") as f:
+            f.write(page)
+        print(f"page: {p['href']}  <- {os.path.basename(p['src'])}")
 
     panels = {
         "daily": (bi("早盘 · 美股A股对标映射分析 ／ 晚间 · A股收盘技术分析 — 定时任务自动更新",
@@ -961,7 +1018,8 @@ def build_archives(daily_cards, tab_cards):
             title=f"每日报告归档 {ym}", body=body,
             meta_line=bi(f"{ym} · 共 {len(months[ym])} 篇",
                          f"{ym} - {len(months[ym])} reports"), root="",
-            mathjax="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
+            mathjax="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+            backhash="#daily", prevnext="")
         with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -974,7 +1032,8 @@ def build_archives(daily_cards, tab_cards):
         page = PAGE_TMPL.format(
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
             meta_line=bi(f"共 {len(cards)} 篇", f"{len(cards)} posts"), root="", mathjax="",
-            themeinit=THEME_INIT, donatefloat=donatefloat_html(""))
+            themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+            backhash="#" + tab_id, prevnext="")
         with open(os.path.join(SITE, fname), "w",
                   encoding="utf-8") as f:
             f.write(page)

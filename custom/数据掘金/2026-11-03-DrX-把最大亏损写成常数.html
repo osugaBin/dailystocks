@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-把最大亏损写成常数：箱体回归数字规程的公式体系与两轮实盘对照 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-10-13-DrX-闭式解验证配对交易Smooth-Fit数值求解.html" title="DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/数据掘金/2026-11-06-SGu-双基金策略设计与回测.html" title="SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">DrX-把最大亏损写成常数：箱体回归数字规程的公式体系与两轮实盘对照</span><span class="le">DrX-Writing the Maximum Loss as a Constant: The Box-Regression Rulebook and Two Live Rounds</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This article is the complete rulebook, and the worked demonstration, of the box-regression system that trades Xinjinlu (000510.SZ) in the simulated account. Nine formulas govern the strategy end to end: the robust-quantile trading box and regression channel, the box-position signal (buy at or below 0.25, sell at or above 0.75), the regime-based position matrix, two-step entry at the lower edge with a one-cent penetration fill rule and 1.50% gap protection, the locked hard stop set by the smaller of one ATR and 20% of box height, and a three-step take-profit ladder. Their consequence is an identity: the maximum loss of a round is fixed at order time as shares times stop distance plus fees - a constant, not a random variable. Two live rounds verify the arithmetic: the first closed on the locked stop with a realized loss of CNY -7,608.88, exactly the precomputed cap; the second was open at publication.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月3日</p>
 <blockquote>

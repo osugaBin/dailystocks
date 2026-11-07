@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>配对交易最优规则：均值回归价差、三阈值与止损约束 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-12-配对交易最优策略.html" title="配对交易最优策略：GBM框架下的闭式解、回测与市场应用前景"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/金融建模/2026-10-12-配对交易综述解读.html" title="统计套利配对交易策略：Krauss (2015) 综述解读与展望"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">配对交易最优规则：均值回归价差、三阈值与止损约束</span><span class="le">An Optimal Pairs-Trading Rule: Mean-Reverting Spread, Three Thresholds and a Stop-Loss Constraint</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Entry rules for pairs trading are well studied; the exit that practitioners care most about - the stop-loss - is not. Song &amp; Zhang (2013, Automatica), the prequel to the 2017 GBM treatment by the same group, keep a mean-reverting (Ornstein-Uhlenbeck) spread and, for the first time in this literature, impose the stop-loss level as an explicit state constraint inside the optimal stopping problem. The optimal rule is characterized by three thresholds: enter when the spread is wide enough, take profit when it normalizes, and cut the position unconditionally if the spread dives through the stop level first. The article lays out the problem&#x27;s motivation from practice - risk limits, margin and model failure - the quasi-variational formulation, and how the constrained solution differs from the unconstrained one: the entry threshold tightens because a trade that can be stopped out must promise more. Numerical sections trace the thresholds as volatility, reversion speed and the stop level vary.</p></div>
 <p>这篇2013年发表于《Automatica》的论文（Song &amp; Zhang），是配对交易"最优交易规则"系列的重要一篇。它与本站已解读的 Tie, Zhang &amp; Zhang (2017) 出自同一团队（Qing Zhang），可以看作<strong>前传</strong>：2017年那篇去掉了均值回归假设、在GBM下求解；这篇则<strong>保留均值回归框架</strong>，并首次把<strong>止损水平作为状态约束</strong>纳入最优停时问题——"怎么亏钱时认输出局"，是实盘中最重要却最少被严格建模的一环。</p>
 <blockquote>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-10-13-DrX-DGM配对交易HJB深度求解.html" title="DrX-DGM：以深度学习求解配对交易 HJB 变分不等式"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/数据掘金/2026-11-03-DrX-把最大亏损写成常数.html" title="DrX-把最大亏损写成常数：箱体回归数字规程的公式体系与两轮实盘对照"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">DrX-闭式解验证技术报告：配对交易 Smooth-Fit 方程组的数值求解</span><span class="le">DrX-Verification Report: Numerical Solution of the Smooth-Fit System for Pairs Trading</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Before trusting a neural-network solver, its benchmark must itself be verified. This technical report independently reproduces the closed-form solution reported in Section 6 of Tie, Zhang &amp; Zhang (2017) for optimal pairs trading under geometric Brownian motion. Starting from the paper&#x27;s Target/Walmart calibration (drifts 0.2059 and 0.2459, correlation structure and a proportional transaction cost K = 0.001), the value function is reduced to a one-dimensional problem in the price ratio, and the entry and exit thresholds are obtained by solving the smooth-fit algebraic system to full precision: k1 = 1.038 and k2 = 1.283, matching the paper&#x27;s rounded values 1.039 and 1.282. Every intermediate quantity - the reduced volatility, the characteristic roots and the constants of the general solution - is derived and cross-checked. The verified solution serves as the exact reference against which the companion DGM study measures its approximation error.</p></div>
 <p><strong>对象</strong>: Tie, Zhang &amp; Zhang (2017, JOTA) 配对交易论文 §6 的闭式解
 <strong>目标</strong>: 独立复现论文报告的 $k_1=1.039$、$k_2=1.282$（Target/Walmart 校准）

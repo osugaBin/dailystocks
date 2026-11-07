@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>可切换均值回归下的最优交易规则：买低卖高的阈值解 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-12-低买高卖的随机优化方法.html" title="低买高卖的随机优化：模型无关的随机逼近交易策略"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/金融建模/2026-10-12-均值回归双阈值解析解.html" title="均值回归低买高卖：双阈值最优法则的解析解"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">可切换均值回归下的最优交易规则：买低卖高的阈值解</span><span class="le">Optimal Trading under a Switchable Mean-Reversion Model: Threshold Solutions for Buying Low and Selling High</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Classical buy-low-sell-high results assume the equilibrium level of a mean-reverting asset never moves. Nguyen, Tie &amp; Zhang (2014, Journal of Optimization Theory and Applications) let it jump exactly once: the price first oscillates around an old equilibrium, then, at an unannounced random time, around a new one - the step pattern produced by an earnings shock, a policy shift or a changed industry outlook. The trader must therefore solve two coupled problems: trade optimally within each regime, and carry the right position across the jump. The value functions satisfy a system of quasi-variational inequalities, and the optimal strategy remains a threshold rule, with the buy and sell levels in each regime given in closed form through algebraic equations. This study walks through the model, the verification argument and the comparative statics - how jump intensity and the distance between equilibria move the thresholds - and discusses where step-wise equilibria appear in real markets.</p></div>
 <p>Zhang &amp; Zhang (2008) 给出了均值回归资产"买低卖高"的最优阈值规则，但假设均衡水平恒定不变。Nguyen, Tie &amp; Zhang (2014) 把均衡水平改成<strong>随机跳跃一次</strong>——价格呈现"台阶"形态：先围绕旧均衡震荡，跳跃后围绕新均衡震荡。用拟变分不等式刻画值函数，求出买卖阈值的闭式解。这是把经典结论推广到更贴近现实的市场形态。</p>
 <blockquote>

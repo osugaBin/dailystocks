@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261104b">
+<link rel="stylesheet" href="assets/style.css?v=20261107a">
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
@@ -236,11 +236,15 @@
     ['daily','data','model'].forEach(function(n){
       document.getElementById('tab-'+n).hidden=(n!==name);
     });
+    try{localStorage.setItem('drx_tab',name)}catch(e){}
     try{history.replaceState(null,'','#'+name)}catch(e){}
   }
   tabs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.tab)})});
   var h=(location.hash||'').replace('#','');
-  if(h==='data'||h==='model') show(h);
+  var saved='';
+  try{saved=localStorage.getItem('drx_tab')||''}catch(e){}
+  if(h==='daily'||h==='data'||h==='model') show(h);
+  else if(saved==='data'||saved==='model') show(saved);
 })();
 </script>
 <div id="msgfloat">

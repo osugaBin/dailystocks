@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>高维均值回归资产篮子期权的近似定价方法 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -13,8 +13,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
-<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-13-配对交易最优随机控制与库存惩罚.html" title="配对交易的最优随机控制：绝对与相对库存惩罚下的交易规则"><span class="lz">← 前一篇</span><span class="le">← Prev</span></a><a href="../../custom/金融建模/2026-11-03-DrX-HJ方程到BS方程.html" title="DrX-从 Hamilton-Jacobi 方程到 Black-Scholes 方程：变分法研究方案 · 第一讲"><span class="lz">后一篇 →</span><span class="le">Next →</span></a></span></p>
 <h1><span class="lz">高维均值回归资产篮子期权的近似定价方法</span><span class="le">Approximate Pricing of Basket Options on High-Dimensional Mean-Reverting Assets</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>A basket option on mean-reverting underlyings - energy, rates, commodities - has no closed-form price, and Monte Carlo is too slow for routine use, worse in high dimensions. Li &amp; Wu (2008, Computers &amp; Operations Research) propose a two-step approximation: moment matching first replaces the high-dimensional basket by a one-dimensional process with matched first two moments, and a Black-Scholes-type formula then prices the option on that surrogate in closed form. Across 2, 4, 6 and 10 dimensions and three mean-reverting models (including exponential Ornstein-Uhlenbeck dynamics), the approximation stays within 1% of Monte Carlo while taking roughly one ten-thousandth of the computing time - and, remarkably, its runtime does not grow with dimension. This study explains why the basket of mean-reverting assets is close enough to lognormal for moment matching to work, where the approximation deteriorates (deep out-of-the-money, long maturities), and what the trick teaches about taming the curse of dimensionality by structure rather than by computation.</p></div>
 <p><strong>论文</strong>：Xun Li, Zhenyu Wu, <em>On an approximation method for pricing a high-dimensional basket option on assets with mean-reverting prices</em>, Computers &amp; Operations Research 35 (2008), 76–89. DOI: <a href="https://doi.org/10.1016/j.cor.2006.02.020">10.1016/j.cor.2006.02.020</a>。</p>
 <p>篮子期权（ payoff 取决于多个标的资产加权平均价格的期权）是经典的高维期权。当标的为能源商品、利率这类<strong>均值回归</strong>资产时，定价尤其困难：既无解析解，蒙特卡洛又太慢，维度越高数值积分越贵。本文提出一个"两步近似法"——先用矩匹配把高维问题降到一维，再用 Black–Scholes 公式给出近似解析解，在 2/4/6/10 维、三种均值回归模型下精度与蒙特卡洛相差不到 1%，耗时仅为蒙特卡洛的约万分之一，且耗时<strong>不随维度增长</strong>。</p>
