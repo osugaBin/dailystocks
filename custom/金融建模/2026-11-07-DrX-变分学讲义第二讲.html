@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-张恭庆《变分学讲义》第二讲：Euler-Lagrange 方程——一阶变分、du Bois-Reymond 引理与四种可解情形 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261104b">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button></p>
+<h1><span class="lz">DrX-张恭庆《变分学讲义》第二讲：Euler-Lagrange 方程——一阶变分、du Bois-Reymond 引理与四种可解情形</span><span class="le">DrX-Zhang Gongqing&#x27;s Lectures on the Calculus of Variations, Lecture 2: The Euler-Lagrange Equation - First Variation, the du Bois-Reymond Lemma and Four Solvable Cases</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Lecture 2 of the reading of Zhang Gongqing&#x27;s Lectures on the Calculus of Variations derives the first necessary condition for an extremum. Starting from the finite-dimensional Fermat argument - restrict to a line, use that a one-variable minimum forces equality in the two-sided limit - the article computes the first variation of I(u) = integral of L(t, u, u&#x27;) dt and notes Zhang&#x27;s distinctive step: integrate the L_u term, not the L_p term, by parts, so that no differentiability of the minimizer is assumed in advance. The du Bois-Reymond lemma then converts the integral identity into the Euler-Lagrange equation in integral form, with the differential form and the Lipschitz and piecewise-C1 extensions discussed. Natural boundary conditions for free endpoints follow from the same first variation. The four solvable cases (L independent of u, of t, of p, and coordinate changes) are worked in full: Newton&#x27;s equations and the geodesic equation with Christoffel symbols, the cycloid for the brachistochrone, the catenary for the minimal surface of revolution, great circles on the sphere, and straight lines via polar coordinates. Companion readings identify the stochastic counterparts: Oksendal&#x27;s HJB(I) theorem as the random version of &#x27;first variation equals zero&#x27;, and Nualart&#x27;s divergence operator, defined by duality through the integration-by-parts formula, as the Wiener-space form of the du Bois-Reymond extraction argument.</p></div>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月7日</p>
+<p>第一讲提出了一批变分问题：最速降线、测地线、极小曲面、特征值、薄板平衡、再投资控制。它们形状各异，但问的是同一个问题——使泛函取极值的函数长什么样。本讲给出第一个统一答案：一条<strong>必要条件</strong>。若 $u^{\ast}$ 是极小点，则它必须满足一个微分方程，即 Euler-Lagrange 方程（简称 E-L 方程）。推导的方法是从有限维微积分搬来的：沿任意方向作一元函数，用一元极值的 Fermat 定理。难点只在最后一步：如何把"对一切扰动方向的积分恒等式"变成"逐点成立的微分方程"，这一步靠 du Bois-Reymond 引理。本讲按张恭庆《变分学讲义》第二讲（[1]，pp. 13–28）逐节展开：§2.1 回顾函数极值的必要条件；§2.2 推导 E-L 方程并讨论函数类的放宽；§2.3 边值条件；§2.4 四种可降阶情形与全部例题。最后一节把本讲的两个关键动作——"一阶变分等于零"与"对一切试验对象成立则逐点成立"——在 Øksendal 的随机控制与 Nualart 的 Malliavin 微积分中各找一个对应物。本讲自成一篇；全系列的地图见<a href="2026-11-07-DrX-变分学讲义第一讲.html">第一讲</a>。</p>
+<h2>一、有限维原型：一元化与双边极限</h2>
+<p>设 $\Omega \subset \mathbb{R}^{N}$ 是开集，$f \in C^{1}(\Omega)$ 在 $x_{0} \in \Omega$ 达到极小。取任意方向 $h \ne \theta$ 与充分小的 $\varepsilon$，点 $x_{0} + \varepsilon h$ 仍在邻域内，于是 $f(x_{0} + \varepsilon h) \ge f(x_{0})$，即差商 $\varepsilon^{-1}[f(x_{0} + \varepsilon h) - f(x_{0})]$ 在 $\varepsilon &gt; 0$ 时非负、$\varepsilon &lt; 0$ 时非正。令 $\varepsilon \to 0$，两个单侧极限夹出等式 [1，§2.1]：</p>
+<p>$$
+(\nabla f(x_{0}), h)_{\mathbb{R}^{n}} = 0.
+$$</p>
+<p>$h$ 任意，故 $\nabla f(x_{0}) = 0$。</p>
+<blockquote>
+<p><strong>补充讲解：记住这个模板。</strong> 整个推导只有两个动作：（1）<strong>一元化</strong>——把多变量（或无穷维）问题沿直线 $x_{0} + \varepsilon h$ 收缩成一元函数 $\varepsilon \mapsto f(x_{0} + \varepsilon h)$，极小性传递给这个一元函数在 $0$ 点的极小；（2）<strong>双边性</strong>——$\varepsilon$ 可正可负，不等式在两侧反向，只能在极限处相等，于是得到<strong>等式</strong>而非不等式。§2.2 对泛函做的事与此一字不差，只是方向 $h$ 换成函数 $\varphi$、梯度内积换成一阶变分。若扰动只能单边进行（例如控制有约束 $0 \le u \le 1$），双边性失效，结论就从方程退化为变分不等式或最大值原理——第一讲例 1.6 的 bang-bang 解正是如此，第十九讲再回来处理。</p>
+</blockquote>
+<h2>二、E-L 方程的推导</h2>
+<h3>2.1 设定与一阶变分</h3>
+<p>本讲只讨论泛函依赖于<strong>单变量</strong>（取值可以是向量）函数的情形，多变量问题留待第六讲 [1，§2.2]。设区间 $J = [t_{0}, t_{1}]$，区域 $\Omega \subset \mathbb{R}^{N}$，$L = L(t, u, p) \in C^{1}(J \times \Omega \times \mathbb{R}^{N}, \mathbb{R}^{1})$，端点 $P_{0}, P_{1} \in \Omega$ 给定，可行集与泛函为</p>
+<p>$$
+M = \lbrace u \in C^{1}(J, \Omega) \mid u(t_{i}) = P_{i}, \ i = 0, 1 \rbrace, \qquad I(u) = \int_{J} L(t, u(t), \dot{u}(t))\, dt.
+$$</p>
+<p>$u^{\ast} \in M$ 称为极小点，若它在 $M$ 中（按 $C^{1}$ 拓扑）有邻域 $U$ 使 $I(u) \ge I(u^{\ast})$ 对一切 $u \in M \cap U$ 成立。取试验函数 $\varphi \in C_{0}^{1}(J, \mathbb{R}^{N})$（$C_{0}^{\infty}$ 在 $C^{1}$ 中的闭包，即端点取零值的 $C^{1}$ 函数），当 $|\varepsilon|$ 小时 $u^{\ast} + \varepsilon \varphi \in M \cap U$。与 §2.1 完全平行，一元函数 $\varepsilon \mapsto I(u^{\ast} + \varepsilon \varphi)$ 在 $0$ 取极小，其导数称为 $I$ 在 $u^{\ast}$ 处沿 $\varphi$ 的<strong>一阶变分</strong>：</p>
+<p>$$
+\delta I(u^{\ast}, \varphi) = \lim_{\varepsilon \to 0} \frac{1}{\varepsilon} \big( I(u^{\ast} + \varepsilon \varphi) - I(u^{\ast}) \big) = \int_{J} \sum_{i=1}^{N} \big[ L_{u^{i}} \varphi^{i}(t) + L_{p^{i}} \dot{\varphi}^{i}(t) \big] dt,
+$$</p>
+<p>其中 $L_{u^{i}}, L_{p^{i}}$ 均在 $(t, u^{\ast}(t), \dot{u}^{\ast}(t))$ 处取值。注意此刻只能得到 $\delta I(u^{\ast}, \varphi) = 0$ 这一条积分关系，离微分方程还差一步。</p>
+<h3>2.2 关键技巧：对哪一项分部积分</h3>
+<p>通常的教科书会对 $L_{p^{i}} \dot{\varphi}^{i}$ 分部积分，把导数移到 $L_{p^{i}}$ 上。但这要求 $L_{p^{i}}(t, u^{\ast}(t), \dot{u}^{\ast}(t))$ 可微，而 $u^{\ast}$ 目前只知是 $C^{1}$ 的——这个可微性恰恰是待证的结论，不能预先假设。张的做法反过来：对 $L_{u^{i}} \varphi^{i}$ 一项分部积分，利用 $\varphi$ 在端点为零，把它写成原函数乘 $\dot{\varphi}^{i}$ 的形式 [1，§2.2]：</p>
+<p>$$
+\delta I(u^{\ast}, \varphi) = \int_{J} \left( \sum_{i=1}^{N} \int_{t_{0}}^{t} L_{u^{i}}(s, u^{\ast}(s), \dot{u}^{\ast}(s))\, ds - L_{p^{i}}(t, u^{\ast}(t), \dot{u}^{\ast}(t)) \right) \dot{\varphi}^{i}(t)\, dt \ge 0.
+$$</p>
+<p>这里先写 $\ge 0$ 是因为 $\varepsilon \to 0$ 走的是 $\varepsilon &gt; 0$ 一侧；把 $\varphi$ 换成 $-\varphi$（相当于 $\varepsilon &lt; 0$），不等号反向，于是得等式：对一切 $\varphi \in C_{0}^{1}(J, \mathbb{R}^{N})$，上式积分等于零。剩下的任务，是把括号里那个与 $\varphi$ 无关的函数从积分号下"提取"出来。</p>
+<h3>2.3 du Bois-Reymond 引理与定理 2.1</h3>
+<p><strong>引理 2.1（du Bois-Reymond）</strong> 设 $\psi \in C[t_{0}, t_{1}]$，且 $\int_{J} \psi(t) \dot{\lambda}(t)\, dt = 0$ 对一切 $\lambda \in C_{0}^{1}(J)$ 成立，则 $\psi$ 是常数 [1，§2.2]。</p>
+<p>证明只有三行，但值得细看。令 $c = |J|^{-1} \int_{J} \psi(t)\, dt$ 为 $\psi$ 的平均值，并取 $\lambda(t) = \int_{t_{0}}^{t} (\psi(s) - c)\, ds$。由 $c$ 的选法，$\lambda(t_{1}) = 0$，故 $\lambda \in C_{0}^{1}(J)$ 是合法的试验函数，且 $\dot{\lambda} = \psi - c$。代入假设：</p>
+<p>$$
+\int_{J} (\psi(t) - c)^{2} dt = \int_{J} \psi(t) (\psi(t) - c)\, dt = \int_{J} \psi(t) \dot{\lambda}(t)\, dt = 0,
+$$</p>
+<p>$\psi$ 连续，故 $\psi \equiv c$。</p>
+<blockquote>
+<p><strong>补充讲解：这个证明为什么妙。</strong> 结论要的是 $\psi - c \equiv 0$，而假设只给出 $\psi$ 与"一切零端点函数的导数"正交。证明的关键是意识到 $\psi - c$ <strong>自己</strong>就是一个合法的导数：把常数 $c$ 取成平均值，恰好保证原函数在右端点回到零。换句话说，为了证明某个函数为零，就拿它自己（修正后端点相容）去作试验函数——这是变分法与 PDE 弱解理论中反复出现的自举手法。与它对照的是更常见的基本引理：若 $\int \psi \varphi = 0$ 对一切 $\varphi \in C_{0}^{\infty}$ 成立则 $\psi \equiv 0$，那里试验对象是 $\varphi$ 本身；本引理的试验对象是 $\dot{\lambda}$，"导数"这一层使结论从"$\psi = 0$"弱化为"$\psi = $ 常数"，常数正是被微分杀掉的部分。</p>
+</blockquote>
+<p>把引理逐分量用于 2.2 的积分等式（每个分量单独取 $\varphi$ 只在该分量非零），得到本讲的主定理。</p>
+<p><strong>定理 2.1（积分形式的 E-L 方程）</strong> 设 $u^{\ast} \in M$ 是 $I$ 的极小点，则对 $1 \le i \le N$ 与一切 $t \in J$，</p>
+<p>$$
+\int_{t_{0}}^{t} L_{u^{i}}(s, u(s), \dot{u}(s))\, ds - L_{p^{i}}(t, u(t), \dot{u}(t)) = \mathrm{const}.
+$$</p>
+<p>[1，§2.2，定理 2.1]</p>
+<h3>2.4 微分形式、E-L 算子与函数类的放宽</h3>
+<p><strong>注 2.1</strong> 当 $L \in C^{1}$、$u \in C^{1}$ 时，积分形式在广义函数意义下可写成微分形式</p>
+<p>$$
+\frac{d}{dt} L_{p}(t, u(t), \dot{u}(t)) - L_{u}(t, u(t), \dot{u}(t)) = 0,
+$$</p>
+<p>并定义 <strong>Euler-Lagrange 算子</strong> $(E_{L} u)(t) = \frac{d}{dt} L_{p}(t, u(t), \dot{u}(t)) - L_{u}(t, u(t), \dot{u}(t))$。若进一步 $L \in C^{2}$、$u \in C^{2}$，导数就是通常导数，方程逐点成立 [1，§2.2，注 2.1]。</p>
+<blockquote>
+<p><strong>补充讲解：为什么定理先以积分形式出现。</strong> 积分形式只用 $L \in C^{1}$ 与 $u \in C^{1}$，结论是"$L_{p}$ 等于一个绝对连续函数"，即自动给出了 $L_{p}$ 沿轨道的可微性（广义导数意义下）。这是一个正则性结论的雏形：极小点比一般 $C^{1}$ 函数多一层光滑性。反之，若一开始假设 $u \in C^{2}$ 再分部积分，推导更短，但结论的适用范围也随之缩水（存在性理论给出的极小点通常达不到 $C^{2}$）。积分形式与微分形式之间的这层关系，在第六讲、第十讲处理 PDE 与 Sobolev 空间时会以"弱解→正则性"的形式再次出现。</p>
+</blockquote>
+<p><strong>注 2.2（Lipschitz 类）</strong> $C^{1}(J)$ 可以放大到 Lipschitz 函数类：Lipschitz 函数绝对连续、几乎处处可导，$I$ 按 Lebesgue 积分理解，邻域用 $\lbrace v : |v(t) - u^{\ast}(t)| + |\dot{v}(t) - \dot{u}^{\ast}(t)| &lt; \delta, \ \text{a.e. } t \rbrace$ 定义。求一阶变分时积分号下取极限由 Lebesgue 控制收敛定理保证；du Bois-Reymond 引理相应改为 $\psi \in L^{\infty}(J)$、$\lambda$ 取边值为零的绝对连续函数。积分形式的 E-L 方程在 Lebesgue 意义下对几乎一切 $t$ 成立 [1，§2.2，注 2.2]。</p>
+<p><strong>注 2.3（逐段 $C^{1}$）</strong> 逐段 $C^{1}$ 的连续函数（导数只有有限个跳跃点）是 Lipschitz 函数，积分形式的 E-L 方程对这一类同样成立 [1，§2.2，注 2.3]。但跳跃点处还有额外的衔接条件（角点条件），见 §5 的说明与本讲习题 2、3。</p>
+<h2>三、E-L 方程的两个基本例：Newton 方程与测地线</h2>
+<h3>3.1 例 2.1：质点运动方程</h3>
+<p>质量为 $m$ 的质点受外力 $F$ 作用，位置 $x = (x_{1}, x_{2}, x_{3})$，速度 $v = \dot{x}$，动能 $T = \frac{1}{2} m v^{2}$。设 $F$ 有位势 $V$：$F = -\nabla V$。取 Lagrange 函数 $L = T - V = \frac{1}{2} m |\dot{x}|^{2} - V(x)$，作用量 $I(x) = \int_{t_{1}}^{t_{2}} L(x(t), \dot{x}(t))\, dt$ 的极小轨道满足 E-L 方程，而该方程正是 $F = m \ddot{x}$——Newton 第二定律。对 $n$ 个自由度的质点组，广义坐标 $q = (q_{1}, \dots, q_{n})$ 下动能是正定二次型 $T = \frac{1}{2} \sum_{i,j} a_{ij} \dot{q}_{i} \dot{q}_{j}$，E-L 方程组为</p>
+<p>$$
+\sum_{j=1}^{n} a_{ij} \ddot{q}_{j} = -\frac{\partial V}{\partial q_{i}}, \qquad i = 1, \dots, n,
+$$</p>
+<p>仍是 Newton 方程 [1，§2.2，例 2.1]。</p>
+<blockquote>
+<p><strong>补充讲解。</strong> 这条例子说明 E-L 方程不是"变分问题特有的方程"，而是经典力学的基本方程的统一来源：先有作用量（动能减位能的时间积分），再有方程。这也是第一讲例 1.9 中 Hamilton 原理的 $C^{2}$ 版本。注意逻辑方向：变分原理给出的是必要条件，"真实轨道使作用量取极小"在短时间内成立、长时间一般只是驻定（临界点）——取极小还是仅驻定，由第三讲的二阶变分与共轭点判定。</p>
+</blockquote>
+<h3>3.2 例 2.2：测地线方程</h3>
+<p>设 $(M, g)$ 是 $N$ 维 Riemann 流形，度量矩阵 $(g_{ik}(u))$ 正定对称。在一个坐标卡内取 <strong>能量泛函</strong> 的 Lagrange 函数 $L(u, p) = \sum_{i,j=1}^{N} g_{ij}(u) p_{i} p_{j}$，$I(u) = \int_{J} L(u, \dot{u})\, dx$。其 E-L 方程为</p>
+<p>$$
+\frac{d}{dt} \sum_{j} \lbrace g_{ij}(u) \dot{u}^{j} \rbrace = \frac{1}{2} \sum_{j,k} g_{jk,i}(u) \dot{u}^{j} \dot{u}^{k}, \qquad g_{jk,i} = \frac{\partial g_{jk}}{\partial u^{i}}.
+$$</p>
+<p>展开左端、利用 $\sum_{j,k} g_{ij,k} \dot{u}^{k} \dot{u}^{j} = \sum_{j,k} g_{kl,j} \dot{u}^{k} \dot{u}^{j}$ 这类对称化恒等式，并引入 Christoffel 符号 $\Gamma_{jlk} = \frac{1}{2} \lbrace g_{ij,k} + g_{kl,j} - g_{jk,l} \rbrace$ 与其升指标版本 $\Gamma^{i}_{jk} = \sum_{l} g^{il} \Gamma_{jlk}$（$(g^{ik})$ 是 $(g_{ik})$ 的逆阵），方程化为微分几何中的测地线方程 [1，§2.2，例 2.2]：</p>
+<p>$$
+\ddot{u}^{i} + \sum_{j,k} \Gamma^{i}_{jk}(u) \dot{u}^{j} \dot{u}^{k} = 0, \qquad \forall i.
+$$</p>
+<blockquote>
+<p><strong>补充讲解：为什么用能量泛函而不用弧长泛函。</strong> 第一讲例 1.2 用的是弧长 $\int \sqrt{g_{ij} \dot{u}^{i} \dot{u}^{j}}\, dt$。弧长对参数变换不变，其 Lagrange 函数关于 $p$ 一次齐次，按第一讲习题方向的 Euler 齐次公式，这使它的 E-L 方程组线性相关（退化），处理起来麻烦。能量泛函 $\int g_{ij} \dot{u}^{i} \dot{u}^{j} dt$ 没有这个毛病：由 Cauchy-Schwarz 不等式，固定端点时能量取极小的曲线必以恒定速率行驶，且其像与弧长取极小者一致（至多差参数化）。代价是多记住一条：能量泛函选出的不只是测地线的像，还有等速参数化。球面上的具体求解见 §6.2 的例 2.6。</p>
+</blockquote>
+<h2>四、变分导数：E-L 算子的局部性</h2>
+<p>§2.2 的推导在整个区间 $J$ 上进行，但点 $c \in \mathrm{int}(J)$ 处的 E-L 方程实际上只依赖 $L$ 在 $c$ 附近的行为：取支集含于小邻域 $(c - h, c + h)$ 内的试验函数 $\varphi$，它们同样是合法的 $C_{0}^{1}$ 函数，其任意性已经给出该邻域上的 E-L 方程。把这一局部性推向极限，就得到<strong>变分导数</strong>的定义。以 $N = 1$、$L \in C^{2}$、$u \in C^{2}$ 为例，取 $\varphi$ 支集在 $(c - h, c + h)$ 内，记 $\Delta \sigma = \int_{c-h}^{c+h} \varphi(t)\, dt$（曲线 $u + \varphi$ 与 $u$ 之间所夹的面积），则 [1，§2.2，变分导数]：</p>
+<p>$$
+\lim \frac{I(u + \varphi) - I(u)}{\Delta \sigma} = E_{L}(u)(c),
+$$</p>
+<p>极限过程是 $h \to 0$ 且 $\sup_{t \in [c-h, c+h]} |\dot{\varphi}(t)| \to 0$（扰动越来越窄、越来越平）。即 $E_{L}(u)(t) = \frac{d}{dt} L_{p}(t, u(t), \dot{u}(t)) - L_{u}(t, u(t), \dot{u}(t))$ 是泛函 $I$ 在 $t$ 点的变分导数：泛函增量与"扰动面积"之比的局部极限。</p>
+<blockquote>
+<p><strong>补充讲解。</strong> 有限维时 $\nabla f(x_{0})$ 是"函数增量与位移之比"的极限；这里的位移换成面积 $\Delta \sigma$，梯度换成一条曲线 $E_{L}(u)(\cdot)$。这一定义有两层用途：其一，它解释了 E-L 方程为什么是 ODE 而不是别的——泛函的一阶信息逐点地由一个函数承载；其二，它是下一讲 §6.4 证明"E-L 方程在坐标变换下不变"的工具（见 §6.4）：泛函与面积元都是几何量，与坐标选取无关，故变分导数为零这一命题也与坐标无关。</p>
+</blockquote>
+<h2>五、边值条件：固定端点与自然边界条件</h2>
+<p>§2.2 的 $u^{\ast}$ 除了满足 E-L 微分方程，还必须满足端点条件 $u(t_{0}) = P_{0}$、$u(t_{1}) = P_{1}$，两件合起来才是完整的边值问题 [1，§2.3]。若把定义域换成不加端点限制的 $M = C^{1}(J, \mathbb{R}^{N})$，极值函数应满足什么？此时试验函数 $\varphi$ 不必在端点为零。先对 $u^{\ast} \in C^{2}$ 用通常的分部积分展开一阶变分：</p>
+<p>$$
+\delta I(u^{\ast}, \varphi) = \int_{J} \big( L_{u} - \frac{d}{dt} L_{p} \big) \cdot \varphi\, dt + \sum_{i=1}^{N} L_{p^{i}}(t, u^{\ast}(t), \dot{u}^{\ast}(t))\, \varphi^{i}(t) \Big|_{t_{0}}^{t_{1}}.
+$$</p>
+<p>推导分两步走：先取 $\varphi \in C_{0}^{1}$，边界项消失，照常得到 E-L 方程；再取任意 $\varphi \in C^{1}$，此时积分项已经消失，而 $\varphi^{i}(t_{j})$（$i = 1, \dots, N$，$j = 0, 1$）可以任意取值，故边界项逐项为零 [1，§2.3]：</p>
+<p>$$
+L_{p^{i}}(t_{j}, u^{\ast}(t_{j}), \dot{u}^{\ast}(t_{j})) = 0, \qquad i = 1, \dots, N, \quad j = 0, 1.
+$$</p>
+<p>这称为<strong>自然边界条件</strong>（natural boundary condition）：端点不固定时，动量 $L_{p}$ 在端点必须为零。混合情形（一个端点固定、另一个自由；或对向量值的不同分量用不同条件）逐项照此办理；周期条件、自由边值等其他类型在后面几讲专门讨论 [1，§2.3]。</p>
+<blockquote>
+<p><strong>补充讲解：自然边界条件不是外加的。</strong> 它与 E-L 方程来自同一个 $\delta I = 0$：内部扰动给出方程，端点扰动给出边界条件。"自然"二字指它由问题自身（泛函的形式）决定，而非人为指定。本讲习题 1 给一个手算例。还要提醒 §2.3 开头的一条注意事项：以上讨论始终在 $C^{1}$ 类内；若换成逐段 $C^{1}$ 类，E-L 方程在每段内部不变，但在导数跳跃的角点处必须另加衔接条件——动量 $L_{p}$ 跨角点连续（第一 Erdmann 角点条件）与 Hamilton 量 $L - \sum p_{i} L_{p^{i}}$ 跨角点连续（第二 Erdmann 角点条件），见原书习题 2、4 [1，第二讲习题]。</p>
+</blockquote>
+<h2>六、求解 E-L 方程：四种降阶情形</h2>
+<p>一般地 E-L 方程是二阶 ODE，未必有闭式解。但当 $L$ 缺某个自变量时，方程可降一阶。本节处理 [1，§2.4] 的全部内容。</p>
+<h3>6.1 情形 1：$L$ 不含 $u$，即 $L = L(t, p)$</h3>
+<p>E-L 方程化为 $\frac{d}{dt} L_{p}(t, \dot{u}(t)) = 0$，即 $L_{p}(t, \dot{u}(t)) = c$。这是一个不含 $u$ 的一阶方程；若 $L_{pp} \ne 0$ 可解出 $\dot{u} = g(t, c)$，再积分得 $u$。动量守恒是其物理对应。</p>
+<p><strong>例 2.3</strong> 在 $M = \lbrace u \in C^{1}([1, 2]) \mid u(1) = 0, u(2) = 1 \rbrace$ 上求 $I(u) = \int_{1}^{2} \frac{\sqrt{1 + \dot{u}^{2}}}{t}\, dt$ 的极小。此时 $L_{p} = \frac{p}{t \sqrt{1 + p^{2}}} = C$，解出 $\dot{u} = \frac{Ct}{\pm \sqrt{1 - C^{2} t^{2}}}$（符号吸收进常数 $C$），积分得 $u = \frac{1}{C} \sqrt{1 - C^{2} t^{2}} + C_{1}$。代入边值条件得 $C = \frac{1}{\sqrt{5}}$、$C_{1} = 2$，解为</p>
+<p>$$
+(u - 2)^{2} + t^{2} = 5,
+$$</p>
+<p>一段圆弧 [1，§2.4，例 2.3]。极小曲线是圆弧而非直线，因为被积函数带权重 $1/t$：越靠近 $t = 2$，"路程"越便宜，曲线愿意往大 $t$ 方向鼓。</p>
+<h3>6.2 情形 2：$L$ 不含 $t$（自守系统），Hamilton 量守恒</h3>
+<p>引入 <strong>Hamilton 量</strong> $H(u, p) = p L_{p}(u, p) - L(u, p)$。</p>
+<p><strong>定理 2.2</strong> 设 $L \in C^{2}$ 且与 $t$ 无关，$u \in C^{2}$ 是 E-L 方程的解，则 $H(u(t), \dot{u}(t)) = \mathrm{const}$ 对一切 $t$ 成立。证明是一行计算：$\frac{d}{dt} H(u(t), u'(t)) = u'(t) \cdot E_{L}(u)(t) = 0$ [1，§2.4，定理 2.2]。</p>
+<blockquote>
+<p><strong>补充讲解：这一行计算的骨架。</strong> 展开 $\frac{d}{dt}[u' L_{p} - L]$，$u'' L_{p}$ 与 $-L_{p} u''$ 相消，剩下 $u' (\frac{d}{dt} L_{p} - L_{u}) = u' E_{L}(u)$。所以 Hamilton 量守恒不是独立的物理输入，而是"$L$ 不显含时间"经 E-L 方程的直接推论；其力学含义（能量守恒）是本讲习题 3。它与情形 1 的动量守恒并列：$L$ 缺 $u$ 得动量守恒、缺 $t$ 得能量守恒——对称性与守恒量的这种配对，在第八讲将由 Noether 定理统一。</p>
+</blockquote>
+<p><strong>例 2.4（最速降线续解）</strong> 第一讲例 1.1 的 $L(u, p) = \frac{1}{\sqrt{2g}} \frac{\sqrt{1 + p^{2}}}{\sqrt{y_{1} - u}}$ 不显含 $x$。由定理 2.2（常数吸收进 $c$）：</p>
+<p>$$
+c^{2} (1 + u'^{2})(y_{1} - u) = 1.
+$$</p>
+<p>作参量替换 $u(\theta) = y_{1} - k(1 - \cos \theta)$（$k$ 为待定正常数），并取 $c = \sqrt{1/(2k)}$，可得 $\dot{x}(\theta) = k(1 - \cos \theta)$（点表示对 $\theta$ 求导），积分后得到摆线</p>
+<p>$$
+x(\theta) = x_{1} + k(\theta - \sin \theta), \qquad u(\theta) = y_{1} - k(1 - \cos \theta), \qquad \theta \in [0, \Theta],
+$$</p>
+<p>$k$ 与 $\Theta$ 由终点 $(x_{2}, y_{2})$ 确定 [1，§2.4，例 2.4]。第一讲留的问题至此闭环：最速降线是摆线（旋轮线）。</p>
+<blockquote>
+<p><strong>补充讲解：替换 $u(\theta) = y_{1} - k(1 - \cos\theta)$ 从哪来。</strong> 一阶方程 $c^{2}(1 + u'^{2})(y_{1} - u) = 1$ 给出 $\frac{du}{dx} = \sqrt{\frac{1 - c^{2}(y_{1} - u)}{c^{2}(y_{1} - u)}}$，右端是 $y_{1} - u$ 的函数。把落差 $y_{1} - u$ 设为 $k(1 - \cos\theta)$，是为了让根号内的 $1 - \cos\theta$ 与 $\sin\theta$ 凑成半角公式 $\frac{1 - \cos\theta}{\cos\theta \text{ 型}}$ 的可积形式——本质是把方程凑成 $\frac{dx}{d\theta} \propto 1 - \cos\theta$。这类"猜一个含三角函数的中间变量把根号消掉"的手法，在一阶可降阶方程里很常见：目标不是解出 $u(x)$ 的显式（摆线没有初等的 $u(x)$ 显式），而是得到参数方程。</p>
+</blockquote>
+<p><strong>例 2.5（旋转极小曲面）</strong> 连接平面两点 $P_{1} = (x_{1}, y_{1})$、$P_{2} = (x_{2}, y_{2})$（$y_{i} &gt; 0$）的曲线绕 $x$ 轴旋转，面积 $I(u) = 2\pi \int_{x_{1}}^{x_{2}} u \sqrt{1 + u'^{2}}\, dx$。由 Hamilton 量守恒（此处以 $L - \dot{u} L_{p} = C$ 的形式写出，与 $H$ 只差符号）：</p>
+<p>$$
+u \sqrt{1 + \dot{u}^{2}} - \frac{u \dot{u}^{2}}{\sqrt{1 + \dot{u}^{2}}} = C \quad \Longrightarrow \quad \dot{u} = C^{-1} \sqrt{u^{2} - C^{2}},
+$$</p>
+<p>积分得 $C \ln \frac{u + \sqrt{u^{2} - C^{2}}}{C} = x + C_{1}$，解为悬链线</p>
+<p>$$
+u = C \cosh \frac{x + C_{1}}{C},
+$$</p>
+<p>相应的旋转曲面是悬链面（catenoid）[1，§2.4，例 2.5]。</p>
+<p><strong>例 2.6（球面测地线续解）</strong> 回到第一讲例 1.2，以经度 $\varphi$ 为参数、纬度 $\theta = \theta(\varphi)$，能量泛函的 Lagrange 函数（对参数一次齐次化的处理后）用定理 2.2 写出首积分：</p>
+<p>$$
+\frac{\theta'^{2}}{\sqrt{\cos^{2} \theta + \theta'^{2}}} - \sqrt{\cos^{2} \theta + \theta'^{2}} = c, \qquad -1 \le c &lt; 1.
+$$</p>
+<p>由此得 $c^{2} \theta'^{2} = \cos^{4} \theta - c^{2} \cos^{2} \theta$。当 $0 &lt; c^{2} &lt; 1$ 时作替换 $t = \tan \theta$ 分离变量积分，得</p>
+<p>$$
+\tan \theta(\varphi) = \frac{\sqrt{1 - c^{2}}}{c} \sin(\pm \varphi + \varphi_{0}),
+$$</p>
+<p>这是球面上大圆的方程；常数 $c, \varphi_{0}$ 由两端点确定。$c = 0$ 对应 $\theta = \pm \pi/2$ 的两极（不是曲线），$c = -1$ 对应赤道 [1，§2.4，例 2.6]。几何结论：球面测地线是大圆弧——第一讲例 1.2 至此也闭环。</p>
+<h3>6.3 情形 3：$L$ 不含 $p$，即 $L = L(t, u)$</h3>
+<p>E-L 方程退化为函数方程 $L_{u}(t, u) = 0$，不再有导数，解是一条或几条给定曲线。<strong>例 2.7</strong>：$I(u) = \int_{a}^{b} (t - u)^{2}\, dt$ 的 E-L 方程是 $t - u = 0$，解为直线 $u = t$ [1，§2.4，例 2.7]。</p>
+<blockquote>
+<p><strong>补充讲解。</strong> 情形 3 提醒我们：E-L 方程的"阶"来自 $L$ 对 $p$ 的依赖。没有 $p$，泛函其实是逐点的——每个 $t$ 独立地选 $u(t)$ 使 $L(t, u)$ 最小，与第一讲的反例 $I_{4}$ 恰成对照：$I_{4}$ 连泛函都不是，而这里是泛函但退化为逐点问题。真正的变分问题（解由整体决定）必须有 $\dot{u}$ 参与，这也是直接方法（第九讲）中紧性来自导数项的原因。</p>
+</blockquote>
+<h3>6.4 情形 4（附带）：坐标变换不变性</h3>
+<p>用变分导数的表达式可以证明：E-L 方程在坐标变换下形式不变。若变换 $(t, u) \leftrightarrow (s, v)$ 互逆，新的 Lagrange 函数为</p>
+<p>$$
+\tilde{L}(s, v, q) = L\left( t(s, v), u(s, v), \frac{u_{s} + u_{v} q}{t_{s} + t_{v} q} \right) (t_{s} + t_{v} q),
+$$</p>
+<p>则 $\int_{t_{0}}^{t_{1}} L\, dt = \int_{s_{0}}^{s_{1}} \tilde{L}\, ds$，关于新变量的 E-L 方程 $\tilde{L}_{v} - \frac{d}{ds} \tilde{L}_{q} = 0$ 与原方程等价：可以先在好算的坐标里求解，再变回来 [1，§2.4]。</p>
+<p><strong>例 2.8</strong> 求极坐标弧长泛函 $I(r) = \int_{\varphi_{0}}^{\varphi_{1}} \sqrt{r^{2} + \dot{r}^{2}}\, d\theta$（$r = r(\theta)$）的极值。其 E-L 方程 $\frac{r}{\sqrt{r^{2} + \dot{r}^{2}}} - \frac{d}{d\theta} \frac{\dot{r}}{\sqrt{r^{2} + \dot{r}^{2}}} = 0$ 不易解。作坐标变换 $x = r \cos\theta$、$u = r \sin\theta$，泛函变为直角坐标弧长 $I(u) = \int_{x_{0}}^{x_{1}} \sqrt{1 + \dot{u}^{2}}\, dx$，E-L 方程是 $\ddot{u} = 0$，通解 $u = ax + b$。代回原问题：$r \sin\theta = a r \cos\theta + b$——直线在极坐标下的方程 [1，§2.4，例 2.8]。平面测地线是直线，这个几何上显然的结论，由变分法在"错坐标"里绕了一圈又回到显然，前提正是变换不变性。</p>
+<h2>七、两本书中的对应物</h2>
+<h3>7.1 Øksendal：HJB 方程是随机版的"一阶变分 = 0"</h3>
+<p>在 Øksendal 的随机控制框架中（记号见第一讲 §5.1），值函数 $\Phi(y) = \sup_{u} J^{u}(y)$ 满足 Hamilton-Jacobi-Bellman 方程</p>
+<p>$$
+\sup_{v \in U} \lbrace F^{v}(y) + (L^{v} \Phi)(y) \rbrace = 0, \qquad y \in G,
+$$</p>
+<p>其中 $L^{v}$ 是控制取常值 $v$ 时受控扩散的生成元 [2，§11.2，定理 11.2.1，式 (11.2.3)]。其推导与本讲同构：由动态规划原理，在长度 $h$ 的小时间窗内把控制<strong>局部扰动</strong>为常值 $v$，展开 $\Phi$，除以 $h$ 令 $h \to 0$——这正是"沿一个方向一元化、取一阶项"的变分动作，只是扰动对象从函数 $\varphi$ 换成了控制取值。结论的形态差异则来自问题结构：</p>
+<ul>
+<li>确定性情形：一阶条件是沿轨道逐点成立的 <strong>ODE</strong>（E-L 方程），未知量是函数 $u^{\ast}(t)$ 本身；</li>
+<li>随机情形：一阶条件是逐点（对每个状态 $y$）的<strong>有限维最大化</strong>加上一个 <strong>PDE</strong>（HJB 方程），未知量是值函数 $\Phi$；最优控制由逐点最大化 $\arg\max_{v} \lbrace F^{v} + L^{v} \Phi \rbrace$ 给出。</li>
+</ul>
+<p>Øksendal 在定理 11.2.1 后特别强调：HJB (I) 只说最优点必须是大括号内函数的最大值点，这是<strong>必要性</strong>；充分性是定理 11.2.2（HJB (II)，验证定理）的内容 [2，§11.2]。这与本讲的处境完全平行：E-L 方程只是必要条件，充分性要等第三讲用二阶变分来补。两本书在"必要条件先行、充分性另证"这一点上结构一致。</p>
+<h3>7.2 Nualart："对一切试验对象成立"在 Wiener 空间成为算子对偶</h3>
+<p>du Bois-Reymond 引理的逻辑是：一个量与一切试验函数的导数配对为零，则该量逐点取常数值。Wiener 空间上没有"逐点"可言，同类逻辑被制度化为算子的<strong>对偶定义</strong>。Nualart 把 Malliavin 导数 $D$ 的伴随算子 $\delta$（散度算子）直接定义为：$u \in \mathrm{Dom}\, \delta$，若存在常数 $c$ 使 $|E \langle DF, u \rangle_{H}| \le c |F|_{2}$ 对一切 $F \in \mathbb{D}^{1,2}$ 成立；$\delta(u)$ 是由恒等式</p>
+<p>$$
+E(F\, \delta(u)) = E \langle DF, u \rangle_{H}, \qquad \forall F \in \mathbb{D}^{1,2},
+$$</p>
+<p>刻画的那个 $L^{2}(\Omega)$ 元 [3，§1.3，定义 1.3.1，式 (1.41)(1.42)]。当 $H = L^{2}[0, T]$ 时 $\delta$ 就是 Skorohod 积分——Itô 积分向非适应被积函数的推广 [3，§1.3]。</p>
+<blockquote>
+<p><strong>补充讲解：对照着读。</strong> 经典一侧的链条是"$\delta I = 0$ 对一切 $\varphi$ ⇒ 引理 ⇒ $E_{L} u = 0$ 逐点成立"，关键资产是分部积分与试验函数的任意性。Wiener 空间一侧没有分部积分公式的经典版本，于是把分部积分公式（第一讲引理 1.2.1）本身当作定义对偶算子的标尺：凡是能通过这条恒等式被"提取"出来的对象，就命名为 $\delta(u)$。du Bois-Reymond 证明里"取平均值 $c$ 使原函数端点相容"的手法，在这一侧也有回声：$\mathrm{Dom}\, \delta$ 的条件 (1.41) 要求先把 $F$ 中的零阶项（期望）处理掉——取 $F = 1$ 得 $E(\delta(u)) = 0$，即 $\delta$ 的值域与常数正交，正如 $\psi - c$ 与常数正交。两处都是同一件事：先减去均值，再谈提取。</p>
+</blockquote>
+<h2>八、小结与自测习题</h2>
+<p><strong>小结。</strong>（1）E-L 方程的推导 = 有限维 Fermat 定理的无穷维翻版：一元化 + 双边极限得 $\delta I = 0$；对 $L_{u} \varphi$（而不是 $L_{p} \dot{\varphi}$）分部积分，绕开对极小点正则性的预先假设。（2）du Bois-Reymond 引理把积分恒等式变成逐点结论，定理 2.1 的积分形式是基本形式，微分形式依赖额外的 $C^{2}$ 假设。（3）端点自由时 $\delta I = 0$ 同时给出 E-L 方程与自然边界条件 $L_{p} = 0$；逐段 $C^{1}$ 时另有 Erdmann 角点条件。（4）$L$ 缺 $u$ 得动量首积分、缺 $t$ 得 Hamilton 量守恒、缺 $p$ 则退化为逐点问题；摆线、悬链线、大圆、直线分别从例 2.4–2.6、2.8 落地。但 E-L 方程只是必要条件：它的解可以是极小、极大或鞍点。判定要靠二阶变分——这是<a href="2026-11-07-DrX-变分学讲义第三讲.html">第三讲</a>的任务：Legendre-Hadamard 条件、Jacobi 场与共轭点。</p>
+<p><strong>习题 1（自然边界条件，原书 §2.3 的方法）</strong> 求泛函 $I(u) = \int_{0}^{1} (\dot{u}^{2} + u)\, dt$ 在 $u(0) = 0$、$u(1)$ 自由的类中的极值曲线，并说明它是极小点。</p>
+<p><strong>习题 2（第一 Erdmann 角点条件，原书习题 2）</strong> 在逐段 $C^{1}$ 类中设 $u_{0}$ 是 $I$ 的极小点，$t^{\ast} \in (t_{0}, t_{1})$ 是 $\dot{u}_{0}$ 的跳跃点。陈述并给出证明要点：$L_{p_{i}}$ 跨 $t^{\ast}$ 连续，即 $L_{p_{i}}(t^{\ast}, u_{0}(t^{\ast}), \dot{u}_{0}(t^{\ast} - 0)) = L_{p_{i}}(t^{\ast}, u_{0}(t^{\ast}), \dot{u}_{0}(t^{\ast} + 0))$。</p>
+<p><strong>习题 3（能量守恒，原书习题 3）</strong> 设 $L \in C^{2}(\mathbb{R}^{N} \times \mathbb{R}^{N})$ 不显含 $t$，$u \in C^{2}$ 是 $I(u) = \int_{J} L(u, \dot{u})\, dt$ 的 E-L 解，$H(u, p) = \sum_{i} p_{i} L_{p_{i}}(u, p) - L(u, p)$。证明 $H(u(t), \dot{u}(t)) = \mathrm{const}$；并对力学 Lagrange 函数 $L = T - V$（$T = \frac{1}{2} \sum a_{ij} \dot{q}_{i} \dot{q}_{j}$）算出 $H$，说明其物理意义。</p>
+<p><strong>习题 4（两种"基本引理"）</strong> 说明 du Bois-Reymond 引理 2.1 与命题"$\int_{J} \psi \varphi = 0$ 对一切 $\varphi \in C_{0}^{\infty}(J)$ 蕴含 $\psi \equiv 0$"的差别：试验对象、结论各弱在哪里，为什么。</p>
+<p><strong>参考答案要点。</strong></p>
+<ol>
+<li>E-L：$\frac{d}{dt} (2\dot{u}) - 1 = 0$，即 $\ddot{u} = \frac{1}{2}$，$u = \frac{t^{2}}{4} + c_{1} t + c_{2}$。$u(0) = 0$ 给 $c_{2} = 0$；端点 $t = 1$ 自由，自然边界条件 $L_{p}(1) = 2\dot{u}(1) = 0$ 给 $\dot{u}(1) = \frac{1}{2} + c_{1} = 0$，$c_{1} = -\frac{1}{2}$。极值曲线 $u(t) = \frac{t^{2}}{4} - \frac{t}{2}$。因 $L_{pp} = 2 &gt; 0$ 且二阶变分 $\delta^{2} I(u, \varphi) = \int_{0}^{1} 2 \dot{\varphi}^{2} dt &gt; 0$（$\varphi \ne 0$），是严格极小点（二阶变分的系统理论见第三讲）。</li>
+<li>证明要点：在 $t^{\ast}$ 的小邻域内取支集、只在角点附近非零的变分；$u_{0}$ 在 $[t_{0}, t^{\ast}]$ 与 $[t^{\ast}, t_{1}]$ 两段上分别满足积分形式 E-L 方程。把两段在 $t^{\ast}$ 处的积分形式相减，并用变分的任意性（特别地，用在 $t^{\ast}$ 处取任意值的 $\varphi$），即得 $L_{p}$ 的左右极限相等。另一条角点条件（第二 Erdmann）：$L - \sum_{i} \dot{u}^{i} L_{p_{i}}$（即负的 Hamilton 量）在角点处也连续，由"移动角点位置"的变分得到，见原书习题 4。</li>
+<li>沿解求导：$\frac{d}{dt} H = \sum_{i} \dot{u}^{i} \left( \frac{d}{dt} L_{p_{i}} - L_{u_{i}} \right) = \sum_{i} \dot{u}^{i} (E_{L} u)_{i} = 0$。力学情形：$L_{p_{i}} = \sum_{j} a_{ij} \dot{q}_{j}$（$a_{ij}$ 对称），$\sum_{i} p_{i} L_{p_{i}} = \sum_{i,j} a_{ij} \dot{q}_{i} \dot{q}_{j} = 2T$，故 $H = 2T - (T - V) = T + V$：总能量。定理 2.2 于此即能量守恒定律。</li>
+<li>基本引理的试验对象是 $\varphi$ 本身（任意零端点光滑函数），结论 $\psi \equiv 0$；du Bois-Reymond 的试验对象是 $\dot{\lambda}$——导数受"积分回零端点"的约束（$\int_{J} \dot{\lambda} = 0$），故只能杀掉 $\psi$ 中与常数正交的部分，结论弱化为 $\psi = \mathrm{const}$。常数恰是被求导运算杀掉的方向，这是结论变弱的根源；证明中取平均值 $c$ 正是把这个方向显式地补回来。</li>
+</ol>
+<h2>参考文献</h2>
+<p>[1] 张恭庆. 变分学讲义. 北京: 高等教育出版社, 2011. ISBN 978-7-04-031958-3.（第二讲，pp. 13–28）</p>
+<p>[2] Øksendal, B. Stochastic Differential Equations: An Introduction with Applications. 5th edition. Berlin: Springer, 1998.（§11.2，定理 11.2.1–11.2.2）</p>
+<p>[3] Nualart, D. The Malliavin Calculus and Related Topics. 2nd edition. Berlin: Springer, 2006.（§1.2–§1.3，定义 1.3.1）</p>
+<p class="meta"><span class="lz">2026-11-07 发布 · 类型：金融建模</span><span class="le">Published 2026-11-07 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
