@@ -786,16 +786,18 @@ def card(href, rtype, pub_date, title, excerpt, data_date, news_note="",
 def prevnext_html(order, idx, root):
     """文章页打印行右侧的前一篇/后一篇按钮。order 为栏目内展示顺序
     （新→旧）的 (href, title) 列表：前一篇=时间上的前一篇（更旧，idx+1），
-    后一篇=时间上的后一篇（更新，idx-1）。"""
+    后一篇=时间上的后一篇（更新，idx-1）。列表竖排、新在上旧在下，故
+    前一篇向下 ↓、后一篇向上 ↑；按钮左→右为[后一篇][前一篇]，前一篇
+    固定在最右端，单按钮时位置不跳。"""
     parts = []
-    if 0 <= idx + 1 < len(order):
-        href, title = order[idx + 1]
-        parts.append(f'<a href="{root}{href}" title="{htmlmod.escape(title)}">'
-                     + bi("← 前一篇", "← Prev") + "</a>")
     if 0 <= idx - 1 < len(order):
         href, title = order[idx - 1]
         parts.append(f'<a href="{root}{href}" title="{htmlmod.escape(title)}">'
-                     + bi("后一篇 →", "Next →") + "</a>")
+                     + bi("后一篇 ↑", "Next ↑") + "</a>")
+    if 0 <= idx + 1 < len(order):
+        href, title = order[idx + 1]
+        parts.append(f'<a href="{root}{href}" title="{htmlmod.escape(title)}">'
+                     + bi("前一篇 ↓", "Prev ↓") + "</a>")
     return "".join(parts)
 
 
