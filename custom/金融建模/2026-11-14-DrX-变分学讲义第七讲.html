@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-张恭庆《变分学讲义》第七讲：约束极值问题——Lagrange 乘子、逐点约束与变分不等式 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第八讲.html" title="DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第六讲.html" title="DrX-张恭庆《变分学讲义》第六讲：含多重积分的变分问题——Euler-Lagrange 方程、Legendre-Hadamard 条件与 Jacobi 场"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-张恭庆《变分学讲义》第七讲：约束极值问题——Lagrange 乘子、逐点约束与变分不等式</span><span class="le">DrX-Zhang Gongqing&#x27;s Lectures on the Calculus of Variations, Lecture 7: Constrained Extremum Problems — Lagrange Multipliers, Pointwise Constraints, and Variational Inequalities</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This lecture studies extremum problems under constraints (Zhang Gongqing, Lecture 7, pp. 91-105). Section 7.1 treats isoperimetric problems: a single integral constraint N(u) = c is handled by a constant Lagrange multiplier, proved by the implicit function theorem in function space; the circle of radius l/(2pi) solves the classical isoperimetric problem, and the multiplier is the eigenvalue in a weighted eigenvalue problem. Section 7.2 turns to pointwise constraints M(u) = 0, where the multiplier becomes a function lambda(x); the proof builds it locally and glues the pieces over a finite cover. Examples are great-circle geodesics, a particle on an inclined plane (lambda = g/2 as the constraint force), and harmonic maps into the sphere (-Delta u = u|grad u|^2). Section 7.3 introduces variational inequalities via the obstacle problem, where one-sided variations replace the Euler-Lagrange equation. It closes with stochastic counterparts in Oksendal (Section 11.3) and Nualart (Section 2.2.2), and multipliers read as shadow prices in finance.</p></div>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月14日</p>
+<p><a href="2026-11-14-DrX-变分学讲义第六讲.html">第六讲</a>把未知函数从一元推广到多元，Euler-Lagrange 方程升级为偏微分方程；本讲回到"约束"这个主题——前面六讲的极值问题大都是无约束的，现在我们要求泛函在约束之下取极值。本讲按张恭庆《变分学讲义》第七讲（[1]，pp. 91–105）逐节展开：§7.1 是积分型约束（等周问题），一条常数 Lagrange 乘子把条件极值化为无条件极值；§7.2 是逐点约束，乘子从常数升级为函数，证明要逐片构造再粘接；§7.3 是不等式约束，Euler-Lagrange 方程退化为变分不等式，障碍问题是它的原型。最后一节是两本英文书的对应物：Øksendal 第 11 章用同一种乘子法处理带终端约束的随机控制，Nualart 里对解关于参数求导的线性方程则是本讲两处"对隐式定义的对象求导"的概率版本。金融一节把乘子读作约束的影子价格，并指出 §7.3 的变分不等式正是美式期权定价问题的形状。</p>
+<h2>一、等周问题与 Lagrange 乘子法</h2>
+<h3>1.1 什么是等周问题</h3>
+<p>给定目标泛函 $(\mathcal{M}, I)$、约束泛函 $(\mathcal{M}, N)$ 与常数 $c$，<strong>等周问题</strong>是求</p>
+<p>$$
+\min\lbrace I(u) \mid u \in \mathcal{M}, \; N(u) = c \rbrace.
+$$</p>
+<p>名称来自最古老的例子。</p>
+<p><strong>例 7.1（等周问题）</strong> 在平面上给定封闭曲线的弧长，问什么样的曲线围成的面积最大？用参数 $\theta \in \lbrack 0, 2\pi\rbrack$ 描写封闭曲线 $x = x(\theta)$、$y = y(\theta)$，它围成的面积与弧长分别是</p>
+<p>$$
+A = \frac{1}{2} \int_{0}^{2\pi} (xy' - yx')\, d\theta, \qquad L = \int_{0}^{2\pi} \sqrt{x'^{2} + y'^{2}}\, d\theta.
+$$</p>
+<p>问题是在约束 $L = l$ 之下使 $A$ 取极值 [1，§7.1，例 7.1]（按：原书此处印作"使泛函 $A$ 达到极小值"，与例题所问的"面积最大"矛盾，"极小值"疑为"极大值"之误；下文按极大值求解，所得的圆同时是极大值点）。</p>
+<p>注意这里的约束 $N(u) = c$ 是一个<strong>数</strong>：整个函数 $u$ 只受一个标量方程的限制。§7.2 的逐点约束则是每一点 $x$ 各受一个方程的限制，自由度完全不同，这是两节的根本区别。</p>
+<h3>1.2 有限维回顾：乘子是法向分量</h3>
+<p>先看数学分析里的情形。设 $f, g \in C^{1}(\Omega, \mathbb{R}^{1})$，$\Omega \subset \mathbb{R}^{n}$ 为开集，$g^{-1}(1) \ne \varnothing$。若 $x_{0} \in \Omega$ 在约束 $g(x_{0}) = 1$ 下使 $f$ 取极小值，则存在 $\lambda \in \mathbb{R}^{1}$ 使</p>
+<p>$$
+\nabla f(x_{0}) + \lambda\nabla g(x_{0}) = 0.
+$$</p>
+<p>几何意义是：约束集 $\mathcal{M} = g^{-1}(1)$ 的法向是 $\nabla g$，极值点处 $\nabla f$ 没有切向分量——否则沿切向走一小步就能减小 $f$ 而不破坏约束。把 $f$ 限制在 $M$ 上记作 $\tilde{f} = f|_{M}$，它的微分是 $\nabla f$ 减去法向投影：</p>
+<p>$$
+d\tilde{f}(x) = \nabla f(x) - \frac{\nabla f(x) \cdot \nabla g(x)}{|\nabla g(x)|^{2}}\, \nabla g(x),
+$$</p>
+<p>极值条件 $d\tilde{f}(x) = 0$ 等价于 $\nabla f(x) + \lambda\nabla g(x) = 0$，其中</p>
+<p>$$
+\lambda = -\frac{\nabla f(x) \cdot \nabla g(x)}{|\nabla g(x)|^{2}}
+$$</p>
+<p>是 $-\nabla f(x)$ 在单位外法向量 $\nabla g(x)$ 上的投影 [1，§7.1]。一句话：<strong>引入乘子之后，条件极值问题的解就是调整后的函数 $f + \lambda g$ 的临界点</strong>。本讲的全部工作就是把这句话搬到泛函上——区别只在于"切向"与"法向"要在无穷维函数空间里重新理解。</p>
+<h3>1.3 定理 7.1：积分约束的乘子法</h3>
+<p>设 $L, G \in C^{2}(\bar{\Omega} \times \mathbb{R}^{N} \times \mathbb{R}^{nN})$，$\rho \in C^{1}(\partial\Omega, \mathbb{R}^{N})$，$\mathcal{M} = \lbrace u \in C^{1}(\bar{\Omega}, \mathbb{R}^{N}) \mid u|_{\partial\Omega} = \rho \rbrace$，泛函</p>
+<p>$$
+I(u) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx, \qquad N(u) = \int_{\Omega} G(x, u(x), \nabla u(x))\, dx.
+$$</p>
+<p><strong>定理 7.1</strong> 设常数 $c$ 使 $N^{-1}(c) \cap \mathcal{M} \ne \varnothing$。若 $u_{0} \in \mathcal{M}$ 是 $I$ 在约束 $N(u) = c$ 下的弱极小点，即 $I(u_{0}) = \min_{u \in \mathcal{M} \cap N^{-1}(c)} I(u)$，又若存在 $\varphi_{0} \in C^{1}_{0}(\Omega, \mathbb{R}^{N})$ 使 $\delta N(u_{0}, \varphi_{0}) \ne 0$，则存在 $\lambda \in \mathbb{R}^{1}$ 满足</p>
+<p>$$
+\delta I(u_{0}, \varphi) + \lambda\delta N(u_{0}, \varphi) = 0, \qquad \forall\, \varphi \in C^{1}_{0}(\Omega, \mathbb{R}^{N}),
+$$</p>
+<p>即令调整后的 Lagrange 函数 $Q = I + \lambda N$，$u_{0}$ 满足对应于 $Q$ 的 E-L 方程</p>
+<p>$$
+\sum_{\alpha=1}^{n} \partial_{\alpha} Q_{p^{i}_{\alpha}}(x, u_{0}(x), \nabla u_{0}(x)) = Q_{u^{i}}(x, u_{0}(x), \nabla u_{0}(x)), \qquad i = 1, \cdots, N. \tag{7.1}
+$$</p>
+<p>[1，§7.1，定理 7.1]（按：原书定理陈述中条件印作 $\delta N(u, \varphi_{0}) \ne 0$，$u$ 疑为 $u_{0}$ 之误；证明中归一化的是 $\delta N(u_{0}, \varphi_{0}) = 1$，故按 $u_{0}$ 转写。）</p>
+<p><strong>证明的思路（超曲面加隐函数定理）。</strong> 把 $N^{-1}(c) \cap \mathcal{M}$ 看成函数空间中的一个超曲面。取与 $\varphi_{0}$ 线性无关的任意 $\varphi \in C^{1}_{0}(\Omega, \mathbb{R}^{N})$，考虑过 $u_{0}$ 由 $\varphi_{0}$ 与 $\varphi$ 张成的二维平面 $\pi = \lbrace u_{0} + \varepsilon\varphi + \tau\varphi_{0} \mid (\varepsilon, \tau) \in \mathbb{R}^{2} \rbrace$（原书图 7.1），以及 $I$、$N$ 在 $\pi$ 上导出的二元函数 $\Phi(\varepsilon, \tau) = I(u_{0} + \varepsilon\varphi + \tau\varphi_{0})$、$\Psi(\varepsilon, \tau) = N(u_{0} + \varepsilon\varphi + \tau\varphi_{0})$。关键点是 $\Psi_{\tau}(0, 0) = \delta N(u_{0}, \varphi_{0}) = 1 \ne 0$（归一化后），于是隐函数定理给出 $\xi \in C^{1}$ 使 $\Psi(\varepsilon, \xi(\varepsilon)) = c$，即平面 $\pi$ 与约束超曲面的交线被参数化为 $u_{0} + \varepsilon\varphi + \xi(\varepsilon)\varphi_{0}$。求导得 $\xi(0) = 0$，$\xi'(0) = -\Psi_{\varepsilon}(0, 0) = -\delta N(u_{0}, \varphi)$。再令 $g(\varepsilon) = \Phi(\varepsilon, \xi(\varepsilon))$：因 $u_{0}$ 是弱极小点（$C^{1}$ 邻域内的极小），$\varepsilon = 0$ 是 $g$ 的极小点，故 $g'(0) = 0$，链式法则给出</p>
+<p>$$
+0 = g'(0) = \Phi_{\varepsilon}(0, 0) + \Phi_{\tau}(0, 0)\xi'(0) = \delta I(u_{0}, \varphi) + \lambda\delta N(u_{0}, \varphi), \tag{7.2}
+$$</p>
+<p>其中 $\lambda = -\Phi_{\tau}(0, 0)$ 与 $\varphi$ 无关 [1，§7.1，定理 7.1 的证明]。</p>
+<blockquote>
+<p><strong>补充讲解：为什么非退化条件 $\delta N(u_{0}, \varphi_{0}) \ne 0$ 不可少。</strong> 它是隐函数定理的入场券：$\Psi_{\tau}(0, 0) \ne 0$ 保证了"沿 $\varphi_{0}$ 方向走可以调节约束值"，即约束超曲面在 $u_{0}$ 处确有法向 $\varphi_{0}$，从而平面 $\pi$ 横截于超曲面，交线是一条光滑曲线。若对一切 $\varphi$ 都有 $\delta N(u_{0}, \varphi) = 0$，则 $u_{0}$ 本身已是 $N$ 的临界点，约束集在 $u_{0}$ 附近退化（尖点或自交），"切空间"的概念失效，乘子法无从谈起——这正是有限维情形要求 $\nabla g(x_{0}) \ne 0$ 的无穷维版本。几何上，(7.2) 说的是 $\delta I$ 与 $\delta N$ 作为 $\varphi$ 的线性泛函成比例，比例系数就是 $\lambda$；而 $\lambda = -\Phi_{\tau}(0, 0)$ 的表达式说明它度量了"沿 $\varphi_{0}$ 方向 $I$ 的变化率"，与 $\varphi$ 无关正是它成为一个数的理由。</p>
+</blockquote>
+<p><strong>注 7.3（多个约束）。</strong> 若有 $m$ 个积分约束 $N_{j}(u) = c_{j}$（$j = 1, \dots, m$），条件换成矩阵 $\big(a_{jk}\big) = \big(\delta N_{j}(u, \varphi_{k})\big)$ 的行列式非零，则有 $m$ 个乘子 $\lambda_{1}, \dots, \lambda_{m}$，$u$ 满足 $Q = I + \lambda_{1}N_{1} + \cdots + \lambda_{m}N_{m}$ 的 E-L 方程 [1，§7.1，注 7.3]。这是有限维"多个约束对应多个乘子"的逐字推广，行列式条件保证 $m$ 个约束方向线性无关。</p>
+<h3>1.4 例 7.1 续：等周问题的答案是圆</h3>
+<p>由定理 7.1，引入乘子 $\lambda$，调整后泛函为 $A + \lambda L$，它的 E-L 方程组是</p>
+<p>$$
+-x' = \lambda\left(\frac{y'}{\sqrt{x'^{2} + y'^{2}}}\right)', \qquad y' = \lambda\left(\frac{x'}{\sqrt{x'^{2} + y'^{2}}}\right)'.
+$$</p>
+<p>对 $\theta$ 积分一次（右端是全导数），得</p>
+<p>$$
+x - c_{1} = -\lambda\, \frac{y'}{\sqrt{x'^{2} + y'^{2}}}, \qquad y - c_{2} = \lambda\, \frac{x'}{\sqrt{x'^{2} + y'^{2}}},
+$$</p>
+<p>$c_{1}, c_{2}$ 为积分常数。两式平方相加，右端恰为 $\lambda^{2}(x'^{2} + y'^{2})/(x'^{2} + y'^{2}) = \lambda^{2}$，于是</p>
+<p>$$
+(x - c_{1})^{2} + (y - c_{2})^{2} = \lambda^{2},
+$$</p>
+<p>即曲线是圆，圆心 $(c_{1}, c_{2})$ 任意，半径 $r = \lambda = l/(2\pi)$（周长 $l = 2\pi r$）[1，§7.1，例 7.1]。这就是等周不等式的等号情形：定长封闭曲线中圆围成的面积最大。值得注意推导中没有用到任何存在性理论——定理 7.1 只给必要条件，"圆是唯一候选者"；面积最大值的存在性要另由紧性论证补足，本书此处从略。</p>
+<h3>1.5 例 7.2：乘子就是特征值</h3>
+<p>第一讲提过的条件极值问题：区域 $\Omega \subset \mathbb{R}^{n}$ 上给定有界连续权函数 $q \in C(\bar{\Omega})$，求</p>
+<p>$$
+\min\lbrace I(u) \mid u \in \mathcal{M}, \; N(u) = 1 \rbrace, \qquad I(u) = \int_{\Omega} |\nabla u|^{2}\, dx, \quad N(u) = \int_{\Omega} q(x)|u(x)|^{2}\, dx, \quad \mathcal{M} = C^{1}_{0}(\Omega).
+$$</p>
+<p>按定理 7.1 引入乘子 $\lambda$，调整后泛函 $Q(u) = \int_{\Omega} \lbrack |\nabla u(x)|^{2} - \lambda q(x)u^{2}(x)\rbrack\, dx$ 对应的 E-L 方程是</p>
+<p>$$
+-\Delta u = \lambda q u.
+$$</p>
+<p>这里的 $\lambda$ 正是 Laplace 算子 $-\Delta$ 对应于权函数 $q$ 的特征值 [1，§7.1，例 7.2]（按：原书此处把调整后泛函的被积函数写作 $Q = p^{2} - \lambda q(x)u^{2}$，$p^{2}$ 疑为 $|\nabla u|^{2}$ 之略写）。更进一步：若 $u_{0}$ 是满足 $N(u_{0}) = 1$ 的极小点，则把方程 $-\Delta u_{0} = \lambda q u_{0}$ 两边乘 $u_{0}$ 并在 $\Omega$ 上积分，分部积分（$u_{0} \in C^{1}_{0}$ 使边界项消失）得</p>
+<p>$$
+\lambda = \int_{\Omega} |\nabla u_{0}(x)|^{2}\, dx \ne 0,
+$$</p>
+<p>即乘子等于极小点的 Dirichlet 能量——它非零是因为 $u_{0}$ 不是零函数（$N(u_{0}) = 1$）。于是极小点 $u_{0}$ 是特征函数，乘子 $\lambda$ 是相应特征值；事实上调整后泛函 $Q$ 的<strong>所有</strong>临界点都是特征函数。这一节的标题"特征值问题续"正在于此：一个谱问题被认作一个等周问题，而 Lagrange 乘子就是谱参数。这个计算也是本讲习题 3 的内容。</p>
+<h2>二、逐点约束：乘子从常数变成函数</h2>
+<h3>2.1 从积分约束到逐点约束</h3>
+<p>等周问题中的约束 $N(u) = c$ 只是一个数。现在考虑另一类约束：给定 $M \in C^{1}(\bar{\Omega} \times \mathbb{R}^{N} \times \mathbb{R}^{nN}, \mathbb{R}^{1})$，要求在每一点 $x \in \Omega$ 都有</p>
+<p>$$
+M(x, u(x), \nabla u(x)) = 0
+$$</p>
+<p>的条件下求 $I(u) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx$ 的极值 [1，§7.2]。直观上这是无穷多个约束（每点一个），所以乘子也不再是一个数，而应是每点一个值——即一个函数 $\lambda(x)$。本节只处理<strong>完整（holonomic）约束</strong>，即 $M$ 仅依赖于 $u$ 而不依赖于 $p = \nabla u$ 的情形；若 $M$ 还依赖 $p$，约束称为非完整的，情况复杂得多（见注 7.5）。</p>
+<h3>2.2 定理 7.2</h3>
+<p>设 $\bar{\Omega} \subset \mathbb{R}^{n}$ 有界闭集，$L \in C^{2}$，$M \in C^{2}(\mathbb{R}^{N}, \mathbb{R}^{1})$，$\rho \in C^{1}(\partial\Omega, \mathbb{R}^{N})$，$\mathcal{M} = \lbrace u \in PWC^{1}(\bar{\Omega}, \mathbb{R}^{N}) \mid u|_{\partial\Omega} = \rho \rbrace$（$PWC^{1}$ 为逐片 $C^{1}$ 函数类）。设 $u_{0} \in \mathcal{M}$ 是约束下的局部极小点，且除有限个 $(n-1)$ 维逐片 $C^{1}$ 超曲面外是 $C^{2}$ 的。若 $\forall\, x \in \bar{\Omega}$ 有 $\nabla M(u_{0}(x)) \ne 0$，则存在连续函数 $\lambda \in C(\bar{\Omega})$，使 $u_{0}$ 满足调整后的 Lagrange 函数 $Q = L + \lambda M$ 对应的 E-L 方程</p>
+<p>$$
+L_{u^{i}} + \lambda M_{u^{i}} = \sum_{\alpha=1}^{n} \frac{\partial L_{p^{i}_{\alpha}}}{\partial x_{\alpha}}, \qquad 1 \leqslant i \leqslant N. \tag{7.3}
+$$</p>
+<p>[1，§7.2，定理 7.2]。与定理 7.1 对照：结论的形式一样（调整后泛函的 E-L 方程），但 $\lambda$ 从常数变成了 $x$ 的函数——约束逐点成立，乘子也逐点取值。条件 $\nabla M(u_{0}(x)) \ne 0$ 仍是非退化条件：它保证约束集 $\lbrace u \mid M(u) = 0 \rbrace$ 在 $u_{0}(x)$ 附近是光滑超曲面，可以局部解出一个分量。</p>
+<p><strong>证明三步。</strong> 第一步（局部解出一个分量）：由 $\nabla_{x}(M(u_{0}(x))) \ne 0$ 得 $\nabla_{u} M \ne 0$，不妨设 $M_{u^{N}}(u_{0}(x)) \ne 0$，则在小球 $B_{r}(x_{0})$ 上由隐函数定理可解出 $u^{N} = U(\tilde{u})$，其中 $\tilde{u} = (u^{1}, \dots, u^{N-1})$，$U$ 为 $C^{2}$ 函数（原书图 7.2）。第二步（化归为无约束问题）：由局部化原理，$u_{0}$ 在 $B_{r}(x_{0})$ 上仍是极小点；把约束代入 $L$ 得约化被积函数 $\Lambda(x, \tilde{u}, \tilde{p}) = L(x, \tilde{u}, U(\tilde{u}), \tilde{p}, p^{N})$，其中 $p^{N} = \big(\sum_{i=1}^{N-1} U_{u^{i}} p^{i}_{\alpha}\big)_{1 \leqslant \alpha \leqslant n}$，则 $\tilde{u}_{0}$ 是 $J(\tilde{u}) = \int_{B_{r}(x_{0})} \Lambda(x, \tilde{u}(x), \nabla\tilde{u}(x))\, dx$ 的极小点，它的 E-L 方程是 (7.4)。第三步（粘接）：$\bar{\Omega}$ 紧，故有限个小球覆盖 $\bar{\Omega}$，每球上定义的 $\lambda$ 在重叠处由 (7.9) 保证一致，从而粘成整体连续函数 [1，§7.2，定理 7.2 的证明]。</p>
+<p>第二步的计算值得展开，因为它有一个漂亮的抵消。记 $P^{N} = \sum_{i=1}^{N-1} U_{u^{i}} \nabla u^{i}$，则 (7.4) 为</p>
+<p>$$
+L_{u^{i}} + L_{u^{N}} U_{u^{i}} + \sum_{\alpha=1}^{n} L_{p^{N}_{\alpha}} \frac{\partial P^{N}_{\alpha}}{\partial u^{i}} = \sum_{\alpha=1}^{n} \frac{\partial}{\partial x_{\alpha}} \big(L_{p^{i}_{\alpha}} + L_{p^{N}_{\alpha}} U_{u^{i}}\big), \qquad i = 1, \cdots, N-1. \tag{7.4}
+$$</p>
+<p>关键恒等式是</p>
+<p>$$
+\frac{\partial P^{N}_{\alpha}}{\partial u^{i}} = \sum_{j=1}^{N-1} \frac{\partial^{2} U}{\partial u^{i} \partial u^{j}}\, u^{j}_{\alpha} = \frac{\partial U_{u^{i}}}{\partial x_{\alpha}}. \tag{7.5}
+$$</p>
+<p>左端是对 $u^{i}$ 求导（把 $P^{N}_{\alpha}$ 看作 $\tilde{u}$ 的函数），右端是对 $x_{\alpha}$ 求导（链式法则），两者相等是因为二阶混合偏导可交换——同一个量 $\sum_{j} U_{u^{i}u^{j}} u^{j}_{\alpha}$ 的两种读法。利用 (7.5)，(7.4) 右端多出的 $L_{p^{N}_{\alpha}} \partial P^{N}_{\alpha}/\partial u^{i}$ 一项与左端相应项抵消，(7.4) 化为</p>
+<p>$$
+L_{u^{i}} + U_{u^{i}}\left(L_{u^{N}} - \sum_{\alpha=1}^{n} \frac{\partial L_{p^{N}_{\alpha}}}{\partial x_{\alpha}}\right) = \sum_{\alpha=1}^{n} \frac{\partial L_{p^{i}_{\alpha}}}{\partial x_{\alpha}}. \tag{7.6}
+$$</p>
+<p>再对约束 $M(\tilde{u}_{0}, U(\tilde{u}_{0})) = 0$ 求导得 $M_{u^{i}} + M_{u^{N}} U_{u^{i}} = 0$，即</p>
+<p>$$
+U_{u^{i}} = -\frac{M_{u^{i}}}{M_{u^{N}}}, \tag{7.7}
+$$</p>
+<p>于是在 $B_{r}(x_{0})$ 上定义</p>
+<p>$$
+\lambda = \frac{1}{M_{u^{N}}}\big(\mathrm{div}\, L_{p^{N}} - L_{u^{N}}\big), \tag{7.8}
+$$</p>
+<p>代入 (7.6) 即得</p>
+<p>$$
+L_{u^{i}} - \mathrm{div}\, L_{p^{i}} + \lambda M_{u^{i}} = 0, \qquad i = 1, \cdots, N-1, \tag{7.9}
+$$</p>
+<p>而 (7.8) 本身就是 (7.3) 的第 $N$ 个分量。合并起来即局部的 (7.3)。注意 $\lambda$ 的定义式 (7.8) 是由"第 $N$ 个方程"反解出来的：先由前 $N-1$ 个方程定出 $\lambda$ 应取的值，再验证它使全部 $N$ 个方程成立——这正是"逐点一个约束配逐点一个乘子"的构造性含义。</p>
+<p><strong>注 7.4 与注 7.5。</strong> 多个逐点约束 $M_{1}(u) = \cdots = M_{s}(u) = 0$ 时，只要 Jacobian 矩阵 $\big(\partial M_{i}/\partial u^{j}\big)$ 的秩恒为 $s$，调整后泛函就是 $Q = I + \sum_{i=1}^{s} \lambda_{i} M_{i}$，$\lambda_{i} \in C(\bar{\Omega})$ [1，§7.2，注 7.4]。若约束函数还依赖其他变量（例如依赖 $p = \nabla u$），约束称为<strong>非完整约束</strong>，乘子法是否可用要复杂得多，可参看 Giaquinta 与 Hildebrandt 的书 [GH]；其中一种特殊情形是最优控制问题，将在第三部分介绍 [1，§7.2，注 7.5]。本系列的第三阶段（最优控制与随机控制）正是从这里接续的。</p>
+<h3>2.3 三个例子：测地线、斜面与调和映射</h3>
+<p><strong>例 7.3（再看球面上的测地线）。</strong> 把球面看成约束 $x^{2} + y^{2} + z^{2} = 1$，求弧长泛函 $I(u) = \int_{a}^{b} \sqrt{\dot{x}^{2} + \dot{y}^{2} + \dot{z}^{2}}\, dt$ 在此逐点约束下的极值。令 $u = (x, y, z)$，引入乘子 $\lambda(t)$，调整后 Lagrange 函数 $Q = \sqrt{\xi^{2} + \eta^{2} + \zeta^{2}} + \lambda(x^{2} + y^{2} + z^{2})$ 的 E-L 方程是 $\frac{d}{dt}\big(\dot{u}/|\dot{u}|\big) = 2\lambda u$，外加 $|u| = 1$。于是</p>
+<p>$$
+\frac{d}{dt}\left(\frac{\dot{u}}{|\dot{u}|} \times u\right) = \frac{d}{dt}\left(\frac{\dot{u}}{|\dot{u}|}\right) \times u + \frac{\dot{u}}{|\dot{u}|} \times \dot{u} = 2\lambda u \times u + \frac{\dot{u}}{|\dot{u}|} \times \dot{u} = 0,
+$$</p>
+<p>故 $v = \frac{\dot{u}}{|\dot{u}|} \times u$ 是常向量；$u \perp v$，即测地线位于垂直于常向量 $v$ 的平面上——必是大圆的一部分 [1，§7.2，例 7.3]。与第一、二讲从无约束角度（用球坐标写弧长泛函再解 E-L 方程）相比，这里的证明只有两行：约束的乘子法把"曲线必须留在球面上"这件事变成方程中的一项 $2\lambda u$，而 $u \times u = 0$ 与 $\dot{u} \times \dot{u} = 0$ 两个平凡的叉积恒等式直接给出首次积分。这是一个示范：选对约束的写法，几何结论几乎是免费的。</p>
+<p><strong>例 7.4（斜面上的质点：乘子就是约束反力）。</strong> 在斜面 $x = y$ 上，质量为 $1$ 的质点受重力作用，$L = \frac{1}{2}(p^{2} + q^{2}) - gy$（$p = \dot{x}$、$q = \dot{y}$），约束 $M(x, y) = y - x = 0$。调整后 $Q = L + \lambda M$ 的 E-L 方程是 $-\lambda = \ddot{x}$、$-g + \lambda = \ddot{y}$。由 $x = y$ 得 $\ddot{x} = \ddot{y}$，故 $\lambda = g/2$，解出 $x = y = -\frac{1}{2}\lambda t^{2} + \dot{x}(0)t + x(0)$ [1，§7.2，例 7.4]。这里 $\lambda$ 的物理意义完全透明：约束力沿 $\nabla M = (-1, 1)$ 方向，大小为 $\lambda = g/2$（单位质量），它恰好抵消重力垂直于斜面的分量，剩下的切向分量使质点以加速度 $g/2$ 沿斜面下滑——验证：加速度向量 $(-g/2, -g/2)$ 沿斜面方向 $(1, 1)/\sqrt{2}$ 的分量为 $-g/\sqrt{2}$，与重力 $(0, -g)$ 沿斜面的分量一致。<strong>乘子就是约束反力</strong>：这句话在力学里是字面意义，在优化里则是"约束的影子价格"（见 §五）。</p>
+<p><strong>例 7.5（到球面的调和映射）。</strong> 设 $\Omega$ 为 $\mathbb{R}^{3}$ 中的单位球，$u = (u_{1}, u_{2}, u_{3}): \Omega \to S^{2}$，求能量 $I(u) = \int_{\Omega} |\nabla u|^{2}\, dx$ 在逐点约束 $M(u) = |u|^{2} - 1 = u_{1}^{2} + u_{2}^{2} + u_{3}^{2} - 1 = 0$ 下的极小点——即从单位实心球到单位球面的<strong>调和映射</strong>。调整后泛函的 E-L 方程是 $-\Delta u_{i} = \lambda u_{i}$，$\lambda$ 为连续函数。由约束 $|u|^{2} = 1$ 求导得 $\langle u, \nabla u\rangle = 0$，再求导得 $\langle u, \Delta u\rangle + |\nabla u|^{2} = 0$；把 E-L 方程两边与 $u$ 作内积，便有 $\lambda = -\langle\Delta u, u\rangle = |\nabla u|^{2}$，即</p>
+<p>$$
+-\Delta u = u|\nabla u|^{2}. \tag{7.10}
+$$</p>
+<p>[1，§7.2，例 7.5]（按：原书 E-L 方程 $-\Delta u_{i} = \lambda u_{i}$ 与定理 7.2 的 (7.3) 对照，$\lambda$ 的符号约定相反，相当于把 $\lambda$ 换成 $-\lambda$；因 $\lambda$ 为待定乘子，结论 (7.10) 不受影响。）这个例子把 §7.2 的抽象机器落到一个具体的几何 PDE 上：乘子 $\lambda(x) = |\nabla u(x)|^{2}$ 恰好是能量密度，一个逐点取值的函数——与 §7.1 的常数乘子形成最鲜明的对照。原书习题 5 把它推广到一般超曲面 $G(u) = 1$ 的调和映射方程。</p>
+<h2>三、变分不等式与障碍问题</h2>
+<h3>3.1 从等式到不等式</h3>
+<p>除了等式约束，还有带不等式约束的变分问题。原型是障碍问题。</p>
+<p><strong>例 7.6（障碍问题）。</strong> 设 $\Omega \subset \mathbb{R}^{2}$ 为平面上有界开区域，边界数据 $\varphi \in C^{1}(\partial\Omega)$，障碍 $\psi \in C^{1}(\bar{\Omega})$，外力 $f \in C(\bar{\Omega})$。考虑一张薄膜：边界固定 $u|_{\partial\Omega} = \varphi$，受外力作用，但不得越过障碍 $u(x) \leqslant \psi(x)$（$\forall\, x \in \bar{\Omega}$）。求使能量 $I(u) = \int_{\Omega} \lbrack \frac{1}{2}|\nabla u(x)|^{2} - f(x)u(x)\rbrack\, dx$ 达到极小值的平衡位置 [1，§7.3，例 7.6]。</p>
+<p>一般提法：给定函数集合 $M$ 及其凸子集 $C$ 与 Lagrange 函数 $L$，求 $\min\lbrace I(u) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx \mid u \in C \rbrace$。设 $u \in C$ 为极小点。因 $C$ 凸，$\forall\, v \in C$ 有 $tv + (1-t)u \in C$（$\forall\, t \in \lbrack 0, 1\rbrack$），故 $I(tv + (1-t)u) \geqslant I(u)$，由此推出单侧方向导数非负：</p>
+<p>$$
+\delta I(u, v - u) = \lim_{t \to +0} \frac{1}{t}\lbrack I(tv + (1-t)u) - I(u)\rbrack \geqslant 0,
+$$</p>
+<p>即 $\forall\, v \in C$，</p>
+<p>$$
+\int_{\Omega} \lbrack L_{u}(x, u(x), \nabla u(x))(v(x) - u(x)) + L_{p}(x, u(x), \nabla u(x)) \cdot (\nabla v(x) - \nabla u(x))\rbrack\, dx \geqslant 0. \tag{7.11}
+$$</p>
+<p>[1，§7.3]（按：原书推导式印作 $\delta I(u, v-u) = \lim_{t\to+0} \lbrack I(tv + (1-t)u) - I(u)\rbrack \geqslant 0$，极限前疑漏因子 $1/t$；否则方括号内当 $t \to +0$ 时趋于 $0$，不等式成为 $0 \geqslant 0$ 的空话。上式按定义补上 $1/t$。）</p>
+<p>注意 E-L 方程与 (7.11) 的差别仅在于前者是等式、后者是不等式，故称 (7.11) 为<strong>变分不等式</strong>。回到障碍问题，$C = \lbrace u \in PWC^{1}(\bar{\Omega}) \mid u(x) \leqslant \psi(x), \forall\, x \in \bar{\Omega}, u|_{\partial\Omega} = \varphi \rbrace$ 是凸集，所得变分不等式为</p>
+<p>$$
+\int_{\Omega} \lbrack \nabla u \cdot \nabla(v - u) - f(v - u)\rbrack\, dx \geqslant 0, \qquad \forall\, v \in C. \tag{7.12}
+$$</p>
+<h3>3.2 为什么是不等式：单侧变分与自由边界</h3>
+<p>关键点在于<strong>变分方向是单侧的</strong>。无约束或等式约束时，试验方向 $\varphi$ 可正可负，极小点处方向导数为零，给出等式；而不等式约束下，若极小点 $u$ 在某处碰到障碍（$u(x) = \psi(x)$），朝外的变分会违反约束，只有朝内的变分是容许的，于是方向导数只能是不等式 $\geqslant 0$。换言之，变分不等式是"等式约束的 E-L 方程"与"不等式约束的单侧性"合起来的产物。</p>
+<p>由此还可读出障碍问题的自由边界结构：在<strong>非接触集</strong> $\lbrace u &lt; \psi \rbrace$ 内，变分在局部可双向进行，(7.12) 退化为等式 $-\Delta u = f$；在<strong>接触集</strong> $\lbrace u = \psi \rbrace$ 内，$u$ 被迫跟随障碍，方程不再成立。接触集本身事先未知——求解变分不等式的同时要定出这条自由边界。这与本系列美式期权例讲中的结构完全相同：期权价值 $V$ 不得低于执行收益（障碍），提前行权区域即接触集，行权边界即自由边界；那里的变分不等式与自由边界是同一枚硬币的两面，§7.3 在此给出了它的变分学源头。</p>
+<h2>四、两本书中的对应物</h2>
+<h3>4.1 Øksendal §11.3：带终端约束的随机控制也用乘子法</h3>
+<p>Øksendal 第 11 章 §11.3 "Stochastic control problems with terminal conditions" 处理的正是本讲 §7.1 的随机版本：控制问题带终端约束。设 $Y^{u}_{t}$ 为受控扩散，$M = (M_{1}, \dots, M_{l}): \mathbb{R}^{n+1} \to \mathbb{R}^{l}$ 为给定连续函数，容许控制集 $\mathcal{K}$ 由终端矩约束定义：</p>
+<p>$$
+E^{y}\lbrack M_{i}(Y^{u}_{T})\rbrack = 0, \qquad i = 1, 2, \dots, l,
+$$</p>
+<p>目标是 $\Phi(y) = \sup_{u \in \mathcal{K}} J^{u}(y)$，其中 $J^{u}(y) = E^{y}\lbrack \int_{0}^{T} F^{u}(Y^{u}_{t})\, dt + K(Y^{u}_{T})\rbrack$ [2，§11.3，式 (11.3.1)–(11.3.4)]。处理办法与定理 7.1 一字不差：引入乘子 $\lambda \in \mathbb{R}^{l}$，把终端约束加进目标，得到无约束问题</p>
+<p>$$
+J^{u}_{\lambda}(y) = E^{y}\left\lbrack \int_{0}^{T} F^{u}(Y^{u}_{t})\, dt + K(Y^{u}_{T}) + \lambda \cdot M(Y^{u}_{T}) \right\rbrack, \qquad \Phi_{\lambda}(y) = \sup_{u} J^{u}_{\lambda}(y).
+$$</p>
+<p><strong>定理 11.3.1</strong> 若对一切 $\lambda \in \Lambda \subset \mathbb{R}^{l}$ 都能解出无约束问题 $\Phi_{\lambda}$ 与最优控制 $u^{\ast}_{\lambda}$，且存在 $\lambda_{0} \in \Lambda$ 使 $E^{y}\lbrack M(Y^{u^{\ast}_{\lambda_{0}}}_{T})\rbrack = 0$，则 $\Phi(y) := \Phi_{\lambda_{0}}(y)$、$u^{\ast} := u^{\ast}_{\lambda_{0}}$ 就是原约束问题的解 [2，§11.3，定理 11.3.1，式 (11.3.5)–(11.3.8)]。证明只有一行：由 $u^{\ast}_{\lambda}$ 的定义，$J^{u^{\ast}_{\lambda}}_{\lambda}(y) \geqslant J^{u}_{\lambda}(y)$ 对一切 $u$ 成立；取 $\lambda = \lambda_{0}$、$u \in \mathcal{K}$，两边的 $\lambda \cdot M$ 项都为零，于是 $J^{u^{\ast}_{\lambda_{0}}}(y) \geqslant J^{u}(y)$。</p>
+<p>与定理 7.1 对照有三点值得点名。其一，乘子从一个数变成向量 $\lambda \in \mathbb{R}^{l}$：$l$ 个终端矩约束配 $l$ 个乘子分量，与注 7.3 的多约束情形平行。其二，证明的难度天差地别：随机情形的证明只是 sup 定义的直接推论，而定理 7.1 需要隐函数定理把约束超曲面局部参数化——因为确定性变分里"容许方向"的概念（切空间）需要构造，随机控制里容许集 $\mathcal{K}$ 是直接由矩条件定义的，比较论证不需要切空间。其三，$\lambda$ 问题的 HJB 方程与原问题相同，只差终端条件 $\Phi_{\lambda} = K + \lambda \cdot M$：乘子进入终端收益，如同定理 7.1 里乘子进入被积函数。Øksendal 在习题 11.11 中给了一个应用实例，可供读者自行演算。</p>
+<h3>4.2 Nualart §2.2.2：对隐式定义的对象求导，导数满足线性方程</h3>
+<p>本讲的证明里两次出现同一个技巧——<strong>对隐式定义的对象求导，得到的导数满足一个线性化方程</strong>。定理 7.1 的证明中，$\xi(\varepsilon)$ 由 $\Psi(\varepsilon, \tau) = c$ 隐式定义，求导得 $\xi'(0) = -\delta N(u_{0}, \varphi)$；定理 7.2 中，$U(\tilde{u})$ 由 $M(\tilde{u}, U(\tilde{u})) = 0$ 隐式定义，求导得 (7.7) $U_{u^{i}} = -M_{u^{i}}/M_{u^{N}}$。Nualart §2.2.2 "Weak differentiability of the solution" 给出这一技巧的随机版本：SDE 的解 $X(t)$ 关于噪声的 Malliavin 导数 $D_{r}X(t)$ 满足以系数梯度为系数的<strong>线性</strong> SDE。</p>
+<p><strong>定理 2.2.1</strong> 设 SDE (2.37) 的系数全局 Lipschitz 且线性增长，则 $X^{i}(t) \in D^{1, \infty}$，且导数 $D^{j}_{r}X(t)$ 满足线性方程 (2.41)：对 $r \leqslant t$，</p>
+<p>$$
+D^{j}_{r}X(t) = A_{j}(r, X(r)) + \int_{r}^{t} (\partial_{k}A^{l}_{\alpha})(s, X(s))\, D^{j}_{r}X^{k}(s)\, dW^{\alpha}_{s} + \int_{r}^{t} (\partial_{k}B^{l})(s, X(s))\, D^{j}_{r}X^{k}(s)\, ds,
+$$</p>
+<p>对 $r &gt; t$ 有 $D^{j}_{r}X(t) = 0$；系数光滑有界时（定理 2.2.2）更有 $X^{i}(t) \in D^{\infty}$ [3，§2.2.2，定理 2.2.1、定理 2.2.2，式 (2.41)、(2.53)]。对照本讲：$A$、$B$ 的梯度 $\partial_{k}A$、$\partial_{k}B$ 扮演的角色，正是 (7.7) 中 $M_{u^{i}}/M_{u^{N}}$ 的角色——约束（或方程）的一阶信息决定了隐式对象的导数所满足的线性方程。第五讲对照节中 SDE 流关于初值的 Jacobian 矩阵 $Y(t)$ 满足同一族线性 SDE（[3，§2.3.1，式 (2.56)、(2.57)]，$D_{s}X_{t} = Y(t)Y(s)^{-1}A(X_{s})$），则是"对初值求导"这一支的对应物。把三处并列：确定性变分里对约束求导得乘子公式，随机分析里对解求导得线性 SDE，手法相同，对象不同。</p>
+<h2>五、金融视角：乘子是约束的影子价格</h2>
+<h3>5.1 带约束的组合优化：两个约束，两个乘子</h3>
+<p>§7.1 注 7.3 的多约束情形在组合优化里每天都在发生。均值–方差问题：</p>
+<p>$$
+\min_{w} \frac{1}{2} w^{T}\Sigma w, \qquad \text{s.t. } \mu^{T}w = m, \quad \mathbf{1}^{T}w = 1,
+$$</p>
+<p>即在目标收益 $m$ 与预算归一两个等式约束下使方差最小。引入两个乘子 $\lambda_{1}, \lambda_{2}$，Lagrange 函数为 $\frac{1}{2}w^{T}\Sigma w - \lambda_{1}(\mu^{T}w - m) - \lambda_{2}(\mathbf{1}^{T}w - 1)$，一阶条件 $\Sigma w = \lambda_{1}\mu + \lambda_{2}\mathbf{1}$ 给出 $w = \Sigma^{-1}(\lambda_{1}\mu + \lambda_{2}\mathbf{1})$，代回约束解出 $\lambda = (A^{T}\Sigma^{-1}A)^{-1}b$，其中 $A = \lbrack \mu, \mathbf{1}\rbrack$、$b = (m, 1)^{T}$。这里乘子的经济学含义就是<strong>影子价格</strong>：$\lambda_{1}$ 度量目标收益 $m$ 提高一个单位时最小方差必须上升多少，$\lambda_{2}$ 度量预算约束收紧一个单位的代价——与 §1.2 中 $\lambda$ 是 $-\nabla f$ 在法向上的投影完全同构：乘子是目标函数沿约束法向的变化率。风险预算约束、跟踪误差约束、换手率约束都是同类积分型（或求和型）约束，处理方式不变：约束进 Lagrange 函数，乘子进一阶条件。Øksendal §11.3 的终端矩约束则是这套语言的动态版本：要求终端财富的某个矩等于给定值，乘子 $\lambda_{0}$ 由"无约束最优解恰好满足约束"这一对偶条件定出。</p>
+<h3>5.2 变分不等式就是美式期权的形状</h3>
+<p>§7.3 的障碍问题在金融里有一个孪生兄弟：美式期权。期权价值 $V$ 不得低于立即行权的收益 $g$（障碍），在不行权区域满足 Black-Scholes 型 PDE，在行权区域 $V = g$；合起来正是变分不等式：$V \geqslant g$，$(-\partial_{t} - \mathcal{L})V \geqslant 0$，$(V - g) \cdot ((-\partial_{t} - \mathcal{L})V) = 0$（互补松弛）。接触集 $\lbrace V = g \rbrace$ 是提前行权区域，它的边界是自由边界——与 §3.2 的薄膜接触集逐字对应。本系列美式期权例讲（<a href="2026-11-03-DrX-美式期权变分不等式与自由边界.html">2026-11-03</a>）从变分不等式与自由边界的角度处理永久美式看跌期权，那里的闭式解 $S^{\ast} = 71.43$、$V(100) = 12.32$（$r = 5.00\%$、$\sigma = 20.00\%$、$K = 100.00$）正是障碍问题"接触集边界可显式定出"的特例。本讲 §7.3 提供了这套方法的变分学源头：单侧变分生出不等式，不等式生出自由边界。</p>
+<h2>六、小结与自测习题</h2>
+<p><strong>小结。</strong>（1）等周问题是积分型约束 $N(u) = c$ 下的极值问题；有限维的 Lagrange 乘子法（$\nabla f + \lambda\nabla g = 0$，$\lambda$ 为法向投影）搬到泛函上即定理 7.1：非退化条件 $\delta N(u_{0}, \varphi_{0}) \ne 0$ 保证隐函数定理可用，调整后泛函 $Q = I + \lambda N$ 的 E-L 方程 (7.1) 是必要条件；多约束时乘子个数与约束个数相同（注 7.3）。（2）例 7.1 续：定长封闭曲线中圆围成最大面积，半径 $r = l/(2\pi)$；例 7.2：Dirichlet 能量在加权 $L^{2}$ 约束下的极小点是特征函数，乘子 $\lambda = \int_{\Omega} |\nabla u_{0}|^{2}\, dx$ 就是特征值。（3）逐点约束 $M(u) = 0$ 下乘子升级为函数 $\lambda(x)$（定理 7.2）：局部由隐函数定理解出 $u^{N} = U(\tilde{u})$，约化泛函的 E-L 方程经恒等式 (7.5) 的抵消化为 (7.6)，再由 (7.7)、(7.8) 读出 $\lambda$，有限覆盖粘接成整体连续函数；非完整约束（依赖 $p$）超出乘子法的范围，通向最优控制。（4）三个例子各有其意：球面测地线（大圆，两行证明）、斜面质点（$\lambda = g/2$ 是约束反力）、到球面的调和映射（$-\Delta u = u|\nabla u|^{2}$，$\lambda(x) = |\nabla u(x)|^{2}$ 为能量密度）。（5）变分不等式：凸集上的单侧变分使方向导数只有不等式 $\delta I(u, v-u) \geqslant 0$；障碍问题中非接触集内 $-\Delta u = f$、接触集内 $u = \psi$，接触集边界是自由边界——与美式期权行权边界同构。（6）随机对应：Øksendal §11.3 用乘子法处理带终端矩约束的随机控制（定理 11.3.1）；Nualart §2.2.2 中 Malliavin 导数满足线性 SDE，是本讲两处"对隐式定义的对象求导"的概率版本。下一讲（<a href="2026-11-14-DrX-变分学讲义第八讲.html">第八讲</a>）进入守恒律与 Noether 定理：变分问题的对称性如何生出守恒量，而带约束的系统里乘子与对称性又如何相互作用。</p>
+<p><strong>习题 1（原书习题 1）</strong> 求 $\min\lbrace I(u) \mid u \in C^{1}\lbrack 0, 1\rbrack, u(0) = 0, u(1) = 2, N(u) = L \rbrace$，其中 $I(u) = \int_{0}^{1} \dot{u}^{2}(t)\, dt$，$N(u) = \int_{0}^{1} u(t)\, dt$。</p>
+<p><strong>习题 2（原书习题 2，Dido 问题）</strong> 求 $\max\lbrace I(u) \mid u \in C^{1}_{0}(0, b), N(u) = L \rbrace$，其中 $I(u) = \int_{0}^{b} u(t)\, dt$，$N(u) = \int_{0}^{b} (1 + \dot{u}(t)^{2})^{1/2}\, dt$。</p>
+<p><strong>习题 3（自编：验证例 7.2 的乘子公式）</strong> 设 $u_{0} \in C^{1}_{0}(\Omega)$ 满足 $-\Delta u_{0} = \lambda q u_{0}$ 与 $\int_{\Omega} q(x)|u_{0}(x)|^{2}\, dx = 1$，证明 $\lambda = \int_{\Omega} |\nabla u_{0}(x)|^{2}\, dx \ne 0$，并说明为什么 $\lambda &gt; 0$。</p>
+<p><strong>习题 4（原书习题 4）</strong> 求泛函 $I(u) = \int_{0}^{1} (\dot{u}_{1}^{2} + \dot{u}_{2}^{2})\, dt$ 在逐点约束 $u_{2}^{2} + (u_{1} - t) = 0$ 下的极值，其中 $(u_{1}, u_{2}) \in C^{1}_{0}((0, 1), \mathbb{R}^{2})$。写出调整后泛函的 E-L 方程组，消去 $\lambda(t)$ 得到只含 $u_{2}$ 的方程，并讨论容许集是否非空。</p>
+<p><strong>参考答案要点。</strong></p>
+<ol>
+<li>调整后被积函数 $Q = \dot{u}^{2} + \lambda u$，E-L 方程 $\lambda - \frac{d}{dt}(2\dot{u}) = 0$，即 $\ddot{u} = \lambda/2$，通解 $u(t) = \lambda t^{2}/4 + At + B$。由 $u(0) = 0$ 得 $B = 0$；由 $u(1) = 2$ 与 $N(u) = \lambda/12 + A/2 = L$ 解出 $\lambda = 24(1 - L)$，$A = 6L - 4$，故极小点为 $u(t) = 6(1 - L)t^{2} + (6L - 4)t$，最小值 $I_{\min} = 12(1 - L)^{2} + 4.00$。检验：$L = 1.00$ 时 $\lambda = 0.00$，$u(t) = 2t$，$I = 4.00$，回到无约束极小点（直线 $u = 2t$ 的平均值恰为 $1.00$），与乘子为零一致。</li>
+<li>调整后 $Q = u + \lambda\sqrt{1 + \dot{u}^{2}}$，E-L 方程 $1 - \lambda\frac{d}{dt}\big(\dot{u}/\sqrt{1 + \dot{u}^{2}}\big) = 0$，积分得 $\dot{u}/\sqrt{1 + \dot{u}^{2}} = (t - a)/\lambda$，即 $(t - a)^{2} + (u - c)^{2} = R^{2}$（圆弧）。由 $u(0) = u(b) = 0$ 得圆心横坐标 $a = b/2$，$R^{2} = b^{2}/4 + c^{2}$；弧长 $L = 2R\arcsin(b/(2R))$ 定出 $c$。特别地，$L = \pi b/2$ 时 $c = 0$，解为半圆，面积 $I = \pi b^{2}/8$。</li>
+<li>方程两边乘 $u_{0}$ 并在 $\Omega$ 上积分：左端 $\int_{\Omega} (-\Delta u_{0})u_{0}\, dx = \int_{\Omega} |\nabla u_{0}|^{2}\, dx$（分部积分，$u_{0} \in C^{1}_{0}$ 使边界项消失）；右端 $\lambda\int_{\Omega} q u_{0}^{2}\, dx = \lambda \cdot 1 = \lambda$。故 $\lambda = \int_{\Omega} |\nabla u_{0}|^{2}\, dx$；又 $u_{0}$ 不恒为零（约束积分为 $1$），故积分严格大于 $0$，$\lambda &gt; 0$。</li>
+<li>约束 $M = u_{2}^{2} + u_{1} - t = 0$ 逐点成立，乘子为函数 $\lambda(t)$：$Q = \dot{u}_{1}^{2} + \dot{u}_{2}^{2} + \lambda(t)(u_{2}^{2} + u_{1} - t)$，E-L 方程组为 $\lambda(t) = 2\ddot{u}_{1}$、$2\lambda(t)u_{2} = 2\ddot{u}_{2}$，即 $\ddot{u}_{2} = \lambda(t)u_{2}$。对约束求导两次：$\ddot{u}_{1} = -2\dot{u}_{2}^{2} - 2u_{2}\ddot{u}_{2}$，代入消去 $\lambda$ 得只含 $u_{2}$ 的方程 $\ddot{u}_{2}(1 + 4u_{2}^{2}) = -4u_{2}\dot{u}_{2}^{2}$。注意：按题面字义，$C^{1}_{0}$ 要求 $u_{1}, u_{2}$ 在端点附近为零，但约束在 $t \to 1$ 时给出 $u_{2}^{2} + u_{1} - t \to -1 \ne 0$，故容许集为空；本题的训练点在写出逐点约束的 E-L 方程组（$\lambda$ 为 $t$ 的函数），而不在求解。</li>
+</ol>
+<h2>参考文献</h2>
+<p>[1] 张恭庆. 变分学讲义. 北京: 高等教育出版社, 2011. ISBN 978-7-04-031958-3.（第七讲，pp. 91–105）</p>
+<p>[2] Øksendal, B. Stochastic Differential Equations: An Introduction with Applications. 5th edition. Berlin: Springer, 1998.（§11.3）</p>
+<p>[3] Nualart, D. The Malliavin Calculus and Related Topics. 2nd edition. Berlin: Springer, 2006.（§2.2.2，定理 2.2.1、定理 2.2.2；§2.3.1，式 (2.56)、(2.57)）</p>
+<p class="meta"><span class="lz">2026-11-14 发布 · 类型：金融建模</span><span class="le">Published 2026-11-14 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

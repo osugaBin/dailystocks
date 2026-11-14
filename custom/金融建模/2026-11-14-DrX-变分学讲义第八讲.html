@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261107a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第七讲.html" title="DrX-张恭庆《变分学讲义》第七讲：约束极值问题——Lagrange 乘子、逐点约束与变分不等式"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量</span><span class="le">DrX-Zhang Gongqing&#x27;s Lectures on the Calculus of Variations, Lecture 8: Conservation Laws and Noether&#x27;s Theorem</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Lecture 8 of the series on Zhang Gongqing&#x27;s Lectures on the Calculus of Variations proves Noether&#x27;s theorem: every continuous symmetry of a variational functional produces a conservation law. From a one-parameter family of diffeomorphisms the Noether identity (8.1) is derived; a general local transformation group, described by its infinitesimal generator (8.2), is converted through formulas (8.3)-(8.4) into Theorem 8.1. In one dimension this yields momentum-type first integrals and the energy integral for autonomous Lagrangians. Section 8.2 extends the Hamiltonian to the energy-momentum tensor and applies it to point masses, giving conservation of momentum, energy, and angular momentum, and to the Klein-Gordon field under the Lorentz group, giving ten conserved quantities. Section 8.3 introduces interior minimizers and shows that the Hopf differential of a Dirichlet minimizer is analytic. Section 8.4 proves Clairaut&#x27;s theorem on surfaces of revolution and the Pohozaev identity, implying nonexistence of nontrivial solutions for the critical-exponent equation on star-shaped domains. Stochastic counterparts in Oksendal and Nualart and four exercises close the lecture.</p></div>
+<p><strong>DrX Quantitative Research</strong> · 2026年11月14日</p>
+<p><a href="2026-11-14-DrX-变分学讲义第七讲.html">第七讲</a>用 Lagrange 乘子法处理约束极值问题：约束把容许变分的方向切掉一块，乘子正是为那块被切掉的方向付的代价。本讲换一个问题：不是问"在什么约束下取极值"，而是问"泛函在什么变换下保持不变"——答案是 Emmy Noether 在 1918 年给出的定理：连续对称性有多少，守恒律就有多少。本讲按张恭庆《变分学讲义》第八讲（[1]，pp. 107–123）逐节展开：§8.1 从一族单参数微分同胚出发，先算出 Noether 恒等式，再把一般的局部单参数变换群转化进来，得到 Noether 定理；§8.2 把 Hamilton 函数推广成能动张量，用质点系与 Klein-Gordon 场算出动量、能量、角动量三条守恒律；§8.3 换一个角度变分——固定因变量、变动自变量——得到内极小与 Hopf 微分的解析性；§8.4 是两个应用：旋转曲面上的 Clairaut 定理与 Pohozaev 恒等式，后者直接推出临界指数方程在星形区域上没有非零解。最后一节是两本英文书的对应物：Øksendal 的 HJB 验证定理与 Girsanov 定理是"不变性生守恒"的随机版本，Nualart 里 SDE 的随机流则是 §8.1 变换群的概率化身。本讲也是经典变分部分（第一至八讲）的收官之讲。</p>
+<h2>一、单参数微分同胚与 Noether 定理</h2>
+<h3>1.1 一个特殊的单参数函数族：先让定义域也动起来</h3>
+<p>前面七讲讨论变分问题时，泛函定义域 $M$ 里的所有函数共享同一个定义区域 $\Omega$。本讲一开头就把这个限制拿掉：允许 $M$ 中的函数有不同的定义域，并把区域写进泛函的记号里加以强调 [1，§8.1]：</p>
+<p>$$
+I(u, \Omega) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx.
+$$</p>
+<p>设 $\Omega \subset \mathbb{R}^{n}$ 有界，$u \in C^{1}(\bar{\Omega}, \mathbb{R}^{N})$，$L \in C^{2}(\bar{\Omega} \times \mathbb{R}^{N} \times \mathbb{R}^{nN})$。引入一族单参数微分同胚 $\eta_{\varepsilon}: \Omega \to \Omega_{\varepsilon}$，$\varepsilon \in (-\varepsilon_{0}, \varepsilon_{0})$，$\Omega_{\varepsilon} = \eta_{\varepsilon}(\Omega)$ 是 $\Omega$ 的一族形变，$\eta_{0} = id$（原书图 8.1）。记它在 $\varepsilon = 0$ 处的速度场为</p>
+<p>$$
+\left.\frac{\partial \eta_{\varepsilon}(x)}{\partial \varepsilon}\right|_{\varepsilon=0} = \bar{X}(x),
+$$</p>
+<p>于是形变到一阶是 $y = \eta_{\varepsilon}(x) = x + \varepsilon \bar{X}(x) + o(\varepsilon)$。再定义一族函数 $v_{\varepsilon} = v(\cdot, \varepsilon): \Omega_{\varepsilon} \to \mathbb{R}^{N}$，$v(x, 0) = u(x)$，并记</p>
+<p>$$
+\left.\frac{\partial v_{\varepsilon}(x)}{\partial \varepsilon}\right|_{\varepsilon=0} = \varphi(x).
+$$</p>
+<p>注意这里同时动了两样东西：定义域 $\Omega$ 被 $\eta_{\varepsilon}$ 拖动，函数值也被 $v$ 拖动。泛函在这族"函数加区域"上的取值是</p>
+<p>$$
+\Phi(\varepsilon) = I(v_{\varepsilon}, \Omega_{\varepsilon}) = \int_{\Omega_{\varepsilon}} L(y, v_{\varepsilon}(y), \nabla v_{\varepsilon}(y))\, dy.
+$$</p>
+<p>换元 $y = \eta_{\varepsilon}(x)$ 把它拉回固定区域 $\Omega$ 上：</p>
+<p>$$
+\Phi(\varepsilon) = \int_{\Omega} L\big(\eta_{\varepsilon}(x), v_{\varepsilon}(\eta_{\varepsilon}(x)), \nabla_{y} v_{\varepsilon}(\eta_{\varepsilon}(x))\big) \det\left(\frac{\partial(\eta_{\varepsilon}(x))}{\partial x}\right) dx.
+$$</p>
+<p>对 $\varepsilon$ 求导并在 $\varepsilon = 0$ 处取值，关键的恒等式是行列式的导数等于散度：</p>
+<p>$$
+\left.\frac{d}{d\varepsilon} \det\left(\frac{\partial(\eta_{\varepsilon}(x))}{\partial x}\right)\right|_{\varepsilon=0} = \mathrm{div}(\bar{X}).
+$$</p>
+<p>这一步值得停一下：$\eta_{\varepsilon}$ 的 Jacobi 矩阵是 $I + \varepsilon D\bar{X} + o(\varepsilon)$，行列式展开到一阶是 $1 + \varepsilon\, \mathrm{tr}(D\bar{X}) + o(\varepsilon)$，而 $\mathrm{tr}(D\bar{X})$ 正是 $\mathrm{div}(\bar{X})$。几何上这就是体积元在流下的瞬时膨胀率。链式法则逐项求导（$L$ 的三个自变量分别贡献 $\partial_{x_{\alpha}} L \bar{X}^{\alpha}$、$L_{u^{i}} \varphi^{i}$、$L_{p_{\alpha}^{i}} \varphi^{i}_{x_{\alpha}}$，再加上行列式贡献的 $L\, \mathrm{div}\, \bar{X}$），当 $u \in C^{2}$ 时得到 <strong>Noether 恒等式</strong>：</p>
+<p>$$
+\Phi'(0) = \int_{\Omega} \big[\partial_{x_{\alpha}} L \bar{X}^{\alpha} + L_{u^{i}} \varphi^{i} + L_{p_{\alpha}^{i}} \varphi^{i}_{x_{\alpha}} + L\, \mathrm{div}\, \bar{X}\big]\, dx.
+$$</p>
+<p>再做一次分部积分，把 $\partial_{x_{\alpha}} L \bar{X}^{\alpha} + L\, \mathrm{div}\, \bar{X}$ 合并成 $\mathrm{div}(L\bar{X})$，把 $L_{p_{\alpha}^{i}} \varphi^{i}_{x_{\alpha}}$ 分部积分成 $-\partial_{\alpha}(L_{p_{\alpha}^{i}}) \varphi^{i} + \mathrm{div}(L_{p^{i}} \varphi^{i})$，就得到恒等式的第二种写法：</p>
+<p>$$
+\Phi'(0) = \int_{\Omega} \big[E_{L}(u)\varphi + \mathrm{div}(L\bar{X} + L_{p^{i}} \varphi^{i})\big]\, dx. \tag{8.1}
+$$</p>
+<p>这里 $E_{L}(u)$ 是 Euler-Lagrange 算子，$E_{L}(u)\varphi = \sum_{i} \big(L_{u^{i}} - \partial_{\alpha} L_{p_{\alpha}^{i}}\big) \varphi^{i}$，求和约定对重复指标求和。这个式子的结构就是全讲的纲：第一项是"方程残量乘变分"，第二项是一个散度——沿极值曲线（$E_{L}(u) = 0$）第一项消失，剩下的散度积分经 Green 公式化为边界项；若再有不变性（$\Phi'(0) = 0$），散度本身为零，这就是守恒律。</p>
+<h3>1.2 一般的局部单参数变换群：相空间里的形变</h3>
+<p>上一小节的函数族是"特殊"的：$\bar{X}$ 与 $\varphi$ 是直接给定的。更一般的图景是在"相空间"（$x$ 与 $u$ 同时变化的空间）里作形变：设 $\lbrace \phi_{\varepsilon} \rbrace: \Omega \times \mathbb{R}^{N} \to \mathbb{R}^{n} \times \mathbb{R}^{N}$ 是一族映射 $(x, u) \mapsto (Y(x, u, \varepsilon), W(x, u, \varepsilon))$，满足 $Y(x, u, 0) = x$、$W(x, u, 0) = u$，称为<strong>局部单参数变换群</strong>。它的<strong>生成向量场</strong>是 [1，§8.1，式 (8.2)]：</p>
+<p>$$
+\left.\frac{d\phi_{\varepsilon}}{d\varepsilon}\right|_{\varepsilon=0} = \sum_{\alpha=1}^{n} X^{\alpha}(x, u)\frac{\partial}{\partial x^{\alpha}} + \sum_{i=1}^{N} U^{i}(x, u)\frac{\partial}{\partial u^{i}}. \tag{8.2}
+$$</p>
+<p>其中 $X(x, u) = \partial_{\varepsilon} Y|<em>{\varepsilon=0}$、$U(x, u) = \partial_{\varepsilon} W|</em>{\varepsilon=0}$。注意生成向量场的两个分量有明确分工：$X$ 管自变量怎么动，$U$ 管因变量怎么动。</p>
+<p>给定 $u \in C^{1}(\bar{\Omega}, \mathbb{R}^{N})$，把变换群"限制"到这条函数图像上：令 $\eta(x, \varepsilon) = Y(x, u(x), \varepsilon)$、$\omega(x, \varepsilon) = W(x, u(x), \varepsilon)$，则 $\eta(x, 0) = x$、$\omega(x, 0) = u(x)$，而</p>
+<p>$$
+\bar{X}(x) = \left.\frac{\partial \eta(x, \varepsilon)}{\partial \varepsilon}\right|_{\varepsilon=0} = X(x, u(x)), \qquad \bar{U}(x) = \left.\frac{\partial \omega(x, \varepsilon)}{\partial \varepsilon}\right|_{\varepsilon=0} = U(x, u(x)). \tag{8.3}
+$$</p>
+<p>于是 $\eta_{\varepsilon}: \bar{\Omega} \to \bar{\Omega}_{\varepsilon}$ 是微分同胚，逆映射记 $\xi_{\varepsilon} = \eta_{\varepsilon}^{-1}$，有 $x = \xi_{\varepsilon}(y) = y - \varepsilon \bar{X}(y) + o(\varepsilon)$。再令 $v_{\varepsilon}(y) = \omega(\xi_{\varepsilon}(y), \varepsilon)$，即把变换后的函数值"拉回"到新区域上定义，就回到了 1.1 节的特殊函数族。它的速度场 $\varphi(x) = \partial_{\varepsilon} v(x, \varepsilon)|_{\varepsilon=0}$ 由链式法则算出：</p>
+<p>$$
+\bar{U} = \varphi(x) + \sum_{\alpha=1}^{n} \partial_{\alpha} u(x) \bar{X}^{\alpha}(x),
+$$</p>
+<p>即</p>
+<p>$$
+\varphi(x) = \bar{U} - \sum_{\alpha=1}^{n} u_{x_{\alpha}} \bar{X}^{\alpha}. \tag{8.4}
+$$</p>
+<p>这个公式是全讲最值得咀嚼的恒等式之一。$\bar{U}$ 是"跟着点走"的函数值变化率：点 $x$ 被拖到 $y = x + \varepsilon \bar{X}$，函数值在新点处的变化率。而 $\varphi$ 是"固定坐标看"的变化率：站在同一个坐标 $x$ 处比较新旧函数。两者之差 $\sum u_{x_{\alpha}} \bar{X}^{\alpha}$ 正是"点本身挪动"带来的函数值变化——把"物质导数"与"局部导数"分开，是连续介质力学里同一组概念的变分版本。把 (8.3)、(8.4) 代入 (8.1)，就得到一般变换群下的 Noether 恒等式。</p>
+<p><strong>定义 8.1（不变性）</strong> 对一切 $\Omega_{0} \subset \bar{\Omega}_{0} \subset \Omega$，令 $(\Omega_{0})_{\varepsilon} = \eta(\Omega_{0}, \varepsilon)$。若 $I(v_{\varepsilon}, (\Omega_{0})_{\varepsilon}) = \mathrm{const}$（不依赖于 $\varepsilon$），对一切 $u \in C^{1}(\bar{\Omega}_{0}, \mathbb{R}^{N})$ 成立，则称 $I$ 关于 $\lbrace \phi_{\varepsilon} \rbrace$ 是<strong>不变的</strong> [1，§8.1，定义 8.1]。一个逐点的充分条件是被积函数在换元下逐点相等（计入 Jacobi 行列式）。注意定义要求对一切子区域 $\Omega_{0}$ 与一切 $u$ 成立——这是"泛函的不变性"，不是某一条极值曲线的不变性；正是这个"对一切 $u$"的要求，让结论可以逐点化（散度为零），而不是只得到一个积分恒等式。</p>
+<p><strong>定理 8.1（Noether）</strong> 设局部单参数变换群 $\lbrace \phi_{\varepsilon} \rbrace$ 由向量场 (8.2) 生成，泛函 $I(u) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx$。则对一切 $u \in C^{2}(\Omega, \mathbb{R}^{N})$ 有 Noether 恒等式 (8.1)，其中 $\bar{X} = X(x, u(x))$、$\bar{U} = U(x, u(x))$、$\varphi^{i} = \bar{U}^{i} - \sum_{\alpha} u^{i}_{x_{\alpha}} \bar{X}^{\alpha}$。若 $I$ 关于 $\lbrace \phi_{\varepsilon} \rbrace$ 是不变的，则</p>
+<p>$$
+E_{L}(u)\varphi + \mathrm{div}(L\bar{X} + L_{p^{i}} \varphi^{i}) = 0.
+$$</p>
+<p>这就是 Noether 定理的恒等式形态：不变性（$\Phi'(0) = 0$ 对一切子区域成立）迫使被积函数本身的组合 $E_{L}(u)\varphi + \mathrm{div}(\cdots)$ 逐点为零。进一步，当 $u$ 是 $I$ 的弱极小点时，$E_{L}(u) = 0$，剩下的散度项为零；把它写成微分形式，就是 $(n-1)$ 形式</p>
+<p>$$
+\nu = \sum_{\alpha=1}^{n} \left[L\bar{X}^{\alpha} + \sum_{i=1}^{N} L_{p_{\alpha}^{i}}\left(\bar{U}^{i} - \sum_{\beta=1}^{n} u^{i}_{x_{\beta}} \bar{X}^{\beta}\right)\right] dx^{1} \wedge \cdots \wedge d\hat{x}^{\alpha} \wedge \cdots \wedge dx^{n}
+$$</p>
+<p>是闭的：$d\nu = 0$ [1，§8.1，定理 8.1]。这里的 $\nu$ 与第四、五讲的闭形式一脉相承：第四讲 Hilbert 不变积分的 1-形式 $\omega$ 闭当且仅当场是 Mayer 场，第五讲程函 $g$ 是它的原函数；这里的 $\nu$ 是同一思想在一般维数、一般变换群下的化身——守恒律就是"某个形式是闭的"。</p>
+<h3>1.3 一维情形：两条推论与能量首次积分</h3>
+<p>当 $n = 1$ 时，散度退化为对 $t$ 的全导数，守恒律变成"某量沿解曲线为常数"的首次积分。</p>
+<p><strong>推论 8.1</strong> 设 $\lbrace \phi_{\varepsilon} \rbrace$ 是 $\mathbb{R}^{N}$ 上的单参数局部变换群，生成向量场为 $U$（即 $X = 0$，只动因变量不动自变量），$I$ 关于它不变，$u \in C^{2}$ 是 $I$ 的弱极小点，则</p>
+<p>$$
+\sum_{i=1}^{N} \bar{U}^{i}(u(t))\, L_{p^{i}}(t, u(t), \dot{u}(t)) = \mathrm{const}.
+$$</p>
+<p>这是"动量型"守恒量：生成元 $U$ 与广义动量 $L_{p}$ 配对。</p>
+<p><strong>推论 8.2</strong> 设 $n = 1$，$L$ 是自守的（与 $t$ 无关），则对 $I$ 的 E-L 方程的解 $u$ 有</p>
+<p>$$
+\left.\left(L - \sum_{i=1}^{N} L_{p^{i}} p^{i}\right)\right|_{(u,p)=(u(t),\dot{u}(t))} = \mathrm{const}.
+$$</p>
+<p>证明取时间平移群：生成向量场 $X = 1$、$U = 0$ [1，§8.1，推论 8.2]。（按：原书证明中写 $\varphi = du/dt$；按 (8.4)，$\varphi = \bar{U} - \dot{u}\bar{X} = -du/dt$，此处符号疑误。但结论不受影响：由 Noether 恒等式，$\frac{d}{dt}\big[L - L_{p^{i}} \dot{u}^{i}\big] = 0$。）这个量正是第五讲的 Hamilton 函数取负号：$H = \langle p, \xi\rangle - L$，沿解曲线 $H = \mathrm{const}$ 就是第五讲定理 5.1 的能量守恒——同一条守恒律，第五讲从 Hamilton 方程组的一行计算得到，这里从时间平移对称性得到。两种证法对照着看，Noether 定理的意义就清楚了：它把"为什么守恒"归结为"因为 $L$ 不显含 $t$"，而不是一次偶然的抵消。</p>
+<h2>二、能动张量与 Noether 定理</h2>
+<h3>2.1 Hamilton 函数的高维推广</h3>
+<p>$n = 1$ 时，Legendre 变换把 $L$ 变成 Hamilton 函数 $H = \langle p, \xi\rangle - L$，$L$ 与 $H$ 在公式中处于对称地位（第五讲）。当 $n &gt; 1$ 时，$p = \nabla u$ 不再是向量而是一个张量（$N \times n$ 矩阵），对哪个指标作 Legendre 变换都有道理——于是 Legendre 变换本身变成一个张量。原书引进 <strong>Hamilton 能量动量张量</strong>（简称能动张量）[1，§8.2]：</p>
+<p>$$
+T(x, u, p) = (T_{\alpha}^{\beta}(x, u, p)), \qquad T_{\alpha}^{\beta} = \sum_{i=1}^{N} p_{\alpha}^{i} L_{p_{\beta}^{i}} - \delta_{\alpha}^{\beta} L.
+$$</p>
+<p>读法：固定 $\alpha$（自变量指标），对 $p_{\alpha}$ 方向作 Legendre 变换，得到 $T_{\alpha}^{\beta}$；$\beta$ 跑遍 $n$ 个方向，就得到 $n$ 个"分 Hamiltonian"。$T$ 的每个分量都是 $L$ 的 Legendre 变换——在这个意义上，能动张量是 Hamilton 函数在高维的推广。$n = 1$ 时它退化为单个量 $T_{1}^{1} = p L_{p} - L = H$，与推论 8.2 的守恒量一致。</p>
+<p><strong>例 8.1（Klein-Gordon 场）</strong> 设 $L = \frac{1}{2}\left(\sum_{\beta,\gamma=0}^{3} g_{\beta\gamma} p_{\beta} p_{\gamma} - M^{2} u^{2}\right) = \frac{1}{2}(p_{0}^{2} - p_{1}^{2} - p_{2}^{2} - p_{3}^{2} - M^{2} u^{2})$，其中 $g_{00} = 1$、$g_{ii} = -1$、$g_{\beta\gamma} = 0$（$\beta \ne \gamma$）。则 $T_{\beta}^{\alpha} = \sum_{\gamma=0}^{3} g_{\alpha\gamma} p_{\beta} p_{\gamma} - \delta_{\alpha\beta} L$，特别地</p>
+<p>$$
+T_{0}^{0} = \frac{1}{2}(p_{0}^{2} + p_{1}^{2} + p_{2}^{2} + p_{3}^{2} + M^{2} u^{2}), \qquad T_{\beta}^{0} = p_{0} p_{\beta}, \quad \beta = 1, 2, 3.
+$$</p>
+<p>$T_{0}^{0}$ 是能量密度：动能 $p_{0}^{2}/2$、梯度能 $\sum p_{i}^{2}/2$、质量能 $M^{2}u^{2}/2$ 三项之和——注意 Minkowski 度规的负号在 Legendre 变换后翻成了正号，能量密度是正定的。$T_{\beta}^{0} = p_{0} p_{\beta}$ 是动量密度（能流）的分量 [1，§8.2，例 8.1]。</p>
+<p>用能动张量，Noether 定理可以写成更紧凑的散度形式。<strong>定理 8.2</strong>：设 $L \in C^{2}$，$I(u) = \int_{\Omega} L(x, u(x), \nabla u(x))\, dx$ 关于局部单参数群 $\lbrace \phi_{\varepsilon} \rbrace$ 不变，$u \in C^{2}(\bar{\Omega}, \mathbb{R}^{N})$ 是 $I$ 的弱极小点，则</p>
+<p>$$
+\sum_{\alpha=1}^{n} \left(\sum_{i=1}^{N} L_{p_{\alpha}^{i}} \bar{U}^{i} - \sum_{\beta=1}^{n} T_{\beta}^{\alpha} \bar{X}^{\beta}\right)_{x_{\alpha}} = 0,
+$$</p>
+<p>简记为 $\mathrm{div}(L_{p^{i}} \bar{U}^{i} - T\bar{X}) = 0$ [1，§8.2，定理 8.2]。与定理 8.1 对照：括号里的第一项是"动量配生成元"，第二项是"能动张量配自变量生成元"；$X = 0$ 的纯内对称只剩第一项，$U = 0$ 的纯时空对称只剩第二项。下一小节的三个例子正好各取一种。</p>
+<h3>2.2 例 8.2：质点系的三条守恒律</h3>
+<p>考虑 $l$ 个质点 $m_{1}, \dots, m_{l}$ 的质点系，位置坐标 $X = (X_{1}, \dots, X_{l})$，$X_{i} = (x_{i}, y_{i}, z_{i})$。动能 $T = \frac{1}{2} \sum_{j=1}^{l} m_{j} |\dot{X}_{j}(t)|^{2}$，位能 $V = -k \sum_{i&lt;j} m_{i} m_{j} / |X_{i} - X_{j}|$，$L = T - V$，泛函 $I(X) = \int_{t_{0}}^{t_{1}} L(X(t), \dot{X}(t))\, dt$ [1，§8.2，例 8.2]。位能只依赖质点间的相对距离，这是下面三个对称性的共同来源。</p>
+<p><strong>空间平移群</strong> $\lbrace S_{\varepsilon} \rbrace$：$\tilde{x}_{i} = x_{i} + \varepsilon$，$\tilde{y}_{i} = y_{i}$，$\tilde{z}_{i} = z_{i}$。整体平移不改变任何一对质点的相对位置，也不改变速度，于是 $L$ 不变。生成向量场 $X = 0$、$U = (e_{1}, \dots, e_{1})$，$e_{1} = (1, 0, 0)$。由推论 8.1，守恒量是 $\sum_{i=1}^{l} P_{i}^{1} = \mathrm{const}$，其中 $P_{i}^{1} = m_{i} \dot{x}_{i}(t)$。对 $y$、$z$ 同理，合起来就是总动量守恒：</p>
+<p>$$
+\sum_{i=1}^{l} P_{i} = \sum_{i=1}^{l} m_{i} \dot{X}_{i}(t) = \mathrm{const}.
+$$</p>
+<p>（按：原书此处写"因为 $L$ 不依赖于 $t$"；空间平移的不变性应源于 $L$ 不依赖于坐标 $x_{i}$ 本身、只依赖坐标差与速度，此处疑为"不依赖于 $x$"之误。时间平移的不变性才源于 $L$ 不依赖于 $t$，见下段。）</p>
+<p><strong>时间平移群</strong> $\lbrace T_{\varepsilon} \rbrace$：$\tilde{t} = t + \varepsilon$，空间坐标不动。$L$ 不显含 $t$，故 $I$ 不变。生成向量场 $X = 1$、$U = 0$，由推论 8.2，守恒量是 $H = pL_{p} - L$。直接算：$pL_{p} = \sum_{j} m_{j} |\dot{X}_{j}|^{2} = 2T$，于是 $H = 2T - (T - V) = T + V = \mathrm{const}$，即总能量守恒。</p>
+<p><strong>单参数转动群</strong> $\lbrace R_{\varepsilon} \rbrace$：绕 $z$ 轴转动，$\tilde{x}_{i} = x_{i} \cos\varepsilon + y_{i} \sin\varepsilon$，$\tilde{y}_{i} = -x_{i} \sin\varepsilon + y_{i} \cos\varepsilon$，$\tilde{z}_{i} = z_{i}$。转动保持相对距离与速度大小，$I$ 不变。生成向量场 $X = 0$、$U = (Z_{1}, \dots, Z_{l})$，$Z_{i} = (y_{i}, -x_{i}, 0)$——这是 $\varepsilon = 0$ 处 $\partial_{\varepsilon} \tilde{x}_{i} = y_{i}$、$\partial_{\varepsilon} \tilde{y}_{i} = -x_{i}$ 的直接结果。由推论 8.1，</p>
+<p>$$
+\sum_{i=1}^{l} m_{i}(y_{i} \dot{x}_{i} - x_{i} \dot{y}_{i}) = \sum_{i=1}^{l} L_{\dot{X}_{i}} Z_{i} = \mathrm{const},
+$$</p>
+<p>即 $z$ 分量角动量守恒。对 $(y, z)$、$(z, x)$ 平面同样转动，得到角动量守恒的向量形式 $\sum_{i=1}^{l} m_{i} X_{i} \wedge \dot{X}_{i} = \mathrm{const}$。</p>
+<p>三条守恒律排在一起，Noether 定理的"词典"就完整了：平移对称性对动量，时间平移对能量，转动对角动量。牛顿力学里这三条是分别发现的经验定律，这里它们是同一个定理代入三个不同的生成向量场。</p>
+<h3>2.3 例 8.3：场论、Lorentz 群与能量-动量</h3>
+<p>把质点换成场：$u: \mathbb{R}^{1} \times \mathbb{R}^{3} \to \mathbb{R}^{N}$ 表示场强分布，$x = (x_{0}, x_{1}, x_{2}, x_{3})$，$x_{0} = t$ 为时间坐标，$\bar{x} = (x_{1}, x_{2}, x_{3})$ 为空间坐标。取 $N = 1$，$L(x, u, p) = \frac{1}{2}(p_{0}^{2} - p_{1}^{2} - p_{2}^{2} - p_{3}^{2} - M^{2} u^{2})$，即 Klein-Gordon 场 [1，§8.2，例 8.3]。</p>
+<p>狭义相对论要求任何物理场的 Lagrange 函数在正向 Lorentz 变换下不变：正向 Lorentz 变换是保持二次型 $x_{0}^{2} - x_{1}^{2} - x_{2}^{2} - x_{3}^{2}$ 不变、保持时间定向的四维时空线性变换，全体构成正向 Lorentz 变换群。它的子群与生成元给出四组守恒律：</p>
+<p><strong>平移（4 个母元）。</strong> 无穷小母元 $\bar{X}^{\beta} = (\delta_{\gamma}^{\beta})_{0 \leqslant \gamma \leqslant 3}$，$U = 0$。由 Noether 定理得 $\sum_{\alpha=0}^{3} (T_{\gamma}^{\alpha})_{x_{\alpha}} = 0$，$\gamma = 0, 1, 2, 3$，即 $\mathrm{div}\, T_{\gamma} = 0$，其中 $T_{\gamma}^{\alpha} = \sum_{\beta} g_{\alpha\beta} \partial_{\beta} u \partial_{\gamma} u - \delta_{\alpha\gamma} L(x, u, \nabla u)$。</p>
+<p>把 $\mathrm{div}\, T_{\gamma} = 0$ 在区域 $\lbrack t_{1}, t_{2} \rbrack \times B_{R}(\theta)$ 上积分：时间边界给出两端能量（动量）的差，空间边界给出穿过球面的通量。若 $R \to \infty$ 时场在无穷远处一致趋于零、且 $T_{\gamma}^{0}(t, \cdot)$ 在 $\mathbb{R}^{3}$ 上可积，边界通量消失，得到守恒量</p>
+<p>$$
+P_{\gamma}(t) = \int_{\mathbb{R}^{3}} T_{\gamma}^{0}(t, \bar{x})\, d\bar{x} = \mathrm{const}.
+$$</p>
+<p>取 $\gamma = 0$：$P_{0}(t) = \int_{\mathbb{R}^{3}} \frac{1}{2}(|\partial_{t} u|^{2} + |\nabla u|^{2} + M^{2} u^{2})\, dx = \mathrm{const}$，这是 Klein-Gordon 场的<strong>能量守恒</strong>，被积函数正是例 8.1 的 $T_{0}^{0}$。取 $\gamma = 1, 2, 3$：$P_{\gamma}(t) = \int_{\mathbb{R}^{3}} \partial_{t} u\, \partial_{\gamma} u = \mathrm{const}$，这是<strong>动量守恒</strong>。</p>
+<p><strong>转动与 Boost（6 个母元）。</strong> 除平移外，Lorentz 变换还有 6 个独立的转动母元：三个空间转动与三个 Boost（时空混合转动），由反对称参数 $\varepsilon_{\mu\nu} = -\varepsilon_{\nu\mu}$（$0 \leqslant \mu \leqslant \nu \leqslant 3$）标记。作变换 $y_{\mu} = x_{\mu} + \sum_{\nu=0}^{3} g_{\nu\nu} \varepsilon_{\mu\nu} x_{\nu}$，对应的向量场是 $X_{\mu}^{\alpha\beta} = g_{\beta\beta} x_{\beta} \delta_{\mu\alpha} - g_{\alpha\alpha} x_{\alpha} \delta_{\mu\beta}$（$0 \leqslant \beta &lt; \alpha \leqslant 3$）。把</p>
+<p>$$
+M_{\alpha\beta\nu} = \sum_{\mu=0}^{3} (L_{p_{\nu}} u_{x_{\mu}} - \delta_{\mu\nu} L) X_{\mu}^{\alpha\beta} = \sum_{\mu=0}^{3} T_{\mu}^{\nu} X_{\mu}^{\alpha\beta}
+$$</p>
+<p>称为角动量（密度），Noether 定理给出 $\int_{\mathbb{R}^{3}} M_{\alpha\beta,0}(t)\, d\bar{x} = \mathrm{const}$，$\forall (\alpha, \beta)$，$0 \leqslant \beta &lt; \alpha \leqslant 3$——这是<strong>角动量守恒</strong>（含 Boost 对应的质心运动守恒）。</p>
+<p><strong>注 8.1</strong> 电磁场、复标量场、Dirac 场等重要物理场的守恒律，都可以类似地由 Noether 定理推导出来。Noether 定理是一条非常基本的定理 [1，§8.2，注 8.1]。数一下自由度：Lorentz 群是 10 维的（4 个平移加 6 个转动/Boost），恰好给出 10 个守恒量（能量 1、动量 3、角动量 3、质心 3）——对称性的维数与守恒律的个数一一对应，这是 Noether 定理最干净的计数。</p>
+<h2>三、内极小：固定因变量，变动自变量</h2>
+<h3>3.1 另一种变分：(8.5) 的推导</h3>
+<p>§8.3 换一个角度讨论极小值的必要条件：以前总让因变量 $u$ 变（导出 E-L 方程），现在把 $u$ 固定，让自变量 $x$ 变化——这样也能得到不同的函数，泛函也要跟着变 [1，§8.3]。沿用 §8.1 的记号，设 $\eta_{\varepsilon}: \bar{\Omega} \to \bar{\Omega}$ 是微分自同胚，$y = x + \varepsilon \bar{X}(x) + o(\varepsilon)$，且 $\bar{X}|_{\partial\Omega} = 0$（边界不动，这是"内"变分的关键：它不碰边界条件，只在区域内部重新参数化）。逆变换记 $x = \xi_{\varepsilon}(y)$。对给定的 $u \in C^{1}(\bar{\Omega}, \mathbb{R}^{N})$，取 $v_{\varepsilon}(y) = u(x)$，即 $v_{\varepsilon} = u \circ \xi_{\varepsilon} = u \circ \eta_{\varepsilon}^{-1}(y)$：新函数在新点 $y$ 处的值等于老函数在原像 $x$ 处的值——函数图像本身没动，动的是"坐标刻度"。</p>
+<p>于是</p>
+<p>$$
+I(v_{\varepsilon}, \Omega) = \int_{\Omega} L(y, v_{\varepsilon}(y), \nabla v_{\varepsilon}(y))\, dy = \int_{\Omega} L\left(\eta_{\varepsilon}(x), u(x), \frac{\partial \xi_{\varepsilon}}{\partial y} \nabla u(x)\right) \det\left(\frac{\partial \eta_{\varepsilon}}{\partial x}\right) dx.
+$$</p>
+<p>注意到 $\frac{\partial \xi_{\varepsilon}}{\partial y} = \left(\frac{\partial \eta_{\varepsilon}}{\partial x}\right)^{-1} = I - \varepsilon \frac{\partial \bar{X}}{\partial x} + o(\varepsilon)$（逆矩阵的一阶展开：$(I + \varepsilon A)^{-1} = I - \varepsilon A + o(\varepsilon)$）。当 $u \in C^{2}$ 时求导，整理后得到</p>
+<p>$$
+\left.\frac{d}{d\varepsilon} I(v_{\varepsilon}, \Omega)\right|_{\varepsilon=0} = \int_{\Omega} E_{L}(u) \cdot \left(-\sum_{\alpha=1}^{n} \frac{\partial u}{\partial x_{\alpha}} \bar{X}^{\alpha}\right) dx. \tag{8.5}
+$$</p>
+<p>推导的中间一步值得写出来：求导后先得到 $\int_{\Omega} \sum_{\alpha} \big[-\sum_{\beta,i} L_{p_{\beta}^{i}} u^{i}_{x_{\alpha}} \bar{X}^{\alpha}_{x_{\beta}} + L_{x_{\alpha}} \bar{X}^{\alpha} + L\, \bar{X}^{\alpha}_{x_{\alpha}}\big] dx$，再利用恒等式 $\partial_{x_{\alpha}} L(x, u(x), \nabla u(x)) = L_{x_{\alpha}} + \sum_{i} L_{u^{i}} u^{i}_{x_{\alpha}} + \sum_{\beta,i} L_{p_{\beta}^{i}} u^{i}_{x_{\alpha} x_{\beta}}$ 与分部积分，把它化成 $E_{L}(u)$ 乘上 $-\sum_{\alpha} u_{x_{\alpha}} \bar{X}^{\alpha}$。最后一项正是 (8.4) 在 $\bar{U} = 0$ 时的 $\varphi$：固定函数图像、只动坐标，等价于在固定坐标下做变分 $\varphi = -\sum u_{x_{\alpha}} \bar{X}^{\alpha}$。§8.1 与 §8.3 在这里汇合：内变分是 Noether 恒等式在 $U = 0$ 时的特例。</p>
+<h3>3.2 定义 8.2 与推论 8.2：弱极小点一定是内极小点</h3>
+<p><strong>定义 8.2</strong> $u \in C^{1}(\bar{\Omega}, \mathbb{R}^{N})$ 称为 $I$ 的一个<strong>内极小点</strong>，如果对一切 $\bar{X} \in C_{0}^{1}(\Omega, \mathbb{R}^{n})$，泛函 $I$ 在 $v_{\varepsilon}$ 的变换下满足 $\left.\frac{d}{d\varepsilon} I(v_{\varepsilon}, \Omega)\right|_{\varepsilon=0} = 0$ [1，§8.3，定义 8.2]。$C_{0}^{1}$ 表示在边界附近为零——内变分不扰动边界值，所以内极小比弱极小弱：它只检验"内部重新参数化"这一类特殊的变分。</p>
+<p>由 (8.5)，当 $u \in C^{2}$ 是内极小点时，$\bar{X}$ 任意迫使</p>
+<p>$$
+E_{L}(u) \frac{\partial u}{\partial x_{\alpha}} = 0.
+$$</p>
+<p>由此立得<strong>推论 8.2</strong>：$C^{2}$ 的弱极小点是其内极小点 [1，§8.3，推论 8.2]。证明只有一句话：弱极小点的 E-L 方程 $E_{L}(u) = 0$ 蕴含上式。反过来不成立：内极小只给出 $E_{L}(u)$ 与 $\nabla u$ 的 $n$ 个正交关系（$E_{L}(u) \cdot \partial_{\alpha} u = 0$），比 $E_{L}(u) = 0$ 本身弱得多。（按：原书此处编号"推论 8.2"与 §8.1 末尾的推论 8.2 重号，照录。）</p>
+<p>内极小的必要条件还可以用能动张量表达：对一切 $u \in C^{2}$、一切 $X \in C_{0}^{1}$，有</p>
+<p>$$
+\sum_{\beta=1}^{n} \frac{\partial T_{\alpha}^{\beta}(x, u(x), \nabla u(x))}{\partial x_{\beta}} + L_{x_{\alpha}}(x, u(x), \nabla u(x)) = 0, \qquad \forall \alpha = 1, \dots, n.
+$$</p>
+<p>当 $L$ 不显含 $x$（$L_{x_{\alpha}} = 0$）时，这就是 $\mathrm{div}\, T = 0$——能动张量无散，与 §8.2 的守恒律是同一结论从内变分角度的复现。</p>
+<p><strong>例 8.4（保形条件）</strong> 设 $\Omega$ 是平面区域，$u \in C^{2}(\bar{\Omega}, \mathbb{R}^{2})$ 对于 Dirichlet 能量 $D(u) = \int_{\Omega} |\nabla u|^{2}\, dxdy$ 是一个弱极小点，则</p>
+<p>$$
+\phi(z) := |\partial_{x} u|^{2} - |\partial_{y} u|^{2} + 2i\, \partial_{x} u\, \partial_{y} u
+$$</p>
+<p>是 $z = x + iy$ 的解析函数 [1，§8.3，例 8.4]。$\phi$ 称为 Hopf 微分。证明：$L = \sum_{\alpha=1}^{2} |p_{\alpha}|^{2}$ 不依赖于 $z$ 与 $u$，$u$ 是内极小点，按 (8.5) 的第一个等式，对任意 $X = (X^{1}, X^{2}) \in C_{0}^{1}(\Omega, \mathbb{R}^{2})$ 有 $\int_{\Omega} \big[L\, \mathrm{div}\, X - \sum_{\alpha,\beta} L_{p_{\alpha}} \partial_{\beta} u\, \partial_{\alpha} X^{\beta}\big] dxdy = 0$。展开并配方：被积函数化成 $(|\partial_{x} u|^{2} - |\partial_{y} u|^{2})(\partial_{x} X^{1} - \partial_{y} X^{2}) + 2 \partial_{x} u\, \partial_{y} u\, (\partial_{x} X^{2} + \partial_{y} X^{1})$。令 $\xi = |\partial_{x} u|^{2} - |\partial_{y} u|^{2}$、$\eta = 2 \partial_{x} u\, \partial_{y} u$，分部积分后由 $X$ 的任意性得</p>
+<p>$$
+\partial_{x} \xi + \partial_{y} \eta = 0, \qquad \partial_{y} \xi - \partial_{x} \eta = 0,
+$$</p>
+<p>这正是 $\phi = \xi + i\eta$ 的 Cauchy-Riemann 方程。于是 $\phi$ 解析。</p>
+<p>这个例子是全讲最漂亮的一次"变废为宝"：Dirichlet 能量的弱极小点由 E-L 方程只知道每个分量调和（$\Delta u^{i} = 0$），而内极小多给了一个复解析的二次微分——调和映射的 Hopf 微分解析，是几何分析里极小曲面与调和映射理论的起点（第二讲的极小曲面、第七讲的约束极值都在这里汇合：保形条件正是极小曲面参数化的解析表述）。</p>
+<h2>四、应用：Clairaut 定理与 Pohozaev 恒等式</h2>
+<h3>4.1 例 8.5：旋转曲面上的 Clairaut 定理</h3>
+<p>设 $l$ 是光滑旋转曲面 $S$ 上的一条测地线，$P \in l$，$r(P)$ 为 $P$ 点水平圆的半径，$\alpha(P)$ 为 $l$ 与子午线在 $P$ 点的夹角，则</p>
+<p>$$
+r(P) \sin \alpha(P) = \mathrm{const}.
+$$</p>
+<p>这是微分几何的经典定理，这里它只是推论 8.1 的一次代入 [1，§8.4，例 8.5]。旋转曲面参数化为 $(x, y, z) = (r \cos\theta, r \sin\theta, f(r))$，曲面上的曲线写成 $r = r(\theta)$。弧长泛函是</p>
+<p>$$
+I(r) = \int_{\theta_{1}}^{\theta_{2}} \sqrt{r^{2} + (1 + f'(r)^{2}) \dot{r}^{2}}\, d\theta,
+$$</p>
+<p>其中 $\dot{r} = dr/d\theta$。被积函数不显含 $\theta$——旋转对称性在泛函层面的化身。由推论 8.2（自守情形的首次积分），守恒量是 $L - L_{\dot{r}} \dot{r}$，算出来是</p>
+<p>$$
+\frac{r^{2}}{\sqrt{r^{2} + (1 + f'(r)^{2}) \dot{r}^{2}}} = \mathrm{const}.
+$$</p>
+<p>弧长微分 $ds = \sqrt{r^{2} + (1 + f'(r)^{2}) \dot{r}^{2}}\, d\theta$，上式化成</p>
+<p>$$
+r^{2} \frac{d\theta}{ds} = \mathrm{const}. \tag{8.7}
+$$</p>
+<p>改用弧长 $s$ 为参数，$r = r(s)$、$\theta = \theta(s)$，曲线 $l$ 的切向量是 $a = (\cos\theta, \sin\theta, f') \dot{r} + (-\sin\theta, \cos\theta, 0) r \dot{\theta}$（对 $s$ 求导，$\dot{r}$、$\dot{\theta}$ 现为对 $s$ 的导数）。水平圆周（$r = \mathrm{const}$）的切向量是 $b = (-r \sin\theta, r \cos\theta, 0)$。两者内积 $a \cdot b = r(s)^{2} \dot{\theta}(s)$。测地线与水平圆周的夹角 $\beta(s) = \frac{\pi}{2} - \alpha(s)$，于是 $a \cdot b = r(s) \cos(\beta(s)) = r(s) \sin(\alpha(s))$。联合 (8.7) 得 $r(s) \sin(\alpha(s)) = \mathrm{const}$。</p>
+<p>几何解释：测地线越靠近转轴（$r$ 越小），它与子午线的夹角 $\alpha$ 越大——$\sin\alpha$ 必须变大来补偿 $r$ 的变小；$r \sin\alpha$ 是测地线"绕轴的角动量"，旋转对称性守恒的正是它。球面上的大圆、圆柱面上的螺旋线都是特例：圆柱面 $f = \mathrm{const}$ 时 $r$ 为常数，定理退化为 $\alpha = \mathrm{const}$，即螺旋线与母线夹角不变。</p>
+<h3>4.2 例 8.6：Pohozaev 恒等式与临界指数的不存在性</h3>
+<p>设 $\Omega \subset \mathbb{R}^{n}$ 有光滑边界，$g \in C(\mathbb{R}^{1})$，考察非线性椭圆方程</p>
+<p>$$
+-\Delta u = g(u) \quad \text{在 } \Omega \text{ 中}, \qquad u = 0 \quad \text{在 } \partial\Omega \text{ 上}. \tag{8.9}
+$$</p>
+<p>当 $n \geqslant 3$ 时，它的 $C^{1}$ 弱解满足 <strong>Pohozaev 恒等式</strong></p>
+<p>$$
+\frac{n-2}{2} \int_{\Omega} |\nabla u|^{2}\, dx - n \int_{\Omega} G(u)\, dx + \frac{1}{2} \int_{\partial\Omega} \left|\frac{\partial u}{\partial \nu}\right|^{2} (x \cdot \nu)\, d\sigma = 0, \tag{8.10}
+$$</p>
+<p>其中 $G$ 是 $g$ 的原函数（$G(0) = 0$），$d\sigma$ 是 $\partial\Omega$ 的面积元，$\nu$ 是单位外法向量 [1，§8.4，例 8.6]。证明是 Noether 恒等式的一次"伸缩变分"：取 Lagrange 函数 $L(u, p) = \frac{1}{2} p^{2} - G(u)$，它的 E-L 方程正是 (8.9)。取伸缩变换 $\eta_{\varepsilon}(x) = (1 + \varepsilon) x$（原书图 8.2），$\Omega_{\varepsilon} = (1 + \varepsilon)\Omega$，$v_{\varepsilon}(y) = u((1 + \varepsilon)^{-1} y)$，则 $\bar{X} = x$，$\varphi(x) = -x \cdot \nabla u$。Noether 恒等式 (8.11) 给出</p>
+<p>$$
+\left.\frac{d}{d\varepsilon} I(v_{\varepsilon}, \Omega_{\varepsilon})\right|_{\varepsilon=0} = \int_{\Omega} \mathrm{div}\left[\left(\frac{1}{2}|\nabla u|^{2} - G(u)\right) x - \nabla u (x \cdot \nabla u)\right] dx.
+$$</p>
+<p>一方面用方程 (8.9) 直接计算（用到 $-\Delta u = g(u)$ 与 $\nabla G(u) = g(u) \nabla u$ 的抵消），它等于 $\int_{\Omega} \big[\frac{n-2}{2} |\nabla u|^{2} - n G(u)\big] dx$；另一方面对 (8.11) 用 Green 公式、并注意 $u|_{\partial\Omega} = 0$（边界上 $\nabla u$ 只有法向分量），它等于 $-\frac{1}{2} \int_{\partial\Omega} |\partial u/\partial\nu|^{2} (x \cdot \nu)\, d\sigma$。两式相等即 (8.10)。</p>
+<p>恒等式的威力在临界指数情形：取 $\Omega \subset \mathbb{R}^{n}$（$n \geqslant 3$）为星形区域（从原点出发的任一射线与 $\partial\Omega$ 恰交于一点），$g(u) = u^{(n+2)/(n-2)}$，则方程 (8.12) $-\Delta u = u^{(n+2)/(n-2)}$、$u|<em>{\partial\Omega} = 0$ 没有非零解。证明：取 $G(u) = \frac{n-2}{2n} u^{2n/(n-2)}$，由 (8.10)，前两项恰好抵消（$\frac{n-2}{2} \int |\nabla u|^{2} = n \int G(u)$ 可由方程乘 $u$ 积分得到），剩下 $\int_{\partial\Omega} |\partial u/\partial\nu|^{2} (x \cdot \nu)\, d\sigma = 0$。星形区域上 $x \cdot \nu &gt; 0$，故 $\partial u/\partial\nu|</em>{\partial\Omega} = 0$；连同 $u|_{\partial\Omega} = 0$，由 Laplace 方程 Cauchy 问题（初值问题）的唯一性得 $u \equiv 0$。</p>
+<p>这里的指数 $\frac{n+2}{n-2}$ 是 Sobolev 临界指数：伸缩变换 $u_{\lambda}(x) = \lambda^{(n-2)/2} u(\lambda x)$ 恰好保持 Dirichlet 能量 $\int |\nabla u|^{2}$ 不变——伸缩对称性在临界指数处"恰好"成立，Pohozaev 恒等式正是这一临界伸缩的 Noether 恒等式。它告诉我们：临界指数方程在星形区域上没有非零解，不是因为方程太难，而是因为伸缩对称性与边界几何（$x \cdot \nu &gt; 0$）联手排除了非零解。这是变分法与非线性 PDE 交界处最著名的不存在性结果之一，也是第六讲（多重积分）里 Sobolev 嵌入临界情形的先声。</p>
+<h2>五、两本书中的对应物</h2>
+<h3>5.1 Øksendal：HJB 验证定理与 Girsanov 变换——随机版的不变性</h3>
+<p><strong>值函数沿最优轨道的守恒。</strong> Øksendal 第 11 章的随机控制问题里，值函数 $\Phi$ 满足 Hamilton-Jacobi-Bellman 方程 [2，§11.2]。定理 11.2.1（HJB (I)）说值函数满足 $\partial_{t}\Phi + \sup_{v} \lbrace f + \mathcal{L}^{v}\Phi \rbrace = 0$；定理 11.2.2（HJB (II)，验证定理的逆）说：任何满足不等式 $F^{v} + \mathcal{L}^{v}\phi \leqslant 0$ 与边界条件的光滑函数 $\phi$ 都是值函数的上界，而使等式成立的控制 $u_{0}$ 就是最优的 [2，§11.2，定理 11.2.1、定理 11.2.2]。对照本讲：当控制问题是自守的（系数与运行收益不显含时间），最优轨道上的 Hamilton 量沿轨道守恒——这正是推论 8.2 与第五讲定理 5.1 在随机控制里的对应物：时间平移对称性生出能量型首次积分，确定性一侧叫 $H = \mathrm{const}$，随机一侧叫"值函数沿最优轨道满足的动态规划恒等式"。第五讲 §六已经建立了 HJB 与 H-J 方程的逐项对照，本讲补上另一半：Noether 定理的"对称性生守恒"在随机控制里表现为"自守性生首次积分"，验证定理（定理 11.2.2）则扮演了"完备性"的角色——一个足够好的 HJB 解能反过来制造最优控制，如同完全积分生成 H-S 通解。</p>
+<p><strong>Girsanov 定理：测度变换群下的不变性。</strong> Øksendal §8.6 的 Girsanov 定理说：改变扩散过程的漂移系数，相当于在路径空间上换一个等价概率测度；Brownian 运动在新测度下仍是 Brownian 运动（带漂移修正）[2，§8.6]。对照 §8.1 的语言：Girsanov 变换是一族作用在路径空间上的"变换群"，它保持的不是泛函 $I$ 的数值，而是过程的"鞅结构"——在等价测度变换下，随机积分的 Itô 结构、二次变差、鞅表示定理的形式全部不变。金融里的对应物在第 12 章：市场、组合与套利 [2，§12.1]——自融资组合的财富过程在计价单位（numéraire）变换下保持自融资性，无套利条件在等价鞅测度变换下保持不变。可以说：Noether 定理的"群作用下泛函不变"在随机金融里的化身，就是"等价测度变换下无套利结构不变"；而 §8.2 能动张量的"每个分量都是 Legendre 变换"，在金融里对应风险中性定价中"每个计价单位下都有自己的鞅测度"。这条对照是定性的——随机情形没有有限维的 Noether 恒等式 (8.1) 可逐项搬运，但"对称性决定守恒结构"的思想完全相同。</p>
+<h3>5.2 Nualart：随机流——变换群的概率化身</h3>
+<p>§8.1 的核心对象是一族微分同胚 $\lbrace \phi_{\varepsilon} \rbrace$ 及其生成向量场。随机分析里有逐字平行的对象：SDE 的解作为初值的函数。Nualart 定理 2.2.1 说：在系数全局 Lipschitz 且线性增长的条件下，解 $X(t)$ 属于 $D^{1,\infty}$，其 Malliavin 导数 $D_{r} X(t)$ 满足线性方程 (2.41) [3，§2.2.1，定理 2.2.1]。在 §2.3.1 中，Malliavin 导数满足同一族线性 SDE（式 (2.56)），而流的 Jacobian 矩阵 $Y(t) = \partial X(t, x_{0}) / \partial x_{0}$ 满足以 $\nabla A$、$\nabla B$ 为系数的线性 SDE（式 (2.57)）；当系数为 $C^{1+\alpha}$ 时，$X(t, x_{0})$ 关于初值 $x_{0}$ 连续可微，$Y(t)$ 就是它的 Jacobian [3，§2.3.1，式 (2.56)、(2.57)]。两者由分解式 $D_{s} X_{t} = Y(t)\, Y(s)^{-1} A(X_{s})$ 缝合在一起 [3，§2.3.1]。</p>
+<p>对照本讲逐条看：映射 $x_{0} \mapsto X(t, x_{0})$ 是一族随机微分同胚——它就是 §8.1 里 $\phi_{\varepsilon}$ 的随机版本，只不过参数不再是确定性的 $\varepsilon$，而是初值 $x_{0}$ 与噪声路径；$Y(t)$ 是这族随机微分同胚的生成向量场的 Jacobian，好比 (8.2) 式对 $x_{0}$ 求导；分解式 $D_{s} X_{t} = Y(t) Y(s)^{-1} A(X_{s})$ 则说"对噪声求导"（Malliavin 导数）与"对初值求导"（Jacobi 矩阵）由同一条线性化方程联系起来——正如本讲 (8.4) 式把 $\varphi$（固定坐标看的变化率）与 $\bar{U}$（跟着点走的变化率）用 $\sum u_{x_{\alpha}} \bar{X}^{\alpha}$ 联系起来。第五讲 §六指出 Jacobi 定理"对参数求导"的思想在 Nualart 里化身为流的求导；本讲补上另一半：Noether 定理"对变换群求导得守恒律"的思想，在随机一侧化身为"对随机流求导得 Greeks 与密度光滑性"——本系列 M2 里程碑的 Malliavin 权重法正是这条线的终点：先对最优轨迹求导（经典一侧用 Jacobi 场与 Noether 流，随机一侧用 $D$ 与 $Y$），再由分部积分把导数变成可计算的权重。</p>
+<h2>六、小结与自测习题</h2>
+<p><strong>小结。</strong>（1）§8.1：允许定义域也动的单参数函数族上，$\Phi'(0)$ 的计算给出 Noether 恒等式 (8.1)；一般的局部单参数变换群由生成向量场 (8.2) 刻画，经 (8.3)、(8.4) 转化为特殊函数族；不变性（定义 8.1）迫使 $E_{L}(u)\varphi + \mathrm{div}(L\bar{X} + L_{p^{i}} \varphi^{i}) = 0$，弱极小点上相应的 $(n-1)$ 形式 $\nu$ 闭（$d\nu = 0$）；$n = 1$ 时得推论 8.1（动量型）与推论 8.2（自守情形的能量首次积分，与第五讲定理 5.1 同源）。（2）§8.2：能动张量 $T_{\alpha}^{\beta} = \sum p_{\alpha}^{i} L_{p_{\beta}^{i}} - \delta_{\alpha}^{\beta} L$ 是 Hamilton 函数的高维推广，定理 8.2 把 Noether 定理写成 $\mathrm{div}(L_{p^{i}} \bar{U}^{i} - T\bar{X}) = 0$；质点系的三个群分别给出动量、能量、角动量守恒；Klein-Gordon 场在 Lorentz 群下给出能量 $P_{0}$、动量 $P_{\gamma}$、角动量 $M_{\alpha\beta}$ 守恒，10 维群对 10 个守恒量。（3）§8.3：固定 $u$、变动 $x$ 的内变分给出 (8.5)，内极小点满足 $E_{L}(u) \partial u/\partial x_{\alpha} = 0$，弱极小点一定是内极小点；Dirichlet 能量的弱极小点有解析的 Hopf 微分 $\phi(z)$。（4）§8.4：旋转对称性给出 Clairaut 定理 $r \sin\alpha = \mathrm{const}$；伸缩对称性给出 Pohozaev 恒等式 (8.10)，推出临界指数方程在星形区域上没有非零解。（5）随机对应：自守随机控制问题的最优轨道上有首次积分（Øksendal 定理 11.2.2），Girsanov 变换是测度变换群下的不变性（[2]，§8.6），SDE 的随机流是变换群的概率化身（Nualart 式 (2.56)、(2.57)）。</p>
+<p><strong>第一至八讲收束。</strong> 八讲走完，经典变分部分的全貌可以一句话收束：第一讲提出变分问题，第二讲给出极值的一阶必要条件（Euler-Lagrange 方程），第三讲用二阶变分与 Jacobi 场判别极小的性质，第四讲把极值曲线嵌进极值场、用 Hilbert 不变积分得到强极小的充分条件，第五讲把场论翻译成 Hamilton 语言（程函、Legendre 变换、H-J 方程、Jacobi 定理），第六讲把未知函数换成多元函数、把 E-L 方程升级为偏微分方程，第七讲给约束极值配上 Lagrange 乘子，第八讲则回答了"守恒律从哪里来"——对称性。八讲的逻辑链是：必要条件、充分条件、对偶表述、高维推广、约束处理、不变结构；而 Noether 定理是这条链的合龙处：它把第二讲的 E-L 方程、第五讲的 Hamilton 函数、第六讲的多重积分 PDE 全部收进同一个恒等式 (8.1)，并指出每一条守恒律背后都有一个变换群。下一讲（第九讲，下周）进入随机变分部分：变分问题本身将被噪声驱动，Euler-Lagrange 方程、H-J 方程与 Noether 定理都将获得随机版本。</p>
+<p><strong>习题 1（原书习题 1）</strong> 设 $L(t, u, p) = t^{2}(p^{2} - \frac{1}{3}u^{6})$，$\varphi_{\varepsilon}: \mathbb{R}^{1} \times \mathbb{R}^{N} \to \mathbb{R}^{1} \times \mathbb{R}^{N}$ 由 $Y(t, u, \varepsilon) = (1 + \varepsilon)t$、$W(t, u, \varepsilon) = u/(1 + \varepsilon)^{1/2}$ 定义。求证：(1) $I(u) = \int_{0}^{1} t^{2}(\dot{u}^{2} - \frac{1}{3}u^{6})\, dt$ 是 $\varphi_{\varepsilon}$ 不变的；(2) 若 $u$ 是 $I$ 的 E-L 方程的解，则 $\frac{t^{3}}{3}u^{6} + t^{3}\dot{u}^{2} + t^{2}u\dot{u} = \mathrm{const}$。</p>
+<p><strong>习题 2（原书习题 2）</strong> 设 $L = (p + ku)^{2}$，$k$ 为常数，$\lbrace \varphi_{\varepsilon} \rbrace$ 由 $Y(t, u, \varepsilon) = t + \varepsilon$、$W(t, u, \varepsilon) = u + \varepsilon\alpha e^{-kt}$（$\alpha \in \mathbb{R}^{1}$）定义。(1) 验证 $I(u) = \int_{0}^{1} (\dot{u} + ku)^{2}\, dt$ 是 $\lbrace \varphi_{\varepsilon} \rbrace$ 不变的；(2) 若 $u$ 是 $I$ 的 E-L 方程的解，求 $u$ 满足的守恒律；(3) 用转化为 Hamilton 系统的方法解出 $u$；(4) 对这个 $u$ 验证 (2) 的结论。</p>
+<p><strong>习题 3（自编：机械能守恒）</strong> 设 $n = 1$，$L = \frac{1}{2}\dot{u}^{2} - V(u)$，$V \in C^{2}(\mathbb{R}^{1})$。用推论 8.2 求 $I$ 的 E-L 方程的解满足的首次积分，并验证它就是机械能 $E = \frac{1}{2}\dot{u}^{2} + V(u)$。</p>
+<p><strong>习题 4（自编：弱极小点是内极小点）</strong> 设 $u \in C^{2}(\bar{\Omega}, \mathbb{R}^{N})$ 是 $I$ 的弱极小点。任取 $\bar{X} \in C_{0}^{1}(\Omega, \mathbb{R}^{n})$，令 $v_{\varepsilon} = u \circ \xi_{\varepsilon}$ 如 §8.3 所设。证明 $u$ 是内极小点：先说明 $v_{\varepsilon} - u$ 是 $M$ 中的容许变分且其一阶变分方向是 $\varphi = -\sum_{\alpha} u_{x_{\alpha}} \bar{X}^{\alpha}$，再由弱极小的一阶变分为零推出 (8.5) 的右端为零。</p>
+<p><strong>参考答案要点。</strong></p>
+<ol>
+<li>(1) 直接换元验证：$Y = (1 + \varepsilon)t$ 是一族伸缩，$W = u/(1 + \varepsilon)^{1/2}$ 的选取使 $t^{2}\dot{u}^{2}$ 与 $t^{2}u^{6}$ 两项在变换下同等缩放，计入 $dt$ 的 Jacobi 因子 $(1 + \varepsilon)$ 后被积函数逐点不变（细节：令 $s = (1 + \varepsilon)t$，$\tilde{u}(s) = (1 + \varepsilon)^{-1/2} u(t)$，则 $\tilde{u}'(s) = (1 + \varepsilon)^{-3/2} \dot{u}(t)$，$s^{2} \tilde{u}'(s)^{2} = t^{2} \dot{u}(t)^{2} (1 + \varepsilon)^{-1}$，$s^{2} \tilde{u}(s)^{6} = t^{2} u(t)^{6} (1 + \varepsilon)^{-1}$，乘 $ds = (1 + \varepsilon) dt$ 后两项都不变）。(2) 生成向量场：$X = t$、$U = -u/2$，故 $\bar{X} = t$、$\bar{U} = -u/2$，$\varphi = -u/2 - t\dot{u}$。$L_{p} = 2t^{2}\dot{u}$，Noether 守恒量 $L\bar{X} + L_{p}\varphi = t^{3}(\dot{u}^{2} - u^{6}/3) + 2t^{2}\dot{u}(-u/2 - t\dot{u}) = -(t^{3}\dot{u}^{2} + t^{3}u^{6}/3 + t^{2}u\dot{u}) = \mathrm{const}$，取负号即得结论。</li>
+<li>(1) 令 $s = t + \varepsilon$，$\tilde{u}(s) = u(t) + \varepsilon\alpha e^{-kt}$，则 $\tilde{u}'(s) + k\tilde{u}(s) = \dot{u}(t) + ku(t) + \varepsilon\alpha e^{-kt}(k - k) = \dot{u} + ku$，故被积函数逐点不变（$ds = dt$）。(2) 生成向量场 $X = 1$、$U = \alpha e^{-kt}$，$\varphi = \alpha e^{-kt} - \dot{u}$，$L_{p} = 2(\dot{u} + ku)$，守恒律为 $L\bar{X} + L_{p}\varphi = (\dot{u} + ku)^{2} + 2(\dot{u} + ku)(\alpha e^{-kt} - \dot{u}) = (\dot{u} + ku)(-\dot{u} + ku + 2\alpha e^{-kt}) = \mathrm{const}$。(3) $\xi = L_{p} = 2(\dot{u} + ku)$，$H = \xi p - L = \xi^{2}/4 - ku\xi$，H-S 为 $\dot{u} = \xi/2 - ku$、$\dot{\xi} = k\xi$，故 $\xi = C e^{kt}$（$C$ 为常数），$\dot{u} + ku = (C/2)e^{kt}$，解得 $u = (C/4k)e^{kt} + D e^{-kt}$（$k \ne 0$；$k = 0$ 时 $L = \dot{u}^{2}$，$u = Ct + D$）。(4) 记 $A = C/(4k)$，则 $\dot{u} + ku = 2kA e^{kt} = (C/2)e^{kt}$，$-\dot{u} + ku + 2\alpha e^{-kt} = 2(kD + \alpha)e^{-kt}$，乘积为 $C(kD + \alpha) = \mathrm{const}$，与 (2) 一致。</li>
+<li>$L$ 不显含 $t$，由推论 8.2，$L - L_{p}\dot{u} = \mathrm{const}$。$L_{p} = \dot{u}$，故 $\frac{1}{2}\dot{u}^{2} - V(u) - \dot{u}^{2} = -\big(\frac{1}{2}\dot{u}^{2} + V(u)\big) = \mathrm{const}$，即机械能 $E = \frac{1}{2}\dot{u}^{2} + V(u) = \mathrm{const}$。与第五讲定理 5.1 对照：这里 $H = \frac{1}{2}\dot{u}^{2} + V(u)$ 正是 Hamilton 函数。</li>
+<li>$\bar{X}|<em>{\partial\Omega} = 0$ 蕴含 $\xi_{\varepsilon} = id$ 在 $\partial\Omega$ 附近，故 $v_{\varepsilon} - u \in C_{0}^{1}$，是容许变分；$\left.\frac{d}{d\varepsilon} v_{\varepsilon}\right|</em>{\varepsilon=0} = \varphi = -\sum_{\alpha} u_{x_{\alpha}} \bar{X}^{\alpha}$（§8.3 的 (8.4) 在 $\bar{U} = 0$ 时的情形）。弱极小点的一阶变分为零：$\delta I(u)\varphi = \int_{\Omega} E_{L}(u)\varphi\, dx = 0$ 对一切这样的 $\varphi$ 成立，即 (8.5) 的右端为零，故 $\left.\frac{d}{d\varepsilon} I(v_{\varepsilon}, \Omega)\right|_{\varepsilon=0} = 0$，$u$ 是内极小点。</li>
+</ol>
+<h2>参考文献</h2>
+<p>[1] 张恭庆. 变分学讲义. 北京: 高等教育出版社, 2011. ISBN 978-7-04-031958-3.（第八讲，pp. 107–123）</p>
+<p>[2] Øksendal, B. Stochastic Differential Equations: An Introduction with Applications. 5th edition. Berlin: Springer, 1998.（§8.6、§11.2、§12.1）</p>
+<p>[3] Nualart, D. The Malliavin Calculus and Related Topics. 2nd edition. Berlin: Springer, 2006.（§2.2.1，定理 2.2.1；§2.3.1，式 (2.56)、(2.57)）</p>
+<p class="meta"><span class="lz">2026-11-14 发布 · 类型：金融建模</span><span class="le">Published 2026-11-14 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
