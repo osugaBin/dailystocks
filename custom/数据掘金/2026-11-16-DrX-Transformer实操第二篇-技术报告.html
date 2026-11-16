@@ -21,6 +21,126 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <blockquote>
 <p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · 第二篇（本篇）技术报告</p>
 </blockquote>
+<h2>先看结果（Highlights）</h2>
+<p>这一节只讲市场结果，不讲技术和数学。只关心「机器选股跑下来赚了多少、选了哪些股票」的读者，看这一节就够了；后面的章节是完整的技术报告。</p>
+<p><strong>回测成绩（2024 年 1 月 24 日至 31 日，样本外模拟，交易费用已全部扣除）</strong></p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th style="text-align: right;">期间收益</th>
+<th style="text-align: right;">跑赢沪深 300</th>
+<th style="text-align: right;">最大回撤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本系统（双层 Transformer 选股）</td>
+<td style="text-align: right;">+1.02%</td>
+<td style="text-align: right;">+1.53%</td>
+<td style="text-align: right;">-2.61%</td>
+</tr>
+<tr>
+<td>等权买入沪深 300 成分股</td>
+<td style="text-align: right;">+0.60%</td>
+<td style="text-align: right;">+1.11%</td>
+<td style="text-align: right;">-2.08%</td>
+</tr>
+<tr>
+<td>动量策略（买入近期强势股）</td>
+<td style="text-align: right;">-0.61%</td>
+<td style="text-align: right;">-0.09%</td>
+<td style="text-align: right;">-2.96%</td>
+</tr>
+<tr>
+<td>XGBoost（机器学习模型）</td>
+<td style="text-align: right;">-3.18%</td>
+<td style="text-align: right;">-2.66%</td>
+<td style="text-align: right;">-5.38%</td>
+</tr>
+<tr>
+<td>随机森林（机器学习模型）</td>
+<td style="text-align: right;">-7.02%</td>
+<td style="text-align: right;">-6.50%</td>
+<td style="text-align: right;">-9.34%</td>
+</tr>
+<tr>
+<td>同期沪深 300 指数</td>
+<td style="text-align: right;">-0.51%</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>选出的 10 只股票（2024 年 1 月 31 日收盘后给出，次日开盘买入）</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">排名</th>
+<th>股票</th>
+<th>代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>爱尔眼科</td>
+<td>300015.SZ</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>药明康德</td>
+<td>603259.SH</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>比亚迪</td>
+<td>002594.SZ</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>长城汽车</td>
+<td>601633.SH</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>浦发银行</td>
+<td>600000.SH</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>兴业银行</td>
+<td>601166.SH</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>顺丰控股</td>
+<td>002352.SZ</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>平安银行</td>
+<td>000001.SZ</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>恒生电子</td>
+<td>600570.SH</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>工商银行</td>
+<td>601398.SH</td>
+</tr>
+</tbody>
+</table>
+<p>名单一半是近期跌幅较大的成长龙头，一半是走势稳健的银行股，进攻与防守搭配出现，是模型自己选出来的。这次还有一个反直觉的现象：按「整体预测准不准」打分，动量策略和 XGBoost 更准，但模拟买卖下来反而亏钱；本系统赢在最靠前的 10 只选得更好。原因与数据在第五节有完整分析。</p>
+<p><strong>先说清三件事（重要）</strong></p>
+<ul>
+<li>这只是 2024 年 1 月一个月的短样本，样本外验证只有几天。结果只能证明整套流程真实跑通了，不能证明长期能赚钱；</li>
+<li>回测用的成分股名单是现在的名单，不是 2024 年当时的名单，成绩会因此偏乐观（专业上称幸存者偏差），下一阶段会补齐历史名单重跑；</li>
+<li>本篇是量化研究记录，不是投资建议，这份名单也不是荐股。</li>
+</ul>
 <h2>一、执行摘要</h2>
 <p>本系统是一个面向 A 股沪深 300 成分股横截面与时序联合排序的端到端量化选股研究系统，围绕「时序演化 + 截面竞争」的双重结构建模：先用时序 Transformer 编码每只股票自身的状态演化，再用截面 Transformer 建模同一交易日股票之间的相对关系，训练目标同时包含收益回归、尺度不变的截面成对排序与风险回归三项，并与防泄漏的时间切分（Purged 切分）、贴近 A 股真实制度的 t+1 开盘撮合回测集成在同一工程框架中。截至 MVP 验证阶段，已完成的里程碑如下：</p>
 <ol>
