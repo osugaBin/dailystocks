@@ -748,13 +748,13 @@ def _cn_num(s):
 
 
 def _custom_sort_key(fname):
-    """同日文章按文件名倒序；带「第X讲」的系列文章先按讲次倒序（新讲在前）。"""
+    """同日文章按文件名倒序；带「第X讲/第X篇」的系列文章先按序号倒序（新篇在前），「开篇」记为 0。"""
     m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)\.(md|html)$", fname)
     if not m:
         return ("", -1, fname)
-    lm = re.search(r"第([一二三四五六七八九十两]+|\d+)讲", m.group(2))
+    lm = re.search(r"第([一二三四五六七八九十两]+|\d+)[讲篇]", m.group(2))
     if not lm:
-        n = -1
+        n = 0 if "开篇" in m.group(2) else -1
     elif lm.group(1).isdigit():
         n = int(lm.group(1))
     else:
