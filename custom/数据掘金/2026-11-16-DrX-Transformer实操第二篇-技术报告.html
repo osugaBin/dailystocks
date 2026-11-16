@@ -9,7 +9,16 @@
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+document.querySelectorAll('pre > code.language-mermaid').forEach(function(code){
+var div=document.createElement('div');div.className='mermaid';div.textContent=code.textContent;code.parentElement.replaceWith(div);});
+var t=document.documentElement.getAttribute('data-theme');
+var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+mermaid.initialize({startOnLoad:false,theme:dark?'dark':'default',securityLevel:'strict'});
+mermaid.run();});
+</script>
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
@@ -152,7 +161,43 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <p>系统在代码层强制执行四项研究护栏（详见第 0 篇）：零未来信息泄漏、零幸存者偏差（时点成分股，退化时显式警告）、信号与成交时序严格对齐（t 日收盘出信号、t+1 日开盘成交，涨跌停/停牌/ST 过滤、整手与 T+1 锁定）、严禁伪造数据（合成数据强制带模拟标记并与真实产出物理隔离）。</p>
 <h2>二、系统设计</h2>
 <h3>2.1 分层与职责</h3>
-<p>系统分为六个子系统：多源数据获取与清洗、特征工程与标签、Purged 训练验证、两阶段模型与基线对比、t+1 回测与每日报告、Apple Silicon 硬件基准。各层职责如下：</p>
+<p>系统分为六个子系统：多源数据获取与清洗、特征工程与标签、Purged 训练验证、两阶段模型与基线对比、t+1 回测与每日报告、Apple Silicon 硬件基准。其端到端数据与控制流如下图所示（图中节点已按本系列的公开口径去掉代码标识，只保留结构与数据流）：</p>
+<pre><code class="language-mermaid">flowchart TD
+    ENV[&quot;运行配置与环境&quot;] --&gt; DATA
+    subgraph DATA[&quot;1. 多源数据获取与清洗层&quot;]
+        DS1[&quot;新浪 / 中证指数通道（主路径）&quot;]
+        DS2[&quot;Tushare Pro（可选增强）&quot;]
+        DS3[&quot;海外通道（备用）&quot;]
+        DL[&quot;增量加载与口径规约&quot;]
+        DC[&quot;数据清洗与质量检验&quot;]
+        DS1 --&gt; DL
+        DS2 --&gt; DL
+        DS3 --&gt; DL
+        DL --&gt; DC
+    end
+    DC --&gt;|&quot;清洗后行情面板&quot;| FEAT
+    subgraph FEAT[&quot;2. 无泄漏特征工程与标签层&quot;]
+        TF[&quot;35 项历史技术特征&quot;]
+        CSF[&quot;单日截面 Z-Score 与环境缩放&quot;]
+        LBL[&quot;日历透视复权前向收益 / 风险标签&quot;]
+        TF --&gt; CSF --&gt; LBL
+    end
+    FEAT --&gt; SPLIT[&quot;3. Purged 时序切分与张量构建&quot;]
+    subgraph MODELS[&quot;4. 模型训练与多基线对比&quot;]
+        T1[&quot;时序编码器（L 步时序编码）&quot;]
+        T2[&quot;截面编码器（N 股截面交互）&quot;]
+        LOSS[&quot;多任务损失（收益 + 排序 + 风险）&quot;]
+        BASE[&quot;基线：动量 / 随机森林 / XGBoost&quot;]
+        T1 --&gt; T2 --&gt; LOSS
+    end
+    SPLIT --&gt; MODELS
+    MODELS --&gt; INF[&quot;5. t 日收盘选股推理&quot;]
+    MODELS --&gt; BT[&quot;6. t+1 开盘撮合回测&quot;]
+    INF --&gt; RPT[&quot;日度信号与选股报告&quot;]
+    BT --&gt; RPT
+    HW[&quot;Apple Silicon 硬件基准&quot;] -.-&gt;|&quot;设备与批量建议&quot;| MODELS
+</code></pre>
+<p>各层职责如下：</p>
 <table>
 <thead>
 <tr>
