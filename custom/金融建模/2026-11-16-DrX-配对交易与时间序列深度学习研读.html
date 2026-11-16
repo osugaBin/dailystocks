@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-配对交易 × 时间序列深度学习：Yilmaz &amp; Sefer（JFDS 2025）研读报告 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第八讲.html" title="DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-配对交易 × 时间序列深度学习：Yilmaz &amp; Sefer（JFDS 2025）研读报告</span><span class="le">Pairs Trading Meets Time-Series Deep Learning: A Reading Report on Yilmaz &amp; Sefer (JFDS 2025)</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report reviews Yilmaz and Sefer (The Journal of Finance and Data Science, 2025), who recast Avellaneda-Lee generalized pairs trading as a panel-level residual-direction prediction problem and benchmark seven learning models (LSTM, Informer, Autoformer, iTransformer, Scaleformer, Chronos, AdaBoost) against the classical OU relative-value strategy. On S&amp;P 500 data (test period 2022-2024, 0.5% per-trade costs), iTransformer attains the highest Sharpe ratio (1.94 versus 0.57 for the baseline), and all five time-series Transformers outperform classical methods, partly through lower turnover. We assess the paper&#x27;s strengths (rolling refits, frozen hyperparameters, cost sensitivity, FDR control, open code) and weaknesses (an unrealistically high baseline cost, a thin crypto sample), then connect it to our own work: the DGM/HJB stochastic-control approach to pairs trading and our two-stage Transformer stock-selection system, closing with a concrete plan for a three-arm benchmark within the M3 pairs-trading simulation milestone.</p></div>
+<p>本篇研读 Yilmaz 与 Sefer 发表于 The Journal of Finance and Data Science 的《Pairs trading with time-series deep learning models》。这篇论文把 Avellaneda–Lee 的广义配对交易与近年的时间序列 Transformer 系统地接到了一起，是机器学习路线在配对交易上一次实现得相当规范的尝试。本文先完整报告它的方法与结果，给出质量评价，再重点延伸两件事：它与本项目既有工作（DGM 求解配对交易 HJB、沪深 300 双层 Transformer 选股）的结合点，以及据此排定的未来操作。本篇为研究记录，不构成投资建议。</p>
+<p><strong>要点速览（标普 500，测试期 2022-01 至 2024-12，含 0.50% 单边交易成本）</strong></p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align: right;">年化收益</th>
+<th style="text-align: right;">年化波动</th>
+<th style="text-align: right;">夏普比率</th>
+<th style="text-align: right;">最大回撤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>相对价值基准（RV，OU 均值回归）</td>
+<td style="text-align: right;">+25.24%</td>
+<td style="text-align: right;">44.44%</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;">-38.33%</td>
+</tr>
+<tr>
+<td>AdaBoost</td>
+<td style="text-align: right;">+9.52%</td>
+<td style="text-align: right;">30.78%</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">-43.93%</td>
+</tr>
+<tr>
+<td>LSTM</td>
+<td style="text-align: right;">+35.70%</td>
+<td style="text-align: right;">40.61%</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">-27.49%</td>
+</tr>
+<tr>
+<td>Informer</td>
+<td style="text-align: right;">+30.56%</td>
+<td style="text-align: right;">22.12%</td>
+<td style="text-align: right;">1.38</td>
+<td style="text-align: right;">-13.54%</td>
+</tr>
+<tr>
+<td>Autoformer</td>
+<td style="text-align: right;">+32.12%</td>
+<td style="text-align: right;">19.23%</td>
+<td style="text-align: right;">1.67</td>
+<td style="text-align: right;">-4.95%</td>
+</tr>
+<tr>
+<td><strong>iTransformer</strong></td>
+<td style="text-align: right;"><strong>+34.00%</strong></td>
+<td style="text-align: right;"><strong>17.52%</strong></td>
+<td style="text-align: right;"><strong>1.94</strong></td>
+<td style="text-align: right;">-27.12%</td>
+</tr>
+<tr>
+<td>Scaleformer</td>
+<td style="text-align: right;">+31.55%</td>
+<td style="text-align: right;">23.15%</td>
+<td style="text-align: right;">1.36</td>
+<td style="text-align: right;">-22.45%</td>
+</tr>
+<tr>
+<td>Chronos</td>
+<td style="text-align: right;">+25.45%</td>
+<td style="text-align: right;">16.92%</td>
+<td style="text-align: right;">1.50</td>
+<td style="text-align: right;">-38.91%</td>
+</tr>
+</tbody>
+</table>
+<p>一句话：五种时间序列 Transformer 全面跑赢经典相对价值基准，iTransformer 夏普最高；深度模型赢的不只是预测——它们的交易次数更少、持仓更久，在高成本假设下优势被进一步放大。</p>
+<h2>一、论文出处</h2>
+<ul>
+<li>作者：Selin Yilmaz、Emre Sefer（通讯作者），土耳其 Özyeğin 大学计算机科学与人工智能工程系；</li>
+<li>出处：The Journal of Finance and Data Science, 11 (2025) 100177，DOI：10.1016/j.jfds.2026.100177；2025-07-20 收稿，2026-01-28 接受，2026-02-04 在线；</li>
+<li>开放获取（CC BY-NC-ND），代码公开于作者实验室的 GitHub 仓库（seferlab/pairstrading）——这一点在同类论文里并不常见，对复现与对照实验的价值很大。</li>
+</ul>
+<h2>二、方法框架</h2>
+<h3>2.1 起点：Avellaneda–Lee 广义配对交易</h3>
+<p>论文的骨架是 Avellaneda 与 Lee（2010）的广义配对交易：不用两两配对，而是先把每只资产的收益分解为因子部分与特质残差：</p>
+<p>$$r_{i,t} = \sum_{j=1}^{m} \beta_{i,j} F_{j,t} + \varepsilon_{i,t}$$</p>
+<p>因子由滚动一年的日收益做 PCA 提取（252 个交易日窗口，80% 累计方差阈值，实际恒取前 3 个主成分），载荷与因子收益随再平衡日滚动更新以防前视。经典相对价值（RV）基准把每个残差独立地建成 OU 均值回归过程：</p>
+<p>$$d\varepsilon_{i,t} = \kappa_{i}\left(\theta_{i} - \varepsilon_{i,t}\right) dt + \sigma_{i}\, dW_{i,t}$$</p>
+<p>再由标准化偏离（s-score）触发交易。这一基准的局限正是论文的出发点：逐资产独立估计、参数对窗口长度敏感、无法利用截面上的共同动态。</p>
+<h3>2.2 重构：面板级残差方向预测</h3>
+<p>论文的核心改动是把问题重构为一个面板级二分类任务：用全部资产过去 60 日的特质残差序列作为输入，预测每只资产次日残差的方向（涨/跌），全截面共享同一组模型参数。这样模型学到的是跨资产共享的时间动态与状态切换结构，而不是逐资产各拟合一条均值回归曲线。参赛模型共七个：LSTM（经典时序基线）、五种时间序列 Transformer（Informer、Autoformer、iTransformer、Scaleformer 与基础模型 Chronos），外加集成学习方法 AdaBoost；对照组是上述 RV 基准。</p>
+<h3>2.3 评估协议（本文最值得注意的部分）</h3>
+<ul>
+<li>数据：标普 500 覆盖 2010-01 至 2024-12，测试期 2022-01 至 2024-12，并按牛市/熊市分拆报告；加密货币为 20 个大市值币种，测试期为 2024 全年；</li>
+<li>成分股做时点追踪以处理幸存者偏差；训练用 3 年残差、每 60 日滚动重训，与 RV 基准的 60 日再校准节奏对齐；</li>
+<li>超参数只在训练窗内的验证期上选定、之后在全部测试期冻结；</li>
+<li>交易成本基准假设为单边 0.50%，并另做 0.10% / 0.30% / 0.75% 三档敏感性；显著性比较做了 FDR 控制；另有滚动因子暴露检验，确认各策略的因子载荷统计上接近于零（收益来自特质残差而非系统性风险溢价）、Top-K 执行变体对照等稳健性安排。</li>
+</ul>
+<h2>三、主要结果</h2>
+<p><strong>股票（标普 500）</strong>：见文首速览表。五种 Transformer 的夏普在 1.36 至 1.94 之间，全部高于 LSTM（0.88）与 RV（0.57）；AdaBoost 因交易过于频繁垫底（0.31）。牛市/熊市分拆后排序大体不变：熊市里 RV 年化 -5.25%、夏普 -0.34，而 iTransformer 仍有 +11.23% 与 0.46——深度模型在逆风期的相对优势更明显。Autoformer 的最大回撤全场最小（全期 -4.95%）。</p>
+<p><strong>加密货币（2024 年）</strong>：Scaleformer 夏普 2.22 与 iTransformer 2.19 并列居首，RV 为 0.91。多尺度结构（Scaleformer）在波动结构更复杂的加密市场上与 iTransformer 打平，作者据此强调模型归纳偏置要与市场的时间尺度结构匹配。</p>
+<p><strong>成本与换手</strong>：无成本时 AdaBoost 与 Transformer 接近；成本升至 0.50% 后高换手策略衰减最快，Transformer 靠更低的交易频率与约 10 天的平均持仓保持优势——作者的核心论点是：深度模型的胜势一半来自信号质量，一半来自交易克制。</p>
+<p><strong>一个克制的注脚</strong>：作者自己在讨论中承认，头部 Transformer 之间的差异多数不显著，真正的分水岭是「面板级预测建模」这一形式化本身，而不是某个具体架构。</p>
+<h2>四、质量评价</h2>
+<p><strong>长处</strong>：问题重构有真实贡献；评估协议在同类应用论文里属于上乘——时间切分连续、超参数冻结、幸存者偏差处理、成本敏感性、FDR、因子中性检验一应俱全；代码开源；结论部分诚实，明说使用的是简单执行策略与基础成本模型、未计买卖价差、结果未必可直接实盘部署。</p>
+<p><strong>短板</strong>：</p>
+<ol>
+<li>基准成本 0.50%/笔对流动性良好的标普成分股明显偏高（真实机构成本为基点量级），这一假设系统性地偏袒低换手模型，「扣成本后深度学习胜出」的叙事有一部分是被假设放大的；0.10% 档下排名虽不变，但差距收窄；</li>
+<li>预测对象只是次日残差方向，是相当弱的信号；夏普 1.94 这类数字对执行阈值政策与等权资金口径敏感，跨研究不可直接比较；</li>
+<li>加密一侧样本单薄：仅 20 个资产、单个牛市年份，资产名单里还包含稳定币 USDT，放进残差框架在概念上并不干净；</li>
+<li>经典对照只有 RV 一家：没有与随机控制路线（HJB 最优交易区）的比较——这恰好是本文与本项目最直接的接口，见下节；</li>
+<li>写作略粗糙，个别表述有误（结果一节把股票测试误称 Forex），期刊为开放获取的中游刊物。</li>
+</ol>
+<p>总评：四篇同期配对交易文献（另见 Springer 的多阶段机器学习框架与 T&amp;F 的贝叶斯分布信号）里方法学最规范的一篇，值得作为本项目机器学习路线的标准对照文献。</p>
+<h2>五、与本项目的结合</h2>
+<h3>5.1 与 DGM 配对交易 HJB 项目：同一问题的两条路线</h3>
+<p>本项目此前的配对交易工作（见 <a href="2026-10-13-DrX-DGM配对交易HJB深度求解.html">DrX-DGM 配对交易 HJB 深度求解</a>）走的是 Krauss 五分法中的随机控制路线：在 OU 价差模型下写出 HJB 变分不等式，用深度 Galerkin 方法数值求解值函数与最优交易区，并与闭式解逐点对照。那条路线的产出是「最优策略本身」——何时开仓、平仓、止损，由值函数的自由边界给出；Yilmaz &amp; Sefer 的路线不求最优，只从数据里学一个方向信号，再套上阈值执行。两条路线恰好互补：</p>
+<ul>
+<li><strong>HJB 路线缺的正是这篇的强项</strong>：真实数据上的多模型对照与成本敏感的回测证据。DGM 复现用的是论文参数与模拟路径，没有在真实行情上与任何数据驱动策略同场比较过；</li>
+<li><strong>这篇缺的正是 HJB 路线的强项</strong>：一个有最优性含义的经典基准。它只打败了 RV（参数化的 OU 规则），没有回答「学到的信号离最优交易区有多远」。把 HJB 最优策略加进对照组，是这篇论文留下的、最自然的一个研究缺口；</li>
+<li>两边对「交易克制」的结论互相印证：HJB 的不交易区（no-trade region）在数学上就是最优的克制；这篇里 Transformer 靠低换手胜出，是同一现象的数据版。</li>
+</ul>
+<h3>5.2 与沪深 300 双层 Transformer 选股系统：架构直觉的互证</h3>
+<p>本项目的 <a href="../数据掘金/2026-11-16-DrX-Transformer实操第二篇-技术报告.html">Transformer 实操系列</a> 采用时序编码 + 截面交互的双层结构。这篇里表现最好的 iTransformer，其关键设计是「以整条序列为实例、跨资产共享参数」，本质上是在用实例级注意力做截面信息共享——与我们的截面交互层是同一个直觉的两种实现。它在股票与加密两个市场上都排第一，构成对「截面共享学习有用」这一设计选择的外部证据。两点可直接吸收的经验：</p>
+<ul>
+<li><strong>评估纪律</strong>：滚动重训 + 超参数冻结 + 成本敏感性分档 + FDR，与我们 Phase 2 的 Walk-forward 计划同构，可逐项对照补齐（我们的报告目前缺成本敏感性表与多重比较控制）；</li>
+<li><strong>任务形式</strong>：他们只做方向分类也能打出高夏普，提示我们的多任务损失（收益回归 + 排序 + 风险）之外，可以把「方向分类头」列入消融清单，检验它对头部组合收益的边际贡献。</li>
+</ul>
+<h3>5.3 在研究版图中的定位</h3>
+<p>把近期读到的配对交易文献按 Krauss 五分法摆开：随机控制路线有本项目的 DGM/HJB 工作；机器学习路线以本文为规范代表，Springer 的多阶段框架（协整选对 → 是否调仓 → 权重档位分类）胜在问题分解；贝叶斯路线（T&amp;F 的分布信号）胜在把对冲比率的不确定性显式建模。三条路线在 M3 里程碑（配对交易 HJB 模拟盘）里正好可以同场。</p>
+<h2>六、未来操作</h2>
+<p>按可执行顺序排定如下：</p>
+<ol>
+<li><strong>文献与基准清单落位（本周内）</strong>：本文列入 M3 的标准对照文献；其 GitHub 代码作为 ML 臂的实现参考（只借鉴结构与评估协议，不直接沿用其成本假设）；</li>
+<li><strong>M3 三臂对照设计（M3 启动时执行）</strong>：同一批配对、同一成本口径下三臂同场——① 经典 RV/OU 规则；② HJB-DGM 最优交易区策略（已有求解器与闭式解校验）；③ 面板 Transformer 方向预测（按本文协议复现要点）。评价指标除夏普与回撤外，必须包含换手与成本敏感性分档，直接回答「最优交易区 vs 学到的信号」谁更抗成本；</li>
+<li><strong>评估纪律并入（随 Phase 2 一并做）</strong>：沪深 300 Transformer 的 Walk-forward 报告模板增加两项——交易成本敏感性表（按我方真实费率口径分档）与多策略比较时的 FDR 控制；</li>
+<li><strong>方向分类头消融（并入损失消融批次）</strong>：在现有三任务损失之外加一组 direction-head 对照，观察 RankIC 与 Top 10 头部收益的变化，结论写回技术报告；</li>
+<li><strong>混合策略构想（M3 之后评估）</strong>：用 HJB 值函数给出不交易区与止损边界，用 ML 信号只在边界附近做触发确认——把最优控制的结构先验与数据信号的适应性拼在一起。若三臂对照显示两条路线各有胜场，这是最有希望的下一步。</li>
+</ol>
+<h2>参考文献</h2>
+<ul>
+<li>Yilmaz, S., Sefer, E. Pairs trading with time-series deep learning models. The Journal of Finance and Data Science, 11 (2025) 100177. DOI: 10.1016/j.jfds.2026.100177.</li>
+<li>Avellaneda, M., Lee, J.-H. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), 2010, 761–782.</li>
+<li>Krauss, C. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), 2017, 513–545.</li>
+</ul>
+<p class="meta"><span class="lz">2026-11-16 发布 · 类型：金融建模</span><span class="le">Published 2026-11-16 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
