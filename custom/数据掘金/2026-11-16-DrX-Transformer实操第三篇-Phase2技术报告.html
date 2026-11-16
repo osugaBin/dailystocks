@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-Transformer 实操 · 第三篇：Phase 2 技术报告——数据审计、工程修复与 Walk-Forward 验收 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第二篇-技术报告.html" title="DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html" title="DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-Transformer 实操 · 第三篇：Phase 2 技术报告——数据审计、工程修复与 Walk-Forward 验收</span><span class="le">DrX-Transformer in Practice, Part 3: Phase 2 Technical Report — Data Audit, Engineering Remediation and Walk-Forward Acceptance</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Phase 2 of the CSI 300 dual-layer Transformer stock-selection system runs no multi-year training and reports no returns. Instead, it audits the local data cache — only 22 trading days of January 2024, with 2015-2023 empty and constituents available solely as a 2026-10-30 static snapshot — and freezes a purged walk-forward design (train 4 years, purge 6 days plus embargo 5 days, validation 1 year, test 1 year) with an 11-cell risk-calibration grid selected on validation data only. Two remediation rounds then close eight engineering modules: execution-aligned labels from t+1 open to t+6 open net of the index open return, separate return and risk masks, seven delisting-exit boundary cases with a conservative 0.50 haircut, an explicit corporate-action ledger, bounded adjustment-factor governance, suspension and metadata gates with stale-valuation tracking, a five-cohort overlapping ledger, zero-fallback index-open benchmarks, and validation-only hyperparameter selection. All 44 Phase 2 checks pass; final acceptance is conditional, with multi-year historical verification explicitly not verified.</p></div>
+<p>本篇是双层 Transformer 沪深 300 选股系统 Phase 2 技术报告的公开版。Phase 1 跑通原型之后，这一阶段不急于训练多年期模型，而是先做历史数据审计、两轮科研级工程修复与终审验收，把系统抬到多年期 Purged Walk-Forward 训练的准入标准。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开，以求自洽。本篇为量化研究记录，不构成投资建议。</p>
+<blockquote>
+<p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a> · 第三篇（本篇）Phase 2 技术报告 · <a href="2026-11-16-DrX-Transformer实操第四篇-Phase3技术报告.html">第四篇：Phase 3 技术报告——数据源核查、诊断试点与付费数据准入</a></p>
+</blockquote>
+<h2>先看结果（Highlights）</h2>
+<p>这一节只讲结论，不讲技术。先说最重要的一句：<strong>这一期没有新的赚钱成绩</strong>。这一阶段压根没有训练模型、没有跑收益回测——任务是把第一期跑通的原型逐项检查、逐项修好、逐项验收，确认它将来面对十年数据时不会算错账。</p>
+<p><strong>查出了什么问题</strong></p>
+<ul>
+<li>手里的历史数据只有 2024 年 1 月一个月（22 个交易日），2015–2023 年与 2024 年 2 月之后全是空缺；</li>
+<li>成分股名单只有今天的一份，用它回测过去会系统性偏乐观（幸存者偏差）；</li>
+<li>一批藏在细节里的账目问题：股票退市了、持仓按什么价卖出；分红送股之后、股数和现金怎么记；复权因子缺了几天怎么补；指数开盘价缺了拿什么顶替。原系统在这些地方有含糊、甚至会算错的处理，本阶段全部逐项修好并配了测试；</li>
+<li>选参数的规矩定死：只许在验证集上选，测试集不许碰——防止「拿着答案调参数」。</li>
+</ul>
+<p><strong>验收结论</strong></p>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>结论</th>
+<th>一句话说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多任务损失与掩码</td>
+<td>通过</td>
+<td>收益与风险两套监督信号彻底分离，互不污染</td>
+</tr>
+<tr>
+<td>退市时的卖出处理</td>
+<td>有条件通过</td>
+<td>七类边界已闭合；还差退市整理期专项规则与折价敏感性报告</td>
+</tr>
+<tr>
+<td>分红送配的账本</td>
+<td>有条件通过</td>
+<td>程序已就绪；真实全市场历史分红数据尚待外部接入</td>
+</tr>
+<tr>
+<td>历史数据集成测试</td>
+<td>有条件通过</td>
+<td>合成测试场景多数通过；真实多年数据仍为未验证</td>
+</tr>
+</tbody>
+</table>
+<p>Phase 2 核验用例 44 项全部通过。下一步是把多年历史数据回补齐（见第四篇），在此之前本系统不发布任何「多年回测收益」。</p>
+<p><strong>先说清三件事（重要）</strong></p>
+<ul>
+<li>本阶段没有任何收益结果可供参考，测试通过指的是工程逻辑正确，不等于策略能赚钱；</li>
+<li>验收里的测试以合成数据与模块集成验证为主，真实多年期历史验证尚未完成；</li>
+<li>幸存者偏差仍未消除：历史时点成分名单补齐之前，一切多年期结论都无从谈起。</li>
+</ul>
+<h2>一、Phase 2 的目标与治理总则</h2>
+<p>Phase 2 的核心使命不是立即启动多年期模型训练，而是对 Phase 1 跑通的原型系统执行科研级的时间对齐、交易规则、损失掩码、回测账本与防泄漏切分重构，使其达到多年期 Purged Walk-Forward 训练的工程准入标准。全程严格遵守三条治理总则：</p>
+<ol>
+<li><strong>双轨物理隔离</strong>：严禁用 2026-10-30 的静态成分快照（静态快照诊断轨）混入或伪装成无偏的时点研究轨（PIT 研究轨）；</li>
+<li><strong>禁止静默回退</strong>：缺失复权因子、缺失指数开盘价、缺失停复牌来源与未核验退市日期，一律不得用静默默认值伪造「已核验」标记；</li>
+<li><strong>非破坏性迭代</strong>：所有新标签与新切分引入独立的标签方案与版本标识（v0.2.0-phase2-exec-aligned），绝不覆盖 Phase 1 与 Beta 校准试点（实验编号 017–025）的历史结果。</li>
+</ol>
+<p>历史基线保护：实验注册表共 25 条基线记录（编号 001–025，SHA256 指纹 <code>a238bbf0456fe0c673397abf2de2fc47f78209ec485b2ef0582b6c501188c751</code>）与 Phase 1 数据面板（SHA256 指纹 <code>b568eac01b828ed6c673394fbceca4e7bc44dbd847b46ab63b4029761b50f234a</code>）全程完整未改动，本阶段所有修复均可由指纹核验。</p>
+<h2>二、历史数据审计与多年度实验规划</h2>
+<h3>2.1 现有缓存数据与成分偏差审计</h3>
+<p>对本地缓存做了一次只读审计，结论很不乐观：</p>
+<ul>
+<li>Phase 1 缓存仅覆盖 2024-01-02 至 2024-01-31 共 22 个交易日（6,528 行、297 只股票），2015–2023 年与 2024-02 至 2026 年的数据均为空缺；</li>
+<li>股票基础信息缺上市日期与行业字段；</li>
+<li>沪深 300 成分目前仅存在 2026-10-30 单日静态快照，幸存者偏差风险明确（系统已挂 SURVIVORSHIP_BIAS_WARNING 标记）。</li>
+</ul>
+<p>也就是说，第一篇与第二篇的全部实证都建立在一个月的短样本上；要谈多年期结论，第一步不是训练，而是补数据与修工程。</p>
+<h3>2.2 实验矩阵与双阶段 Walk-Forward 方案</h3>
+<p>在数据回补之前，先把多年期实验的方案固化下来，避免数据到位后临时改口径：</p>
+<ul>
+<li><strong>实验矩阵</strong>：去重后共 11 组主网格——风险校准系数 beta = 0 的纯收益基准 1 组，加上 beta ∈ {0.0005, 0.001, 0.002, 0.005, 0.01} 与「排序损失中是否切断风险项梯度」∈ {否, 是} 的 10 组组合；另设 beta ∈ {0.05, 1.0} 两组作为过载与历史默认对照；</li>
+<li><strong>切分方案</strong>：严格滚动 Walk-Forward——训练 4 年 → 隔离带（Purge 6 日 + Embargo 5 日）→ 验证 1 年 → 隔离带（Purge 6 日 + Embargo 5 日）→ 测试 1 年；</li>
+<li><strong>选参纪律</strong>：beta = 0.002 明确标定为暂定候选（provisional candidate），严禁在测试集上筛选超参数。</li>
+</ul>
+<h2>三、两轮工程修复（八个模块）</h2>
+<p>第一轮修复与独立代码审计之后，第二轮修复在以下八个模块实现闭环。</p>
+<h3>3.1 可交易标签与训练链路集成</h3>
+<p>训练标签改为与真实成交时序对齐的「执行对齐」口径：信号在 t 日收盘后生成，最早只能在 t+1 日开盘买入，持有 5 个交易日到 t+6 日开盘卖出，收益再扣除同期指数开盘收益，得到超额收益标签：</p>
+<p>$$R^{exec}_{i,t} = \frac{P^{open}_{i,t+6}}{P^{open}_{i,t+1}} - 1 - R^{idx,open}_{t}$$</p>
+<p>其中 $R^{idx,open}_{t}$ 为沪深 300 指数同口径的开盘到开盘收益。配套修复：收益监督与风险（未来波动）监督使用两套独立掩码，分别标记各自的有效样本；多任务损失按各自的有效样本数分别归一化；某个 batch 若无任何有效监督，整步跳过参数更新，避免空监督污染梯度；模型内部只使用样本级归一化（LayerNorm）与填充掩码，不使用会跨样本泄漏统计量的 BatchNorm。</p>
+<h3>3.2 退市退出边界（七类）</h3>
+<p>回测里最容易算错账的是退市股的退出价。本轮新增统一的价格有效性判定与退市退出价解析：开盘价或收盘价为缺失、空值、0 或负值时，不再被程序语言的真值短路误判为「有价格」；退市记录整行缺失、持仓跨过退市日才延迟清仓等七类边界全部覆盖；退市退出价按保守折价（haircut = 0.50）处理，即只按最后可得价格的一半认账，宁可低估不虚增。</p>
+<h3>3.3 公司行动账本</h3>
+<p>分红送配不再靠复权因子「猜」：账本显式支持拆股、送股、转增、现金分红与配股五类公司行动，逐笔入账，同时保持原始价撮合。若某段历史只能凭复权因子变化推断公司行动，账本会显式标记为未核验（NOT_VERIFIED），不与显式账本混同。</p>
+<h3>3.4 复权因子有界治理</h3>
+<p>彻底移除向后填充（bfill，用未来因子补过去等于偷看未来）；活跃交易日无观测时，向前填充上限为 3 日且标记为未核验，超过上限置为缺失；只有停牌来源经确认的停牌日才允许跨日结转并保留已核验标记；原价格序列缺前收盘价时，补齐由除权信息反推的路径。</p>
+<h3>3.5 停牌、元数据门禁与陈旧估值</h3>
+<p>日历补齐出来的「假行」必须打上推断标记：来源标记为省略行填充或推断缺失行，停牌状态记为未确认、不可交易；退市日期的「已核验」标记有严格门槛——要么有有效的 8 位退市日期，要么上市状态为持续上市；新增元数据门禁，未通过核验的样本直接拦截、不进入训练与回测；持仓估值持续累计「陈旧价格天数」，用几天前的旧价估的市值单独可见。</p>
+<h3>3.6 五层重叠组合账本</h3>
+<p>5 日持有期天然产生重叠持仓：账本改为五个独立子账户，每日用 1/5 资金滚动建仓，逐日记录在仓权重、延迟清算权重与陈旧价格权重，并强制校验五层权重和恒等于 1.0；子账户之间严禁互相覆写在途或延迟持仓。</p>
+<h3>3.7 指数开盘基准零回退</h3>
+<p>超额收益的基准只认核验过的沪深 300 指数开盘价；指数开盘价缺失时，对应窗口整体标记失效，超额收益与可交易掩码同步作废——绝不拿指数收盘价或股票截面均值静默顶替。这是第二条治理总则（禁止静默回退）在基准侧的落地。</p>
+<h3>3.8 Walk-Forward 纯验证选参</h3>
+<p>新增三重保障：逐折统计被切分排除的样本数；校验任意两折之间严格不重叠；超参数选择函数只接受验证集口径，显式拒绝以测试集选参的调用。训练管线已集成完整的 Walk-Forward 运行入口，待数据回补即可按 2.2 的方案滚动执行。</p>
+<h2>四、自动化测试与终审验收</h2>
+<h3>4.1 测试验证（合成测试与模块集成验证）</h3>
+<p>Phase 2 核验用例 44 项全部通过。关键实测包括：</p>
+<ul>
+<li>把被掩码屏蔽的目标值扰动到 ±1e6 量级，模型梯度最大差为 0.0——掩码确实把无效样本完全隔离在训练之外；</li>
+<li>空监督 batch 安全跳过，不产生参数更新；</li>
+<li>七类退市价格边界逐一覆盖；</li>
+<li>「10 送 10」「10 派 5」「10 配 3」三类公司行动入账前后，账本权益保持不变性；</li>
+<li>复权因子有界 3 日填充、指数开盘价缺失零回退、多折 Walk-Forward 纯验证集选参，均按设计工作。</li>
+</ul>
+<h3>4.2 终审分级结论与遗留风险</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>终审结论</th>
+<th>遗留事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多任务损失与掩码</td>
+<td>ACCEPTED（通过）</td>
+<td>无</td>
+</tr>
+<tr>
+<td>退市执行</td>
+<td>CONDITIONALLY_ACCEPTED（有条件通过）</td>
+<td>待补退市整理期专项规则与 {0.00, 0.20, 0.50, 0.80, 1.00} 五档折价敏感性报告</td>
+</tr>
+<tr>
+<td>公司行动</td>
+<td>CONDITIONALLY_ACCEPTED（有条件通过）</td>
+<td>代码账本就绪，真实全市场历史分红送配数据尚待外部接入</td>
+</tr>
+<tr>
+<td>历史数据集成测试</td>
+<td>CONDITIONALLY_ACCEPTED（有条件通过）</td>
+<td>除退市整理期专项规则外，其余 8/9 场景在合成测试下通过；真实多年期历史验证仍为 NOT_VERIFIED</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总结论</strong>：Phase 2 的代码工程基线已完整冻结，达到可接数据的准入标准；在获得多年期真实时点（PIT）数据回补之前，禁止开展正式多年期训练，也禁止宣称任何无偏回测结果。数据缺口如何实测核查、又卡在哪里，是第四篇的主题。</p>
+<p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-Transformer 实操 · 第四篇：Phase 3 技术报告——数据源核查、诊断试点与付费数据准入 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-06-SGu-双基金核心卫星模拟仓.html" title="SGu-双基金核心-卫星模拟仓：每日运行记录"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第二篇-技术报告.html" title="DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-Transformer 实操 · 第四篇：Phase 3 技术报告——数据源核查、诊断试点与付费数据准入</span><span class="le">DrX-Transformer in Practice, Part 4: Phase 3 Technical Report — Data-Source Verification, a 12-Stock Diagnostic Pilot and Paid-Vendor Readiness</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Phase 3 verifies, interface by interface, whether free data sources can support unbiased multi-year backtests of the CSI 300 dual-layer Transformer system. Live probes show that on the current Tushare Pro account only daily bars are unrestricted: constituent weights, suspensions, price-limit lists and industry membership return no-permission errors, while dividend, adjustment-factor and calendar endpoints are capped at one call per hour and five per day. AKShare fills part of the gap — full index history back to 2002, delisting lists and suspension records — but point-in-time constituents, historical ST status and industry changes remain unavailable. A 12-stock diagnostic pilot over 2019-2024 finds zero open and close discrepancy across 11,945 overlapping bars, executes 13,243 matches with 140 corporate actions on a five-cohort ledger whose weights sum to exactly one, and exposes a sparse adjustment-factor conflict that would void 9,560 rows. New ingestion adapters, a vendor-neutral provider interface and 48 passing tests close the phase; the baseline is frozen pending a paid data vendor.</p></div>
+<p>本篇是双层 Transformer 沪深 300 选股系统 Phase 3 技术报告的公开版。Phase 2 的终审留下一个明确缺口：多年期历史数据不存在，且免费来源从未逐项核验。Phase 3 就做三件事：把本地能用的数据源逐个实测核查、用 12 只股票做小规模诊断试点、在不改动冻结代码的前提下改造数据接入层并备齐付费数据的采购与验收规范。结论先行：系统已就绪，卡点在数据，项目现已冻结，等待选定付费数据供应商。本系列只对源代码与实现细节保密，方法逻辑与全部核查结果完整公开。本篇为量化研究记录，不构成投资建议。</p>
+<blockquote>
+<p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a> · <a href="2026-11-16-DrX-Transformer实操第三篇-Phase2技术报告.html">第三篇：Phase 2 技术报告——数据审计、工程修复与 Walk-Forward 验收</a> · 第四篇（本篇）Phase 3 技术报告</p>
+</blockquote>
+<h2>先看结果（Highlights）</h2>
+<p>这一节只讲结论，不讲技术。一句话版本：<strong>机器没问题，卡在数据上。</strong></p>
+<p><strong>实测了什么</strong></p>
+<ul>
+<li>把手边数据源的关键接口逐个真拉了一遍。Tushare 只有日线行情是畅通的；成分权重、停复牌、涨跌停名单这几个关键接口直接没有权限；分红、复权因子等接口每小时只许调用 1 次、每天 5 次——按这个速度给全市场回补十年数据，要拉到天荒地老；</li>
+<li>AKShare 能补上一部分：指数全历史行情、退市名单、历史停复牌记录都可用。但「历史上的成分股名单」「历史 ST 名单」「历史行业变迁」三样关键数据，两个来源都没有；</li>
+<li>所以结论不是「再等等免费数据」，而是：无偏的多年期回测必须有付费数据，这一步绕不过去。</li>
+</ul>
+<p><strong>12 只股票试点说明了什么</strong></p>
+<ul>
+<li>两个数据源在 11,945 条重叠行情上，开盘价与收盘价的最大差都是 0.000000——一字不差，行情底稿可信；</li>
+<li>在 5 年半的真实数据上，撮合了 13,243 笔交易、140 次分红送配入账，五层账本的权重和严丝合缝恒为 1.000000；</li>
+<li>也实测出一个真问题：新浪的复权因子是「只在除权日跳一格」的稀疏表，直接套用现行清洗规则会把 9,560 行数据误杀成缺失——接入层已经针对性改造（见第三节）。</li>
+</ul>
+<p><strong>当前状态</strong></p>
+<table>
+<thead>
+<tr>
+<th>事项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全量自动化测试</td>
+<td>48 项全部通过</td>
+</tr>
+<tr>
+<td>付费数据采购要求（10 项）与样本验收规程</td>
+<td>已成文</td>
+</tr>
+<tr>
+<td>是否已购买付费数据</td>
+<td>否</td>
+</tr>
+<tr>
+<td>是否已启动全量下载或多年期训练</td>
+<td>否</td>
+</tr>
+<tr>
+<td>项目状态</td>
+<td>冻结，等待人工选定付费数据供应商</td>
+</tr>
+</tbody>
+</table>
+<p><strong>先说清三件事（重要）</strong></p>
+<ul>
+<li>试点只验证工程流水线，明确不报告收益率与夏普比率，不能当作投资依据；</li>
+<li>「免费数据撑不起无偏多年回测」是逐接口实测的结论，不是估计；</li>
+<li>在付费数据到位之前项目保持冻结，不会用拼凑数据硬跑多年训练、更不会拿拼凑结果冒充无偏回测。</li>
+</ul>
+<h2>一、Phase 3A：真实数据源权限与 PIT 可行性实证</h2>
+<p>针对 Phase 2 遗留的外部数据缺口，本阶段对本地环境（tushare 1.4.29、akshare 1.20.65、yfinance 1.8.0、baostock 未安装）执行了只读实测探测——不是查文档，而是逐个接口真拉数据，看返回什么。</p>
+<h3>1.1 Tushare Pro 当前账户的真实权限与配额</h3>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>接口</th>
+<th>实测结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可用（VERIFIED）</td>
+<td>日线行情 daily</td>
+<td>支持按日、按股批量拉取，无每小时 1 次限制</td>
+</tr>
+<tr>
+<td>强限流（PARTIALLY_VERIFIED）</td>
+<td>股票基础信息 stock_basic</td>
+<td>命中每天 5 次与每小时 1 次双限</td>
+</tr>
+<tr>
+<td>强限流（PARTIALLY_VERIFIED）</td>
+<td>分红 dividend</td>
+<td>试点中连续拉到第 2 只股票即命中每小时 1 次与每天 5 次限</td>
+</tr>
+<tr>
+<td>强限流（PARTIALLY_VERIFIED）</td>
+<td>更名、复权因子、指数日线、每日指标、交易日历</td>
+<td>均受每小时 1 次限制，无法支撑全市场逐日或逐股回补</td>
+</tr>
+<tr>
+<td>无权限（UNAVAILABLE）</td>
+<td>指数成分权重、停复牌、涨跌停名单、申万行业分类、申万成分</td>
+<td>均直接返回「没有接口访问权限」</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 AKShare 备选接口实测</h3>
+<ul>
+<li><strong>指数行情</strong>：新浪源沪深 300 指数返回 2002-01-04 至 2026-11-16 共 6,031 行完整的开、高、低、收、量，已核验可用；</li>
+<li><strong>个股行情</strong>：新浪源支持正常股与已退市股（实测一只退市股返回 1,091 行；退市股的总股本与换手率字段为空），并提供稀疏的后复权因子表；</li>
+<li><strong>公司行动与名单类</strong>：巨潮分红、东财配股（982 条，覆盖 1991–2026 年）、上交所与深交所退市名单（沪 161 条、深 213 条）、历史停复牌记录，均验证可用；</li>
+<li><strong>仍然缺失（UNAVAILABLE）</strong>：全市场历史时点 ST 名单（现有接口只有当前快照，且东财源有 IP 限流）、历史行业变更、沪深 300 历史时点成分与权重（仍只有 2026-10-30 静态快照一份）。</li>
+</ul>
+<h3>1.3 PIT 成分库设计</h3>
+<p>为付费数据到位后的成分回补预先定好规范：时点成分库设 8 个字段，任一股票在日期 t 进入样本的充要条件是其生效区间覆盖 t（生效日 ≤ t &lt; 终止日）；静态快照诊断轨与时点研究轨物理隔离，互不混入。</p>
+<h2>二、Phase 3B：12 股诊断试点与跨源实证（2019-01-02 至 2024-06-30）</h2>
+<p>经人工批准，在「仅诊断试点」范围内选取 12 只代表性股票做小规模实证，原始数据不可变落盘：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>数量</th>
+<th>代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大盘基准</td>
+<td>3</td>
+<td>600519.SH、601318.SH、000001.SZ</td>
+</tr>
+<tr>
+<td>分红配股</td>
+<td>2</td>
+<td>600958.SH、000858.SZ</td>
+</tr>
+<tr>
+<td>停牌 / ST</td>
+<td>4</td>
+<td>603050.SH、600078.SH、600136.SH、002482.SZ</td>
+</tr>
+<tr>
+<td>已退市</td>
+<td>2</td>
+<td>600074.SH、000502.SZ</td>
+</tr>
+<tr>
+<td>创业板制度跨期</td>
+<td>1</td>
+<td>300750.SZ</td>
+</tr>
+</tbody>
+</table>
+<h3>2.1 跨源一致性实测</h3>
+<ul>
+<li>Tushare 日线（11,945 行）与 AKShare 新浪源（14,087 行）在 11,945 条重叠样本上，开盘价与收盘价的最大绝对差均为 0.000000；</li>
+<li>Tushare 拉取中命中「IP 数量超限（最大 10 个）」，导致 2 只股票缺失；其分红接口命中每小时 1 次与每天 5 次限流，实得 0 行，标定为不可用；</li>
+<li>巨潮分红实得 197 行，并检出同除权日的并发事件——同一天同时有「年度分红」与「特别分红」两笔（601318.SH 于 2018-06-07、300750.SZ 于 2024-04-30 与 2026-04-22）。这意味着分红记录绝不可按「股票、除权日、公告日」三元组粗暴去重，否则会把真金白银的一笔分红删掉。</li>
+</ul>
+<h3>2.2 回测工程流水线验证</h3>
+<p>在 1,331 个真实交易日上完成 13,243 笔撮合与 140 次公司行动入账：五层子账户权重和恒为 1.000000，延迟清算队列（最大 5 只）与陈旧估值（最大 6 日）均正常运转；人为注入缺失的指数开盘价后，11,925 个窗口被全数精准阻断——第二篇立下的「禁止静默回退」在真实数据上同样生效。本验证只验工程，不报告夏普比率或超额收益，不作投资依据。</p>
+<h3>2.3 暴露出的核心适配缺口</h3>
+<p>新浪后复权因子是仅含除权变动的稀疏阶跃表——只在除权日跳一格、其余日期不出现。而冻结的清洗器规定「无观测填充上限 3 日」，两者直接冲突：稀疏表喂进去，会有 9,560 行被截断为缺失。这是免费数据接入必须先解决的头号适配问题，也引出了第三节的改造。</p>
+<h2>三、Phase 3C：数据接入层改造与付费供应商集成准备</h2>
+<p>在不修改冻结的 Phase 2 代码的前提下，数据接入层新增三个相互独立的组件，并完成全套付费采购与样本验收规范。</p>
+<h3>3.1 稀疏复权因子适配</h3>
+<p>针对 2.3 的缺口：只依据「事件日 ≤ t」的因果原则把稀疏因子表展开到日频，原始稀疏表完整保留；剔除精确重复，同一事件日出现冲突因子时打冲突标记，因子跳变超出 [0.2, 5.0] 区间时打异常跳变标记。报告同时显式界定五类价格口径，以及「因果展开不足以单独证明完整时点性」的四项边界条件——展开做得再对，也变不出历史成分名单。</p>
+<h3>3.2 公司行动去重</h3>
+<p>基于九元事件标识去重：只删除完全重复的记录；同除权日的并发分红事件完整保留为彼此独立的事件；同键但比例不同的冲突记录不擅自合并，标记为待人工复核。这条规则直接来自 2.1 的实测教训。</p>
+<h3>3.3 供应商无关的数据接口</h3>
+<p>定义覆盖 11 类市场与参考数据的统一接口协议：每个数据源必须显式声明自己的能力矩阵（哪类数据有、哪类没有），数据帧必须通过统一结构与来源列的强校验才能入库。换供应商时换的是适配层，研究与回测代码不动。</p>
+<h3>3.4 单元测试与付费接入等待期</h3>
+<ul>
+<li>新增接入层测试后，全量测试稳定通过：48 项全过，耗时 9.09 秒，0 失败、0 跳过；</li>
+<li>采购侧交付已成文：10 项采购要求、供应商接入档案模板、7 大优先域的样本验收规程；</li>
+<li>Phase 3C 状态正式封存为 CONDITIONALLY_ACCEPTED_AND_FROZEN（有条件通过并冻结），当前为「付费供应商集成等待」（Paid Vendor Integration Hold）：未购买付费数据、未启动全量下载、未启动训练与 Beta 实验。</li>
+</ul>
+<h2>四、小结</h2>
+<p>Phase 2 与 Phase 3 走完，这个项目的状态可以概括为：<strong>研究规范、模型、回测账本与数据接入层全部就绪并冻结，唯一的卡点是多年期时点数据的采购决策。</strong> 后续路线已经排好：选定付费供应商 → 按验收规程验样本 → 全量回补历史数据 → 这时才轮到第三篇规划的 Walk-Forward 滚动训练与风险校准系数网格。在此之前，本系列不会出现任何多年期回测数字——没有无偏数据，就没有无偏结论。历史基线（25 条实验注册记录与 Phase 1 面板，SHA256 指纹同第三篇所列）全程完整未改动。</p>
+<p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
