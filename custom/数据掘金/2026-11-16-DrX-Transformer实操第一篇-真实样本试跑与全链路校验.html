@@ -14,73 +14,44 @@
 <div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第二篇-技术报告.html" title="DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html" title="DrX-Transformer 实操 · 第 0 篇：双层 Transformer 选股系统的架构与研究规范"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验</span><span class="le">DrX-Transformer in Practice, Part 1: First End-to-End Trial Run on Real Data and Full-Pipeline Validation</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 1 of the series reports the first end-to-end trial run of the two-stage Transformer stock-selection system on real CSI 300 data from January 2024 — 22 trading days, 297 tradable constituents and 6,528 panel rows — with the validation results placed first. The data pipeline passed its Phase 1 acceptance checks with zero missing values across all core fields, under an explicit survivorship-bias warning. On a MacBook Air M4 with 32 GB of unified memory, the Metal backend accelerated forward inference by about 3.11 times and full training steps by about 3.50 times relative to CPU. In the purged out-of-sample window, the two-stage Transformer returned +1.02% net of all trading costs against -0.51% for the CSI 300, ahead of equal-weight, momentum, XGBoost and random forest baselines. All 13 automated tests passed, including a future-price perturbation test confirming zero look-ahead leakage. The sample is deliberately short: the run validates engineering correctness rather than establishing alpha.</p></div>
-<p>本篇是双层 Transformer 沪深 300 选股系统的开发日志整理版。按结果优先的顺序，先把真实样本的试跑与校验结果完整放在前面——数据质检、硬件基准、端到端回测与最新信号，开发过程的回放放在后面。出于知识产权保护，过程部分只记阶段与结论，省略实现细节。本篇为量化研究记录，不构成投资建议。</p>
+<p>本篇是双层 Transformer 沪深 300 选股系统的开发日志整理版。按结果优先的顺序，先把真实样本的试跑与校验结果完整放在前面——数据质检、硬件基准、端到端回测与最新信号，开发过程的回放放在后面。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开。本篇为量化研究记录，不构成投资建议。</p>
 <blockquote>
 <p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · 第一篇（本篇）开发日志与试跑校验 · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a></p>
 </blockquote>
-<h2>一、真实样本试跑与校验结果（2024 年 1 月样本）</h2>
+<h2>一、真实样本试跑与校验结果（20240102 ~ 20240131，device = mps）</h2>
 <h3>1. 数据质检：Phase 1 验收通过</h3>
-<p>第一次真实数据接入使用 2024 年 1 月的沪深 300 样本（2024-01-02 至 2024-01-31，共 22 个交易日）。清洗后的面板共 6,528 条记录、297 只实际可交易的成分股（当期成分名单中有 3 只在 2024 年 1 月尚未上市，有效池自然少于 300 只，这本身就是数据未被伪造填充的旁证）。质检结论：</p>
+<p>第一次真实数据接入使用 2024 年 1 月的沪深 300 样本（2024-01-02 至 2024-01-31，共 22 个交易日）。数据来源为多源真实行情：成分股与官方权重来自中证指数通道，指数日线与个股日线、换手率、流通股本及后复权因子来自新浪通道（复权因子以严格防前视方式对齐到不晚于当日的最近历史记录），原定主数据源（Tushare Pro）为可选增强、另一海外通道为兜底备选。清洗后的面板共 6,528 条记录、37 列、297 只实际可交易的成分股（当期成分名单中有 3 只在 2024 年 1 月尚未上市，有效池自然少于 300 只，这本身就是数据未被伪造填充的旁证）。质检结论：</p>
 <ul>
 <li>主键重复行 0、非正收盘价行 0、零成交量行 0；</li>
-<li>12 个核心字段（开高低收、昨收、成交量、成交额、复权因子、换手率、流通市值、成分标记与权重等）缺失率全部为 0.00%；</li>
-<li>数据验收标记 <code>phase1_acceptance_passed = true</code>，数据来源为多源真实行情。</li>
+<li>核心字段（开、高、低、收、昨收、成交量、成交额、复权因子、后复权价格、换手率、流通市值、成分标记与权重）缺失率全部为 0.00%；</li>
+<li>数据验收标记 <code>phase1_acceptance_passed = true</code>，数据来源标记为多源真实数据（MULTI_SOURCE_REAL）。</li>
 </ul>
-<p>需要如实标注的一点：本次成分名单因历史成分接口权限不足，退化为当前快照回退，质检报告中带有幸存者偏差警告（SURVIVORSHIP_BIAS_WARNING）；补齐历史时点成分是下一阶段的最高优先级事项。</p>
+<p>需要如实标注的一点：本次成分名单因历史成分接口权限不足，退化为当前快照（2026-10-30）回退，质检报告中带有幸存者偏差警告（SURVIVORSHIP_BIAS_WARNING）；补齐历史时点成分是下一阶段的最高优先级事项。纯行情口径下另有两处已知缺口：上市日期缺失、行业字段为空。</p>
 <h3>2. 硬件基准：先量算力，再谈训练</h3>
-<p>训练开始前先在 MacBook Air M4（32.00 GB 统一内存）上跑了硬件基准（基准规模的双层 Transformer，约 68.48 万参数，标准输入为单日 300 只股票、60 日窗口）：</p>
+<p>训练开始前先在 MacBook Air M4（32.00 GB 统一内存，macOS 15.7.4，Python 3.11.18，PyTorch 2.15.0，MPS 后端可用、推荐最大显存 21.33 GB）上跑了硬件基准（float32，seed = 42，预热 5 次、正式测量 20 次，标准输入 N = 300、L = 60、F = 40）：</p>
 <ul>
-<li>前向推理：CPU 273.84 毫秒，MPS 88.18 毫秒，MPS 约 3.11 倍加速；</li>
-<li>前向加反向（完整训练步）：CPU 1,353.86 毫秒，MPS 387.14 毫秒，MPS 约 3.50 倍加速；</li>
-<li>批量从 1 增至 4 时吞吐基本持平、单步延迟近似线性上升——单个交易日截面本身已经把 GPU 并行度填满，因此这台机器上推荐小批量加基准规模模型的配置。</li>
+<li><strong>CPU vs MPS（base 模型，684,802 参数，B = 4）</strong>：</li>
+<li>前向：CPU 273.84 毫秒（14.61 样本/秒），MPS 88.18 毫秒（45.36 样本/秒，MPS 驱动占用 1,050.72 MB）——约 <strong>3.11 倍</strong>加速；</li>
+<li>前向加反向：CPU 1,353.86 毫秒（2.96 样本/秒），MPS 387.14 毫秒（10.33 样本/秒，MPS 驱动占用 3,158.89 MB）——约 <strong>3.50 倍</strong>加速。</li>
+<li><strong>批量扩展（MPS，base）</strong>：B = 1 时 91.28 毫秒/步（10.96 样本/秒），B = 2 时 195.03 毫秒/步（10.26 样本/秒），B = 4 时 373.54 毫秒/步（10.71 样本/秒）——吞吐基本持平、延迟近似线性上升，单个交易日截面本身已经把 GPU 并行度填满，这台机器上推荐批量 1 加 base 模型。</li>
+<li><strong>模型规模（MPS，B = 4）</strong>：small（107,522 参数）147.76 毫秒/步（27.07 样本/秒），base（684,802 参数）375.52 毫秒/步（10.65 样本/秒）。</li>
 </ul>
-<h3>3. 端到端试跑：样本外回测（扣费后）</h3>
-<p>在短样本上启用自适应切分：训练 8 个交易日、隔离带 3 个交易日、样本外测试 7 个交易日，训练与测试之间用隔离带杜绝前向标签重叠泄漏。双层 Transformer 在 MPS 上训练 20 个轮次，训练损失由 0.95 平滑收敛至 0.67。样本外区间（2024-01-24 至 2024-01-31）按 t 日收盘出信号、t+1 日开盘成交、扣全部费用后的净收益对比如下（同期沪深 300 为 -0.51%）：</p>
-<table>
-<thead>
-<tr>
-<th>策略</th>
-<th style="text-align: right;">样本外净收益</th>
-<th style="text-align: right;">相对基准超额</th>
-<th style="text-align: right;">最大回撤</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>双层 Transformer</td>
-<td style="text-align: right;">+1.02%</td>
-<td style="text-align: right;">+1.53%</td>
-<td style="text-align: right;">-2.61%</td>
-</tr>
-<tr>
-<td>等权沪深 300</td>
-<td style="text-align: right;">+0.60%</td>
-<td style="text-align: right;">+1.11%</td>
-<td style="text-align: right;">-2.08%</td>
-</tr>
-<tr>
-<td>动量基线</td>
-<td style="text-align: right;">-0.61%</td>
-<td style="text-align: right;">-0.09%</td>
-<td style="text-align: right;">-2.96%</td>
-</tr>
-<tr>
-<td>XGBoost</td>
-<td style="text-align: right;">-3.18%</td>
-<td style="text-align: right;">-2.66%</td>
-<td style="text-align: right;">-5.38%</td>
-</tr>
-<tr>
-<td>随机森林</td>
-<td style="text-align: right;">-7.02%</td>
-<td style="text-align: right;">-6.50%</td>
-<td style="text-align: right;">-9.34%</td>
-</tr>
-</tbody>
-</table>
+<h3>3. 端到端试跑</h3>
+<ul>
+<li><strong>端到端运行</strong>：<code>/opt/anaconda3/envs/csi300_tfm/bin/python scripts/run_stock_selection.py</code>（退出码 0）</li>
+<li><strong>数据划分</strong>：训练 20240108 ~ 20240117（8 日，2,371 有效行）｜ 隔离带 20240118 ~ 20240122（3 日）｜ 样本外测试 20240123 ~ 20240131（7 日）。短样本自适应参数：回望窗口 L = 5、预测期 h = 3、隔离带 purge = 3。</li>
+<li><strong>TwoStageTransformer 训练收敛</strong>：20 epochs on mps，train_loss 由 0.94719 平滑下降至 0.66735（epoch 1 / 5 / 10 / 15 / 20 分别为 0.94719 / 0.80301 / 0.72980 / 0.68308 / 0.66735）。</li>
+<li><strong>样本外真实成本回测净收益（20240124 ~ 20240131）</strong>：<ul>
+<li><code>TwoStageTransformer</code>：<strong>+1.02%</strong>（同期沪深 300 -0.51%，超额 +1.53%，最大回撤 -2.61%，成交 24 笔，手续费 973.90 元）</li>
+<li><code>EqualWeight_CSI300</code>：+0.60% ｜ <code>Momentum</code>：-0.61% ｜ <code>XGBoost</code>：-3.18% ｜ <code>RandomForest</code>：-7.02%</li>
+</ul>
+</li>
+<li><strong>最新信号输出（2024-01-31 收盘，Top 10）</strong>：<code>300015.SZ 爱尔眼科</code>、<code>603259.SH 药明康德</code>、<code>002594.SZ 比亚迪</code>、<code>601633.SH 长城汽车</code>、<code>600000.SH 浦发银行</code>、<code>601166.SH 兴业银行</code>、<code>002352.SZ 顺丰控股</code>、<code>000001.SZ 平安银行</code>、<code>600570.SH 恒生电子</code>、<code>601398.SH 工商银行</code>。</li>
+<li><strong>生成文件</strong>：当日信号表（outputs/daily_signals/2024-01-31.csv）、日度选股报告、样本外回测汇总（sample_backtest_summary.json）、训练后的模型权重。</li>
+</ul>
+<p>回测口径：初始资金 100.00 万元，每 3 个交易日调仓，等权选前 10 只，100 股整手，t 日收盘出信号、t+1 日开盘成交，佣金、印花税、过户费与双边滑点全额计提，并执行 T+1 卖出锁定。</p>
 <p>必须强调：这只是一个月的短样本、样本外仅数日，这组数字的用途是验证特征、防泄漏切分、多模型对比与真实撮合回测的端到端工程正确性，不构成任何长期超额收益的结论。完整的多年度滚动验证在下一阶段。</p>
-<h3>4. 最新信号：2024-01-31 收盘 Top 10</h3>
-<p>试跑产出的最后一个交易日（2024-01-31）收盘信号，前 10 名候选如下：</p>
+<h3>4. Top 10 的结构：一个自发形成的杠铃</h3>
 <table>
 <thead>
 <tr>
@@ -153,21 +124,21 @@
 </tr>
 </tbody>
 </table>
-<p>这份名单呈现出清晰的杠铃结构：一端是短期深度超跌、弹性大的成长龙头（爱尔眼科、药明康德、比亚迪、长城汽车、恒生电子），模型给出高预期收益的同时也给出高风险估计；另一端是低波动、正动量的银行股（浦发银行、兴业银行、平安银行、工商银行），预期收益温和但风险估计显著更低，经风险折扣后稳步进入前十。收益与风险由模型的两个预测头分别定价，这是双层结构自发形成的配置形态。</p>
+<p>这份名单呈现出清晰的杠铃结构：一端是短期深度超跌、弹性大的成长龙头（爱尔眼科、药明康德、比亚迪、长城汽车、恒生电子），模型给出 +14.30% 至 +20.54% 的预期收益，同时给出 23.61% 至 33.75% 的高风险估计；另一端是低波动、正动量的银行股（浦发银行、兴业银行、平安银行、工商银行），预期收益温和（+11.11% 至 +13.22%），但风险估计只有 16.28% 至 18.53%，经风险折扣后稳步进入前十。收益与风险由模型的两个预测头分别定价、再按综合得分 s = 预期收益 - 0.25 × 预期风险排序——这是双层结构自发形成的配置形态，逐只的得分与因子明细见第二篇。</p>
 <h3>5. 全量测试</h3>
-<p>全部 13 项自动化测试通过，其中包括一项关键的防泄漏检测：人为扰动未来价格后，历史特征必须保持不变——通过，说明特征管线不存在前视泄漏。</p>
+<p>全部 13 项自动化测试通过（硬件基准 5 项、数据管道与质检 4 项、选股管线 4 项），其中包括一项关键的防泄漏检测：人为扰动未来价格后，历史特征必须保持不变——通过，说明特征管线不存在前视泄漏；另有切分隔离与撮合约束（整手、T+1、涨跌停过滤）的专项检测。</p>
 <h2>二、开发过程回放（2026-11-16 凌晨）</h2>
 <p>整个 MVP 在一夜之间分五个阶段推进：</p>
 <ol>
-<li><strong>工程初始化与环境检查</strong>：搭好目录结构、集中配置与环境自检，先确认工作区与依赖的真实状态，不假设任何东西已经就绪。</li>
-<li><strong>硬件基准模块</strong>：在写训练代码之前先建基准套件（硬件侦测、内存监测、多规模压测、跨机对比），因为双层 Transformer 的截面自注意力开销随股票数平方增长，算力边界决定了后面所有参数选择。</li>
-<li><strong>环境就绪与首次实测</strong>：在正式的 Python 3.11 环境中装齐依赖，确认 MPS 后端可用，完成第 2 节的基准实测；期间还处理了一个 macOS 上深度学习框架与树模型运行时同进程冲突导致的崩溃问题，定位后以平台自适应设置解决。</li>
-<li><strong>多数据源适配</strong>：原定的主数据源在真实探测中暴露权限与限频问题（部分接口无权限、部分接口触发小时级限额），另一公开接口在连续请求时限流断开。方案随之改为多源路由：以稳定通道为主、原数据源为可选增强、再设备用通道兜底；验收标准同步调整为「至少有一个真实数据源完整提供所需核心字段」，各字段来源逐项登记。</li>
-<li><strong>端到端链路搭建</strong>：依次完成无泄漏特征与前向标签、双层 Transformer 与多任务损失、防泄漏切分与训练、按 A 股真实制度撮合的回测引擎，以及日度信号与选股报告输出，跑通第 3 节的试跑。</li>
+<li><strong>工程初始化与环境检查</strong>（约 01:54—02:02）：搭好目录结构、集中配置与环境自检，先确认工作区与依赖的真实状态，不假设任何东西已经就绪；系统自带的 Python 版本低于项目要求，正式环境在后续阶段单独搭建。</li>
+<li><strong>硬件基准模块</strong>（约 02:04—02:10）：在写训练代码之前先建基准套件（硬件侦测、内存监测、多规模压测、跨机对比），因为双层 Transformer 的截面自注意力开销随股票数平方增长，算力边界决定了后面所有参数选择。无 PyTorch 的保护性测试如实报错退出，没有生成任何虚假测速结果。</li>
+<li><strong>环境就绪与首次实测</strong>（约 02:28—02:30）：在正式的 Python 3.11 环境中装齐依赖，确认 MPS 后端可用，完成第 2 节的基准实测；尚缺的只有个别可选包与数据源凭证配置。</li>
+<li><strong>多数据源适配</strong>（约 02:45—03:14）：原定的主数据源在真实探测中暴露权限与限频问题（成分权重、涨跌停、停牌等接口无权限，多个接口触发 1 次/小时的频次上限），另一公开接口（东方财富通道）在连续请求时限流断开。方案随之改为多源路由：以中证指数加新浪通道为主、原数据源为可选增强、海外通道兜底；验收标准同步调整为「至少有一个真实数据源完整提供所需核心字段」，各字段来源逐项登记（结果见第 1 节）。</li>
+<li><strong>端到端链路搭建</strong>（约 03:17—03:32）：依次完成无泄漏特征（35 维）与前向标签、双层 Transformer 与多任务损失、防泄漏切分与训练、按 A 股真实制度撮合的回测引擎，以及日度信号与选股报告输出，跑通第 3 节的试跑。期间还处理了一个 macOS 上深度学习框架与树模型运行时同进程冲突导致的段错误（退出码 139），根因与修复见第二篇。</li>
 </ol>
 <h2>三、下一步</h2>
 <ul>
-<li>扩展历史区间做全量回填，进入多年度滚动（Walk-forward）验证与大窗口训练；</li>
+<li>扩展历史区间做全量回填，进入多年度滚动（Walk-forward）验证与 60 / 120 日大窗口训练；</li>
 <li>补齐历史时点成分股与行业元数据，消除幸存者偏差警告与行业特征缺口；</li>
 <li>在 Mac Studio M5 Max（64.00 GB）上完成双机硬件基准对比与大模型压测；</li>
 <li>做多任务损失的消融实验，定量评估排序目标与风险目标各自的边际贡献。</li>

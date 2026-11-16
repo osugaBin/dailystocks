@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果 · DrX Daily</title>
 <link rel="stylesheet" href="../../assets/style.css?v=20261116a">
-
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
@@ -14,65 +17,386 @@
 <div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-06-SGu-双基金核心卫星模拟仓.html" title="SGu-双基金核心-卫星模拟仓：每日运行记录"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html" title="DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果</span><span class="le">DrX-Transformer in Practice, Part 2: Technical Report — System Design and Out-of-Sample Results</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 2 presents the public edition of the full technical report for the two-stage Transformer CSI 300 stock-selection system. It summarises the design — a leakage-free feature framework, calendar-aligned forward labels, a temporal encoder followed by a cross-sectional encoder, and a scale-invariant multi-task loss combining return regression, pairwise ranking and risk regression — and the multi-source data engineering that replaced permission-limited and rate-limited primary feeds with a routed fallback architecture, passing Phase 1 quality acceptance on 6,528 real panel rows with zero missing core fields. Hardware benchmarks on a MacBook Air M4 show Metal acceleration of about 3.11 times for inference and 3.50 times for training steps. The purged out-of-sample comparison shows the Transformer returning +1.02% net of costs, a net excess of +1.53% over the CSI 300 at -0.51%, and documents a clear divergence between full-cross-section correlation metrics and top-10 portfolio returns. Limitations and the multi-year walk-forward roadmap are stated in full.</p></div>
-<p>本篇是双层 Transformer 沪深 300 选股系统的完整技术报告的公开版，系统整理研究约束、系统设计、多数据源工程、硬件基准与样本外实证结果。出于知识产权保护，公开版保留方法框架与全部验证结论，省略实现层面的技术细节（特征与模型的精确定义、损失函数的具体形式与参数配置等不在公开范围）。本篇为量化研究记录，不构成投资建议。</p>
+<p>本篇是双层 Transformer 沪深 300 选股系统的完整技术报告的公开版，系统整理研究约束、系统设计、多数据源工程、硬件基准与样本外实证结果。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开，以求自洽。本篇为量化研究记录，不构成投资建议。</p>
 <blockquote>
 <p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · 第二篇（本篇）技术报告</p>
 </blockquote>
 <h2>一、执行摘要</h2>
-<p>本系统是一个面向 A 股沪深 300 成分股的端到端量化选股研究系统，围绕「时序演化 + 截面竞争」的双重结构建模：先用时序 Transformer 编码每只股票自身的状态演化，再用截面 Transformer 建模同一交易日股票之间的相对关系，训练目标同时包含收益回归、截面排序与风险回归三项，并与防泄漏的时间切分、贴近 A 股真实制度的 t+1 开盘撮合回测集成在同一工程框架中。截至 MVP 验证阶段，已完成的里程碑如下：</p>
+<p>本系统是一个面向 A 股沪深 300 成分股横截面与时序联合排序的端到端量化选股研究系统，围绕「时序演化 + 截面竞争」的双重结构建模：先用时序 Transformer 编码每只股票自身的状态演化，再用截面 Transformer 建模同一交易日股票之间的相对关系，训练目标同时包含收益回归、尺度不变的截面成对排序与风险回归三项，并与防泄漏的时间切分（Purged 切分）、贴近 A 股真实制度的 t+1 开盘撮合回测集成在同一工程框架中。截至 MVP 验证阶段，已完成的里程碑如下：</p>
 <ol>
-<li><strong>多数据源行情管线落地</strong>：在主数据源部分接口受权限与频次限制、另一公开接口触发限流的真实环境下，重构为多源路由方案；2024 年 1 月共 22 个交易日的真实样本通过全部数据质量检查（面板 6,528 行、297 只有效成分股、核心字段零缺失）。</li>
-<li><strong>Apple Silicon 硬件基准建成</strong>：在 MacBook Air M4（32.00 GB 统一内存）上实测，MPS 相对 CPU 的前向推理加速约 3.11 倍、完整训练步加速约 3.50 倍；期间定位并解决了 macOS 上深度学习框架与树模型运行时同进程冲突的崩溃问题。</li>
-<li><strong>端到端实证闭环</strong>：在防泄漏切分下完成双层 Transformer 与动量、随机森林、XGBoost、等权基准共五组策略的样本外对比，并产出完整的日度选股信号与候选分析。</li>
+<li><strong>多数据源行情管线落地</strong>：在主数据源部分接口受权限与频次限制、另一公开接口触发限流的真实环境下，重构为多源路由方案；2024 年 1 月共 22 个交易日的真实样本通过全部数据质量检查（面板 6,528 行 × 37 列、297 只有效成分股、核心字段零缺失）。</li>
+<li><strong>Apple Silicon 硬件基准建成</strong>：在 MacBook Air M4（32.00 GB 统一内存）上实测，MPS 相对 CPU 的前向推理加速约 3.11 倍、完整训练步加速约 3.50 倍；期间定位并解决了 macOS 上深度学习框架与树模型运行时同进程冲突的段错误问题。</li>
+<li><strong>端到端实证闭环</strong>：在防泄漏切分下完成双层 Transformer 与动量、随机森林、XGBoost、等权基准共五组策略的样本外对比，并产出完整的日度选股信号与候选深度分析。</li>
 <li><strong>工程质量保障</strong>：13 项自动化测试全部通过，覆盖数据转换与防泄漏边界、硬件探测与设备回退、模型与多任务损失、真实产出核验。</li>
 </ol>
-<h2>二、系统设计要点</h2>
-<p><strong>特征体系</strong>：共五大类、数十项纯后视特征（价格与收益、动量、波动率与风险、成交量与流动性、市场与相对强弱），全部由截至 t 日收盘的历史数据计算。标准化分两路：个股特征只在当日截面内部做标准化并截断极端值；市场环境特征同日全截面共享，采用固定尺度映射，保留其随时间变化的宏观信息。</p>
-<p><strong>标签构造</strong>：先把面板透视到统一交易日历，再用一致复权口径构造未来 5、10、20 日收益、相对沪深 300 的超额收益与未来风险标签；标签与特征矩阵严格隔离，并由切分隔离带保护。</p>
-<p><strong>双层模型</strong>：第一层时序编码器对单只股票的历史窗口做自注意力编码，经注意力池化得到每只股票当日的状态表征；第二层截面编码器把同日全部股票的表征组成序列再做自注意力，配合掩码处理可变股票数与停牌缺失。预测头输出预期超额收益与预期风险两个量，最终排序得分在预期收益上按风险做折扣。</p>
-<p><strong>多任务损失</strong>：总目标由收益回归、截面成对排序与风险回归三部分加权。排序部分做了两点处理：先在当日截面内对得分做尺度归一化，避免不同训练步之间得分量级漂移导致排序梯度消失或爆炸；再只在真实收益差异超过噪声阈值的股票对上计算，把优化精力留给真正可分的相对关系。</p>
-<h2>三、多数据源工程与数据质量验证</h2>
-<p>真实环境探测揭示了 A 股公开数据接口的三类典型瓶颈：其一是权限分级，部分关键接口（历史成分权重、涨跌停与停牌名单等）在当前账号下不可用；其二是频次配额，多只接口触发小时级调用上限，全市场批量拉取还会间歇触发来源 IP 限制；其三是连接稳定性，个别公开接口在连续请求时限流断开。系统的应对是多源路由：成分与权重取自指数公司官方通道，指数与个股行情取自稳定的行情通道，原主数据源保留为可选增强，另设备用通道兜底；涨跌停价按前收与板块规则推算，停牌由缺失与零成交推断，复权因子按「不晚于当日的最近历史记录」严格对齐，杜绝未来日期的因子混入。</p>
-<p>Phase 1 验收结果（2024-01-02 至 2024-01-31）：面板 6,528 行、22 个交易日、297 只有效成分股；主键重复 0、非正收盘 0、零成交量 0、12 个核心字段缺失率 0.00%，验收通过。已知缺口如实记录：纯行情口径下上市日期缺失、行业字段为空，行业相对强弱特征暂时退化为相对全市场平均；成分名单为当前快照回退，报告显式标注幸存者偏差警告。</p>
-<h2>四、硬件基准结果</h2>
-<p>测试环境为 MacBook Air M4（10 核 CPU、32.00 GB 统一内存、macOS、PyTorch 的 MPS 后端），基准条件为单日 300 只股票、60 日窗口输入，模型分小、基准、大三档规模预设以便跨机公平对比。基准规模模型（约 68.48 万参数）的关键实测如下：</p>
+<p>系统在代码层强制执行四项研究护栏（详见第 0 篇）：零未来信息泄漏、零幸存者偏差（时点成分股，退化时显式警告）、信号与成交时序严格对齐（t 日收盘出信号、t+1 日开盘成交，涨跌停/停牌/ST 过滤、整手与 T+1 锁定）、严禁伪造数据（合成数据强制带模拟标记并与真实产出物理隔离）。</p>
+<h2>二、系统设计</h2>
+<h3>2.1 分层与职责</h3>
+<p>系统分为六个子系统：多源数据获取与清洗、特征工程与标签、Purged 训练验证、两阶段模型与基线对比、t+1 回测与每日报告、Apple Silicon 硬件基准。各层职责如下：</p>
 <table>
 <thead>
 <tr>
-<th>测试项</th>
-<th style="text-align: right;">CPU</th>
-<th style="text-align: right;">MPS</th>
-<th>说明</th>
+<th>分层</th>
+<th>职责</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>前向推理（每步）</td>
-<td style="text-align: right;">273.84 毫秒</td>
-<td style="text-align: right;">88.18 毫秒</td>
-<td>MPS 约 3.11 倍</td>
+<td>配置与运行环境</td>
+<td>全局参数集中管理：数据区间、特征清单、模型与基线超参数、多任务损失权重、交易成本；环境探测、随机种子与设备选择（CUDA → MPS → CPU）</td>
 </tr>
 <tr>
-<td>前向加反向（每步）</td>
-<td style="text-align: right;">1,353.86 毫秒</td>
-<td style="text-align: right;">387.14 毫秒</td>
-<td>MPS 约 3.50 倍</td>
+<td>数据客户端</td>
+<td>多数据源接入与代码格式互转：主数据源的接口探测与限频重试、稳定通道的成分/行情获取、备用通道回退；合成数据强制标记</td>
+</tr>
+<tr>
+<td>成分股管理</td>
+<td>沪深 300 时点成分股解析；快照回退时注入幸存者偏差警告</td>
+</tr>
+<tr>
+<td>数据编排与清洗</td>
+<td>增量存储、单位口径规约、复权因子严格历史对齐、面板质量报告生成</td>
+</tr>
+<tr>
+<td>特征工程</td>
+<td>35 项纯后视特征计算、截面标准化与市场环境缩放、前向收益/超额/风险标签构造</td>
+</tr>
+<tr>
+<td>模型与损失</td>
+<td>时序与截面两阶段 Transformer、多任务损失、动量与树模型基线（含 macOS 运行时防护）</td>
+</tr>
+<tr>
+<td>训练与切分</td>
+<td>时序截面样本构建、Purged 切分隔离、多模型联合训练与评估</td>
+</tr>
+<tr>
+<td>回测引擎</td>
+<td>t+1 开盘撮合、涨跌停/停牌/T+1 校验、费率与滑点计提、绩效指标汇总</td>
+</tr>
+<tr>
+<td>推理与报告</td>
+<td>每日打分与分层、信号表与选股报告生成</td>
+</tr>
+<tr>
+<td>硬件基准套件</td>
+<td>硬件信息采集、内存与显存监测、多规模压测与跨机对比报告</td>
 </tr>
 </tbody>
 </table>
-<p>两条规律值得记录。第一，批量扩展没有红利：批量从 1 增至 4，吞吐基本持平在约 10.71 至 10.96 个样本每秒，单步延迟近似线性上升——原因是单个交易日截面已有 300 只股票，第一层的有效批维度与第二层的截面注意力在批量为 1 时已经填满 GPU 并行度。第二，显存占用主要来自图形驱动的中间缓冲而非模型本身，随批量线性增长；综合吞吐与占用，M4 上推荐批量 1 加基准规模模型的组合。基准全程无内存溢出。大规模模型与算子级微基准留待 Mac Studio M5 Max（64.00 GB）的双机对比阶段，基准工具已内置跨机结果对比功能。</p>
-<p>排障记录一则：首次把 MPS 训练与树模型基线串联在同一进程运行时，程序在进入树模型阶段突发段错误。根因是 macOS arm64 下两套运行时争用同一底层多线程库；工程上以平台自适应设置（在该平台约束树模型为单线程并做内存对齐处理）解决，修复后多模型同进程联合评测稳定完成。</p>
-<h2>五、样本外实证结果</h2>
-<p><strong>切分与训练</strong>：短样本启用自适应参数——训练 2024-01-08 至 01-17（8 个交易日、2,371 条有效样本），隔离 01-18 至 01-22（3 个交易日），样本外测试 01-23 至 01-31（7 个交易日）。双层 Transformer 在 MPS 上训练 20 个轮次，总损失由 0.95 平滑单调收敛至 0.67。</p>
-<p><strong>五组策略对比</strong>：回测按 A 股真实制度执行——t 日收盘生成信号、t+1 日开盘成交、等权选前 10 只、整手下单、T+1 锁定，佣金、印花税、过户费与双边滑点全额计提。样本外区间（2024-01-24 至 01-31，同期沪深 300 为 -0.51%）扣费后结果：</p>
+<h3>2.2 特征体系与标准化</h3>
+<p>特征共五大类 35 项（价格与收益 11、动量 8、波动率与风险 6、成交量与流动性 5、市场与相对强弱 5，完整清单见第 0 篇第三节），全部基于截至 t 日收盘的复权价格、成交量/额、换手率及基准指数计算。标准化分两路：个股特征仅在同一交易日的有效成分股截面内部计算均值与标准差并截断至 [-3.0, 3.0]：</p>
+<p>$$z_{i,t,f} = \operatorname{clip}\left(\frac{x_{i,t,f} - \mu_{t,f}}{\sigma_{t,f} + 10^{-8}},\, -3.0,\, 3.0\right)$$</p>
+<p>市场环境特征同日所有股票共享同一指数数值，采用固定先验物理尺度映射保留宏观状态信息：<code>csi300_ret_1d / 0.015</code>、<code>csi300_mom_20 / 0.05</code>、<code>(csi300_vol_20 - 0.012) / 0.006</code>。</p>
+<h3>2.3 标签构造</h3>
+<p>先把面板透视至完整统一交易日历，再用一致复权收盘价构造前向标签（标准配置预测期为 5、10、20 日，MVP 短样本实证自适应取 3 日）：</p>
+<p>$$r_{i,t,k} = \frac{P^{\text{adj}}_{i,t+k}}{P^{\text{adj}}_{i,t}} - 1, \qquad r^{\text{excess}}_{i,t,k} = r_{i,t,k} - r^{\text{CSI300}}_{t,k}$$</p>
+<p>同时构造未来持有期实现波动率作为辅助风险标签。所有未来标签严格隔离出特征矩阵，并通过 Purged 切分边界保护。</p>
+<h3>2.4 两阶段 Transformer</h3>
+<p>输入为日度截面序列张量 X ∈ R^(B×N×L×F)（MVP 实证中 F = 35、L = 5；标准研究架构 L = 60 或 120）。</p>
+<ul>
+<li><strong>第一阶段（时序编码）</strong>：将 B×N 只股票沿批次合并，线性投影至 d_model = 128，叠加位置编码后经 3 层多头自注意力编码器（注意力头 4、前馈维度 256、dropout 0.1），用注意力池化聚合长度 L 的隐状态序列，得到每只股票在 t 日的状态表征 h_{i,t} ∈ R^128；</li>
+<li><strong>第二阶段（截面交互）</strong>：将第 t 日全部有效股票表征拼成截面序列 H_{t}，经 2 层跨股票自注意力编码，配合掩码屏蔽非交易与缺失样本，显式建模同日成分股间的资金跷跷板效应、动量拥挤度与相对强弱结构；</li>
+<li><strong>双输出预测头</strong>：输出预期超额收益 r̂_{i,t} 与预期未来风险 σ̂_{i,t}，选股综合得分按风险厌恶系数 λ = 0.25 做收益-风险权衡：</li>
+</ul>
+<p>$$s_{i,t} = \hat{r}_{i,t} - 0.25 \cdot \hat{\sigma}_{i,t}$$</p>
+<h3>2.5 尺度不变多任务损失</h3>
+<p>总目标为三分支加权（完整模式权重 α = 1.0、β = 1.0、γ = 0.5）：</p>
+<p>$$\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{return}} + \beta \mathcal{L}_{\text{rank}} + \gamma \mathcal{L}_{\text{risk}}$$</p>
+<p>收益与风险分支为回归损失（默认均方误差，可切换为 Huber 鲁棒回归）。排序分支为尺度不变截面成对排序损失：先在当日有效截面内对得分做标准差归一化（配合温度系数 1.0），消除不同训练步之间得分量级漂移导致的梯度消失或爆炸；再仅在真实标签差异大于噪声过滤阈值的股票对上计算：</p>
+<p>$$\mathcal{L}_{\text{rank}} = \operatorname{mean}_{|r_{i} - r_{j}| &gt; \tau_{\text{pair}}}\left(\log\left(1 + \exp\left(-(\tilde{s}_{i} - \tilde{s}_{j}) \cdot \operatorname{sign}(r_{i} - r_{j})\right)\right)\right)$$</p>
+<p>其中 τ_{pair} = 0.002。这一项的设计意图是让优化直接对「同一天股票之间的相对次序」负责，并把精力留给真正可分的股票对，而不是去拟合标签噪声。</p>
+<h2>三、多数据源工程与 Phase 1 数据质量验证</h2>
+<h3>3.1 数据源探测与故障绕行</h3>
+<p>真实环境探测揭示了 A 股公开数据接口的三类典型瓶颈：其一，权限分级——历史成分权重、涨跌停与停牌名单、行业分类等接口在当前账号下被拒绝；其二，频次配额——交易日历、指数日线、股票基础、复权因子、每日指标等接口触发 1 次/小时上限，日线接口可用但全市场批量拉取间歇触发来源 IP 限制；其三，连接稳定性——东方财富通道在连续请求时触发限流与连接断开，无法稳定支撑 300 只成分股连续拉取。重构后的多源路由与各字段的实际来源如下：</p>
+<table>
+<thead>
+<tr>
+<th>数据域</th>
+<th>实际来源</th>
+<th>对齐规则与说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>指数日线</td>
+<td>新浪通道</td>
+<td>沪深 300 指数日线，22 个交易日</td>
+</tr>
+<tr>
+<td>交易日历</td>
+<td>由指数日线派生</td>
+<td>消除跨源节假日不一致</td>
+</tr>
+<tr>
+<td>成分股与权重、股票基础</td>
+<td>中证指数通道</td>
+<td>300 只成分券及官方权重，快照日期 2026-10-30</td>
+</tr>
+<tr>
+<td>个股日线</td>
+<td>主数据源加新浪通道</td>
+<td>原始行情 61,925 行（覆盖 5,340 只股票）；新浪数据按统一口径换算（成交量换算为手、成交额换算为千元）</td>
+</tr>
+<tr>
+<td>复权因子</td>
+<td>新浪后复权因子</td>
+<td>按日期键向后对齐：只取不晚于当日的最近历史记录，禁用未来日期</td>
+</tr>
+<tr>
+<td>每日指标（换手率、流通市值等）</td>
+<td>由新浪行情与股本计算</td>
+<td>换手率与流通市值按真实行情和股本口径推导</td>
+</tr>
+<tr>
+<td>涨跌停价</td>
+<td>按前收与板块规则推算</td>
+<td>主板 ±10%、创业板/科创板（300/301/688）±20%、ST ±5%</td>
+</tr>
+<tr>
+<td>停牌</td>
+<td>由缺失或零成交推断</td>
+<td>成分股在有效交易日缺失或成交量为零即记停牌</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 Phase 1 验收结果</h3>
+<p>验收标记 <code>phase1_acceptance_passed = true</code>，数据来源标记为多源真实数据。清洗后面板 6,528 行 × 37 列，覆盖 2024-01-02 至 2024-01-31 全部 22 个交易日、297 只唯一成分股（当期 300 只成分中有 3 只在 2024 年 1 月尚未上市，日均有效池 296.73 只，侧面印证未出现伪造行情填充）。完整性指标：主键重复行 0、非正收盘价行 0、零成交量行 0、12 个必需核心字段缺失率 0.00%。已知缺口：上市日期缺失率 100.00%、行业字段为空；成分名单为当前快照回退，报告显式附加幸存者偏差警告。</p>
+<h2>四、Apple Silicon 硬件基准</h2>
+<h3>4.1 测试环境与模型预设</h3>
+<p>测试机为 MacBook Air M4（机器型号 Mac16,13，10 核 CPU 即 4 个性能核加 6 个能效核，32.00 GB 统一内存），软件栈为 macOS 15.7.4、Python 3.11.18、PyTorch 2.15.0，MPS 后端已构建且可用、推荐最大显存 21.33 GB。基准条件：quick 模式，float32，seed = 42，预热 5 次、正式测量 20 次，标准输入维度 N = 300、L = 60、F = 40。模型设三档预设以便跨机公平对比：small（d_model = 64、时序 2 层、截面 1 层，107,522 参数）、base（d_model = 128、时序 3 层、截面 2 层，684,802 参数）、large（d_model = 256、时序 4 层、截面 2 层，留待大内存机型压测）。</p>
+<h3>4.2 实测结果（全量 10 项，无一内存溢出）</h3>
+<table>
+<thead>
+<tr>
+<th>测试项</th>
+<th>设备</th>
+<th style="text-align: right;">Batch</th>
+<th>规模</th>
+<th style="text-align: right;">参数量</th>
+<th style="text-align: right;">前向（毫秒）</th>
+<th style="text-align: right;">反向（毫秒）</th>
+<th style="text-align: right;">每步（毫秒）</th>
+<th style="text-align: right;">样本/秒</th>
+<th style="text-align: right;">进程峰值内存（MB）</th>
+<th style="text-align: right;">MPS 驱动占用（MB）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cpu_forward_only</td>
+<td>cpu</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">273.84</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">273.84</td>
+<td style="text-align: right;">14.61</td>
+<td style="text-align: right;">686.09</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr>
+<td>cpu_forward_backward</td>
+<td>cpu</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">742.37</td>
+<td style="text-align: right;">608.10</td>
+<td style="text-align: right;">1,353.86</td>
+<td style="text-align: right;">2.96</td>
+<td style="text-align: right;">3,226.14</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr>
+<td>mps_forward_only</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">88.18</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">88.18</td>
+<td style="text-align: right;">45.36</td>
+<td style="text-align: right;">3,291.34</td>
+<td style="text-align: right;">1,050.72</td>
+</tr>
+<tr>
+<td>mps_forward_backward</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">128.24</td>
+<td style="text-align: right;">254.03</td>
+<td style="text-align: right;">387.14</td>
+<td style="text-align: right;">10.33</td>
+<td style="text-align: right;">3,234.62</td>
+<td style="text-align: right;">3,158.89</td>
+</tr>
+<tr>
+<td>bs_1</td>
+<td>mps</td>
+<td style="text-align: right;">1</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">28.10</td>
+<td style="text-align: right;">58.44</td>
+<td style="text-align: right;">91.28</td>
+<td style="text-align: right;">10.96</td>
+<td style="text-align: right;">3,083.88</td>
+<td style="text-align: right;">1,177.83</td>
+</tr>
+<tr>
+<td>bs_2</td>
+<td>mps</td>
+<td style="text-align: right;">2</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">63.21</td>
+<td style="text-align: right;">127.31</td>
+<td style="text-align: right;">195.03</td>
+<td style="text-align: right;">10.26</td>
+<td style="text-align: right;">3,087.44</td>
+<td style="text-align: right;">2,177.89</td>
+</tr>
+<tr>
+<td>bs_4</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">124.47</td>
+<td style="text-align: right;">245.82</td>
+<td style="text-align: right;">373.54</td>
+<td style="text-align: right;">10.71</td>
+<td style="text-align: right;">3,090.36</td>
+<td style="text-align: right;">3,159.89</td>
+</tr>
+<tr>
+<td>model_small</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>small</td>
+<td style="text-align: right;">107,522</td>
+<td style="text-align: right;">48.57</td>
+<td style="text-align: right;">93.32</td>
+<td style="text-align: right;">147.76</td>
+<td style="text-align: right;">27.07</td>
+<td style="text-align: right;">2,808.59</td>
+<td style="text-align: right;">2,125.89</td>
+</tr>
+<tr>
+<td>model_base</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">124.92</td>
+<td style="text-align: right;">246.72</td>
+<td style="text-align: right;">375.52</td>
+<td style="text-align: right;">10.65</td>
+<td style="text-align: right;">2,812.56</td>
+<td style="text-align: right;">3,173.89</td>
+</tr>
+<tr>
+<td>input_standard</td>
+<td>mps</td>
+<td style="text-align: right;">4</td>
+<td>base</td>
+<td style="text-align: right;">684,802</td>
+<td style="text-align: right;">123.49</td>
+<td style="text-align: right;">246.29</td>
+<td style="text-align: right;">372.78</td>
+<td style="text-align: right;">10.73</td>
+<td style="text-align: right;">2,732.45</td>
+<td style="text-align: right;">3,159.89</td>
+</tr>
+</tbody>
+</table>
+<p>三条规律。第一，MPS 加速显著：B = 4 标准负载下前向推理比 CPU 快 3.11 倍（273.84 对 88.18 毫秒），完整训练步快 3.50 倍（1,353.86 对 387.14 毫秒），快速基准范围内零内存溢出。第二，单日截面天然饱和算力：批量从 1 增至 4，吞吐维持在约 10.26 至 10.96 样本/秒的平台期、单步延迟近似线性上升——单个交易日已包含 300 只股票，第一层的有效批维度为 300 × 60、第二层是 300 个 token 的密集自注意力，批量为 1 时 GPU 并行度已被充分填满。第三，显存占用主要来自图形驱动的中间缓冲而非模型本身（base 在 B = 4 时模型实际分配仅约 21.72 MB，驱动占用却达 3,159.89 MB，随批量线性增长）；综合吞吐与占用，M4 上推荐批量 1 加 base 模型，在约 1.18 GB 驱动占用下取得最高训练吞吐。</p>
+<h3>4.3 排障实录：同进程运行时冲突段错误</h3>
+<p>首次把 MPS 深度学习模型与 XGBoost、随机森林基线串联在同一进程运行时，程序在 MPS 训练完成、进入树模型数据矩阵初始化阶段突发段错误（SIGSEGV，退出码 139）。根因是 macOS arm64 下两套 C++ 运行时各自加载并争用同一底层 OpenMP 线程池，在多线程设置下于进程上下文切换时触发线程竞争崩溃。工程修复分两点：在该平台下把树模型的并行线程数约束为单线程；对传入树模型的矩阵做内存连续化对齐。修复后多模型同进程联合评测稳定以退出码 0 完成。这一坑的教训是：跨框架混跑时，崩溃点往往不在崩溃的那一行，而在更早加载进进程的运行时之间。</p>
+<h3>4.4 跨机对比工作流</h3>
+<p>更大规模的 large 模型与算子级微基准留待完整模式与 Mac Studio M5 Max（64.00 GB）横向测评；基准工具已内置双机结果文件对比功能，可直接生成对比表与图。</p>
+<h2>五、端到端实证：样本外回测与 Top 10 分析</h2>
+<p><strong>研究范围坦诚说明</strong>：本节全部数据来自 2024-01-02 至 2024-01-31 共 22 个交易日的 MVP 短样本实证，样本外评估仅 4 个有标签交易日与 6 个持仓回测日，且成分名单为当前快照回退（带幸存者偏差警告）。本节目的在于验证特征、Purged 训练、多模型对比与真实撮合回测的端到端工程正确性，不作为长期超额收益的定论依据。</p>
+<h3>5.1 切分与训练收敛</h3>
+<p>短样本启用自适应参数（回望窗口 5 日、预测期 3 日、隔离带 3 日）：训练集 2024-01-08 至 01-17（8 个交易日、表格化样本 2,371 行）；隔离区 01-18、01-19、01-22（3 个交易日，隔离 3 日前向标签重叠窗口）；样本外测试 01-23 至 01-31（7 个交易日，其中前 4 日具备完整 3 日真实标签用于 IC 评估，共 6 个持仓撮合日 01-24 至 01-31）。双层 Transformer 在 MPS 上训练 20 个轮次，总损失平滑单调收敛：epoch 1 为 0.94719，epoch 5 为 0.80301，epoch 10 为 0.72980，epoch 15 为 0.68308，epoch 20 为 0.66735。</p>
+<h3>5.2 五组策略对比</h3>
+<p>回测口径：初始资金 100.00 万元，每 3 个交易日调仓，等权选前 10 只，100 股整手，t 日收盘生成信号、t+1 日开盘价成交，买卖双向佣金 0.025%（最低 5.00 元）、仅卖出印花税 0.05%、过户费 0.001%、双边滑点 5 个基点，执行 T+1 卖出限制。样本外截面相关指标（4 个有标签交易日）如下：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th style="text-align: right;">IC</th>
+<th style="text-align: right;">RankIC</th>
+<th style="text-align: right;">ICIR</th>
+<th style="text-align: right;">RankICIR</th>
+<th style="text-align: right;">Top 10 评估超额</th>
+<th style="text-align: right;">多空（Top10 - Bot10）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>双层 Transformer</td>
+<td style="text-align: right;">-0.0047</td>
+<td style="text-align: right;">-0.0012</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">+1.14%</td>
+<td style="text-align: right;">+0.04%</td>
+</tr>
+<tr>
+<td>等权沪深 300</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr>
+<td>动量基线</td>
+<td style="text-align: right;">+0.2620</td>
+<td style="text-align: right;">+0.3314</td>
+<td style="text-align: right;">1.03</td>
+<td style="text-align: right;">1.22</td>
+<td style="text-align: right;">-1.20%</td>
+<td style="text-align: right;">+3.35%</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td style="text-align: right;">+0.0705</td>
+<td style="text-align: right;">+0.0716</td>
+<td style="text-align: right;">1.84</td>
+<td style="text-align: right;">1.98</td>
+<td style="text-align: right;">-1.75%</td>
+<td style="text-align: right;">+1.02%</td>
+</tr>
+<tr>
+<td>随机森林</td>
+<td style="text-align: right;">+0.0051</td>
+<td style="text-align: right;">+0.0204</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.64</td>
+<td style="text-align: right;">-4.26%</td>
+<td style="text-align: right;">-0.07%</td>
+</tr>
+</tbody>
+</table>
+<p>样本外真实撮合回测绩效（6 个持仓日，同期沪深 300 为 -0.51%）如下：</p>
 <table>
 <thead>
 <tr>
 <th>策略</th>
 <th style="text-align: right;">总收益</th>
 <th style="text-align: right;">净超额</th>
+<th style="text-align: right;">年化波动</th>
 <th style="text-align: right;">夏普比率</th>
+<th style="text-align: right;">Sortino 比率</th>
 <th style="text-align: right;">最大回撤</th>
+<th style="text-align: right;">日胜率</th>
 <th style="text-align: right;">交易笔数</th>
 <th style="text-align: right;">总费用（元）</th>
 </tr>
@@ -82,8 +406,11 @@
 <td>双层 Transformer</td>
 <td style="text-align: right;">+1.02%</td>
 <td style="text-align: right;">+1.53%</td>
+<td style="text-align: right;">20.51%</td>
 <td style="text-align: right;">2.16</td>
+<td style="text-align: right;">2.70</td>
 <td style="text-align: right;">-2.61%</td>
+<td style="text-align: right;">50.00%</td>
 <td style="text-align: right;">24</td>
 <td style="text-align: right;">973.90</td>
 </tr>
@@ -91,8 +418,11 @@
 <td>等权沪深 300</td>
 <td style="text-align: right;">+0.60%</td>
 <td style="text-align: right;">+1.11%</td>
+<td style="text-align: right;">16.57%</td>
 <td style="text-align: right;">1.57</td>
+<td style="text-align: right;">2.26</td>
 <td style="text-align: right;">-2.08%</td>
+<td style="text-align: right;">50.00%</td>
 <td style="text-align: right;">214</td>
 <td style="text-align: right;">1,076.00</td>
 </tr>
@@ -100,8 +430,11 @@
 <td>动量基线</td>
 <td style="text-align: right;">-0.61%</td>
 <td style="text-align: right;">-0.09%</td>
+<td style="text-align: right;">27.18%</td>
 <td style="text-align: right;">-0.83</td>
+<td style="text-align: right;">-0.82</td>
 <td style="text-align: right;">-2.96%</td>
+<td style="text-align: right;">50.00%</td>
 <td style="text-align: right;">30</td>
 <td style="text-align: right;">1,236.51</td>
 </tr>
@@ -109,8 +442,11 @@
 <td>XGBoost</td>
 <td style="text-align: right;">-3.18%</td>
 <td style="text-align: right;">-2.66%</td>
+<td style="text-align: right;">23.11%</td>
 <td style="text-align: right;">-5.76</td>
+<td style="text-align: right;">-5.83</td>
 <td style="text-align: right;">-5.38%</td>
+<td style="text-align: right;">33.33%</td>
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">763.96</td>
 </tr>
@@ -118,28 +454,206 @@
 <td>随机森林</td>
 <td style="text-align: right;">-7.02%</td>
 <td style="text-align: right;">-6.50%</td>
+<td style="text-align: right;">37.66%</td>
 <td style="text-align: right;">-7.91</td>
+<td style="text-align: right;">-7.74</td>
 <td style="text-align: right;">-9.34%</td>
+<td style="text-align: right;">16.67%</td>
 <td style="text-align: right;">25</td>
 <td style="text-align: right;">966.98</td>
 </tr>
 </tbody>
 </table>
-<p><strong>一个值得注意的现象</strong>：全截面相关指标与头部组合收益在本窗口显著背离。动量与 XGBoost 在全截面约 297 只股票上的整体相关度占优，但其头部前 10 组合在调仓与扣费后分别录得负的评估超额，真实净回测为负；双层 Transformer 的全截面相关接近于零，却靠排序头与风险头的协同把收益集中在头部，前 10 组合评估超额为 +1.14%，扣费后仍取得正收益与正超额。这说明对选股系统而言，头部排序质量与全截面平均相关是两个不同的问题，评价体系必须把两者分开。再次强调：样本外仅数日、统计量极小，以上只用于验证工程正确性与提出待检验的假设，不作为长期超额收益的结论。</p>
-<p><strong>候选结构</strong>：2024-01-31 收盘信号的前 10 名呈现杠铃结构——一端是深度超跌的高弹性成长龙头（高预期收益、高预期风险），另一端是低波动正动量的银行股（温和预期收益、低预期风险），完整名单与逐只分析见第一篇。</p>
-<h2>六、质量保障与已知局限性</h2>
-<p>13 项自动化测试全部通过，分布在硬件基准模块（5 项）、数据管道与质检（4 项）、选股管线（4 项）三组，其中包括未来价格扰动下特征不变的防前视检测、切分与撮合约束检测。当前局限性如实列示：</p>
+<p>一个极具启发性的现象是：<strong>全截面线性 IC 与头部 Top 10 组合收益在风格剧烈切换期可能显著背离</strong>。在 2024 年 1 月下旬先抑后剧烈分化的短窗口内，动量（IC +0.2620、RankIC +0.3314）与 XGBoost（IC +0.0705、ICIR 1.84）在全截面约 297 只股票的整体相关度上占优，但其头部前 10 组合在 3 日调仓与 t+1 滑点扣费后分别录得 -1.20% 与 -1.75% 的评估超额，真实净回测收于 -0.61% 与 -3.18%。相反，双层 Transformer 的全截面 4 日均值 IC 接近于零，却得益于截面排序头与风险惩罚头的协同约束，把收益集中在头部（Top 10 评估超额 +1.14%），扣费 973.90 元后录得 +1.02% 总收益、相对基准超额 +1.53%、夏普比率 2.16，优于等权基准的 +0.60%（且后者交易笔数高达 214 笔）。结论只能到这里为止：4 日样本统计量极小，这一背离是否稳定存在，必须在多年度完整历史回测中检验；但评价体系必须把全截面相关与头部组合收益分开报告，这一点从本节起就是本项目的固定做法。</p>
+<h3>5.3 2024-01-31 Top 10 候选深度分析</h3>
+<p>模型在 2024-01-31 收盘后对 297 只可交易成分股完成截面推理排序，前 10 名如下（前 9 名达到 97% 分位阈值为强候选，第 10 名为候选）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">排名</th>
+<th>代码</th>
+<th>名称</th>
+<th>等级</th>
+<th style="text-align: right;">综合得分</th>
+<th style="text-align: right;">预测收益</th>
+<th style="text-align: right;">预测风险</th>
+<th style="text-align: right;">收盘价</th>
+<th style="text-align: right;">当日涨跌</th>
+<th style="text-align: right;">换手率</th>
+<th style="text-align: right;">RSI-14</th>
+<th style="text-align: right;">5 日动量</th>
+<th style="text-align: right;">指数权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>300015.SZ</td>
+<td>爱尔眼科</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.12101</td>
+<td style="text-align: right;">+20.54%</td>
+<td style="text-align: right;">33.75%</td>
+<td style="text-align: right;">12.79</td>
+<td style="text-align: right;">-3.11%</td>
+<td style="text-align: right;">0.78%</td>
+<td style="text-align: right;">11.1</td>
+<td style="text-align: right;">-1.45</td>
+<td style="text-align: right;">0.175%</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>603259.SH</td>
+<td>药明康德</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.11956</td>
+<td style="text-align: right;">+20.11%</td>
+<td style="text-align: right;">32.60%</td>
+<td style="text-align: right;">54.20</td>
+<td style="text-align: right;">-4.66%</td>
+<td style="text-align: right;">2.56%</td>
+<td style="text-align: right;">13.3</td>
+<td style="text-align: right;">-1.51</td>
+<td style="text-align: right;">1.548%</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>002594.SZ</td>
+<td>比亚迪</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.11045</td>
+<td style="text-align: right;">+16.95%</td>
+<td style="text-align: right;">23.61%</td>
+<td style="text-align: right;">170.73</td>
+<td style="text-align: right;">-0.72%</td>
+<td style="text-align: right;">1.08%</td>
+<td style="text-align: right;">17.1</td>
+<td style="text-align: right;">-1.01</td>
+<td style="text-align: right;">0.978%</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>601633.SH</td>
+<td>长城汽车</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.10823</td>
+<td style="text-align: right;">+18.68%</td>
+<td style="text-align: right;">31.44%</td>
+<td style="text-align: right;">20.43</td>
+<td style="text-align: right;">-2.90%</td>
+<td style="text-align: right;">0.24%</td>
+<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">-0.90</td>
+<td style="text-align: right;">0.077%</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>600000.SH</td>
+<td>浦发银行</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.08920</td>
+<td style="text-align: right;">+13.22%</td>
+<td style="text-align: right;">17.19%</td>
+<td style="text-align: right;">6.83</td>
+<td style="text-align: right;">0.00%</td>
+<td style="text-align: right;">0.16%</td>
+<td style="text-align: right;">60.1</td>
+<td style="text-align: right;">+0.38</td>
+<td style="text-align: right;">0.589%</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>601166.SH</td>
+<td>兴业银行</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.08247</td>
+<td style="text-align: right;">+12.88%</td>
+<td style="text-align: right;">18.53%</td>
+<td style="text-align: right;">15.73</td>
+<td style="text-align: right;">+0.51%</td>
+<td style="text-align: right;">0.33%</td>
+<td style="text-align: right;">17.7</td>
+<td style="text-align: right;">+0.88</td>
+<td style="text-align: right;">1.467%</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>002352.SZ</td>
+<td>顺丰控股</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.07548</td>
+<td style="text-align: right;">+13.29%</td>
+<td style="text-align: right;">22.98%</td>
+<td style="text-align: right;">35.22</td>
+<td style="text-align: right;">+2.35%</td>
+<td style="text-align: right;">0.54%</td>
+<td style="text-align: right;">20.8</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: right;">0.347%</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>000001.SZ</td>
+<td>平安银行</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.07281</td>
+<td style="text-align: right;">+11.35%</td>
+<td style="text-align: right;">16.28%</td>
+<td style="text-align: right;">9.46</td>
+<td style="text-align: right;">-0.42%</td>
+<td style="text-align: right;">0.70%</td>
+<td style="text-align: right;">38.2</td>
+<td style="text-align: right;">+0.18</td>
+<td style="text-align: right;">0.498%</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>600570.SH</td>
+<td>恒生电子</td>
+<td>强候选</td>
+<td style="text-align: right;">+0.07134</td>
+<td style="text-align: right;">+14.30%</td>
+<td style="text-align: right;">28.65%</td>
+<td style="text-align: right;">21.04</td>
+<td style="text-align: right;">-4.23%</td>
+<td style="text-align: right;">2.34%</td>
+<td style="text-align: right;">16.8</td>
+<td style="text-align: right;">-1.09</td>
+<td style="text-align: right;">0.126%</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>601398.SH</td>
+<td>工商银行</td>
+<td>候选</td>
+<td style="text-align: right;">+0.06834</td>
+<td style="text-align: right;">+11.11%</td>
+<td style="text-align: right;">17.12%</td>
+<td style="text-align: right;">5.17</td>
+<td style="text-align: right;">+0.78%</td>
+<td style="text-align: right;">0.11%</td>
+<td style="text-align: right;">80.5</td>
+<td style="text-align: right;">+0.94</td>
+<td style="text-align: right;">1.248%</td>
+</tr>
+</tbody>
+</table>
+<p>双预测头的输出呈现清晰的杠铃式双风格结构。一端是深度超跌高赔率弹性组（排名 1—4 与 9）：爱尔眼科（RSI-14 为 11.1、5 日动量 -1.45）、药明康德（13.3、-1.51）、比亚迪（17.1）、长城汽车（11.0）与恒生电子（16.8），模型给出 +14.30% 至 +20.54% 的预期收益，同时以 23.61% 至 33.75% 的预测风险明确标价其高波动。另一端是低波稳健动量银行组（排名 5、6、8、10）：浦发银行、兴业银行、平安银行与工商银行，预期收益温和（+11.11% 至 +13.22%），预测风险显著更低（16.28% 至 18.53%），且 5 日动量均为正（+0.18 至 +0.94），经得分公式的风险折扣后稳步进入前十。模型对高回报伴随高风险有清醒的定价，这正是设置风险预测头的目的。</p>
+<h2>六、质量保障、已知局限性与下一阶段路线图</h2>
+<h3>6.1 自动化测试全量验证</h3>
+<p>全套 13 项单元与集成测试全部通过（0 跳过、0 失败）：硬件基准模块 5 项（命令行参数、真实系统硬件采集、内存监测、推荐配置与跨机对比、无 MPS 时的设备回退）；数据管道与质检 4 项（代码格式互转、时点成分与快照回退、防前视复权对齐与单位规约、真实产出与质检报告核验）；选股管线 4 项（未来价格扰动下特征不变的防前视检测、Purged 切分与撮合约束、真实选股产出存在性、Transformer 与多任务损失）。</p>
+<h3>6.2 已知局限性</h3>
 <ol>
-<li>历史跨度受限：真实面板目前只有一个月，尚不足以支撑规范要求的多年滚动验证与大窗口深层训练；</li>
-<li>历史时点成分权重缺口：回测暂用当前成分快照，带幸存者偏差警告，补齐历史成分变化记录是最高优先级；</li>
-<li>行业与上市日元数据缺口：行业相对强弱特征暂时退化处理，新股剔除依赖价格窗口长度的自然过滤；</li>
-<li>双机硬件与算子微基准尚未闭环：M5 Max 实机数据与大规模模型压测未运行。</li>
+<li><strong>历史时间跨度受限</strong>：真实面板仅 22 个交易日，只能支撑短窗口管线测试，尚不足以驱动规范要求的多年滚动验证与 60 / 120 日大窗口深层训练；</li>
+<li><strong>历史时点成分权重缺口</strong>：回测暂用当前成分快照（带幸存者偏差警告），接入正式历史成分变化记录是消除该偏差的最高优先级任务；</li>
+<li><strong>行业与上市日元数据缺口</strong>：上市日期缺失率 100.00%、行业字段为空，行业相对强弱特征暂时退化为相对全市场平均，新股剔除依赖价格窗口长度的自然过滤；</li>
+<li><strong>双机硬件与算子微基准未闭环</strong>：M5 Max 实机数据、算子级耗时剖面与 large 模型压测尚未运行。</li>
 </ol>
-<h2>七、下一阶段路线图</h2>
+<h3>6.3 下一阶段路线图</h3>
 <ol>
-<li><strong>全量历史回填与多年滚动验证</strong>：扩展历史区间并补全历史成分与行业映射后，重跑数据检验与全量选股验证，进入 60 与 120 日大窗口训练；</li>
-<li><strong>多任务损失消融与结构调优</strong>：逐项开关排序目标与风险目标、对比多个预测期限，定量评估各部分对夏普比率与换手率的边际贡献；</li>
-<li><strong>双机基准与精度配置</strong>：在 Mac Studio M5 Max 上完成完整基准与大模型评估，确定全量多年训练的最优算力平台与精度配置。</li>
+<li><strong>全量历史回填与多年滚动回测</strong>：扩展历史区间并补全历史成分与行业映射后，重跑数据检验与全量选股验证，进入大窗口训练与 Walk-forward 评估；</li>
+<li><strong>多任务损失消融与结构调优</strong>：逐项开关排序目标与风险目标（仅回归、无风险、无排序、完整四种模式），并对比 5、10、20 日多个预测期限，定量评估各部分对夏普比率与换手率的边际贡献；</li>
+<li><strong>双机基准与精度配置</strong>：在 Mac Studio M5 Max 上完成完整基准（含半精度测试）并与本次 M4 结果对比，确定全量多年训练的最优算力平台与精度配置。</li>
 </ol>
 <p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>

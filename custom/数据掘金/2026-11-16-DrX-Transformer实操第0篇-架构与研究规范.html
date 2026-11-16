@@ -26,7 +26,7 @@ mermaid.run();});
 <div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html" title="DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-06-SGu-双基金策略设计与回测.html" title="SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-Transformer 实操 · 第 0 篇：双层 Transformer 选股系统的架构与研究规范</span><span class="le">DrX-Transformer in Practice, Part 0: Architecture and Research Specification of a Two-Stage Transformer Stock-Selection System</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 0 opens a hands-on series documenting the design and validation of a two-stage Transformer stock-selection system for CSI 300 constituents. It states four non-negotiable research principles: zero look-ahead bias, zero survivorship bias through point-in-time constituents, strict alignment between signal generation at the close of day t and execution at the open of day t+1, and a strict ban on fabricated data in any reported result. The article then presents the end-to-end architecture — multi-source data routing, leakage-free feature engineering, purged time splits, a temporal encoder followed by a cross-sectional encoder, and a multi-task objective combining return regression, pairwise ranking and risk regression — together with the feature and label framework, the walk-forward validation protocol, the trading-cost model and the reporting metrics. Implementation details are deliberately omitted to protect intellectual property; the series reports methods, constraints and verified results only.</p></div>
-<p>本系列记录一个面向沪深 300 成分股的双层 Transformer 量化选股系统从设计、搭建到实证的完整实操过程。第 0 篇是开篇，讲系统的总体架构与研究规范；第一篇是开发日志，把真实样本试跑与校验结果放在最前面；第二篇是完整技术报告的公开版。出于知识产权保护，本系列博客只讲方法框架、研究约束与验证结果，省略实现层面的技术细节。本系列为量化研究记录，不构成投资建议。</p>
+<p>本系列记录一个面向沪深 300 成分股的双层 Transformer 量化选股系统从设计、搭建到实证的完整实操过程。第 0 篇是开篇，讲系统的总体架构与研究规范；第一篇是开发日志，把真实样本试跑与校验结果放在最前面；第二篇是完整技术报告的公开版。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开，以求自洽。本系列为量化研究记录，不构成投资建议。</p>
 <blockquote>
 <p>系列导览：第 0 篇（本篇）架构与研究规范 · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a></p>
 </blockquote>
@@ -54,30 +54,79 @@ mermaid.run();});
     J --&gt; K
 </code></pre>
 <p>数据层支持多数据源路由：单一数据源在权限、限频或连接稳定性上出问题时自动降级到备用通道，各字段的实际来源逐项记录在数据质量报告里。特征与标签、模型、训练与回测各层之间只通过落盘的数据产物衔接，任何一层都可以单独复跑与核验。</p>
-<h2>三、特征与标签（框架）</h2>
-<p>特征分五大类，全部由截至 t 日收盘的历史行情计算，不含任何未来信息：</p>
-<ul>
-<li><strong>价格与收益</strong>：多期限收益、隔夜与日内收益、振幅、价格相对多周期均线的位置；</li>
-<li><strong>动量</strong>：多窗口动量与常用动量类技术指标；</li>
-<li><strong>波动率与风险</strong>：多尺度波动率、真实波幅、滚动回撤、个股相对指数的滚动贝塔；</li>
-<li><strong>成交量与流动性</strong>：量能与成交额的短期脉冲比率、换手率及其变化、非流动性度量；</li>
-<li><strong>市场与相对强弱</strong>：指数自身的收益、动量与波动环境，个股相对指数的超额收益与相对强弱。</li>
-</ul>
-<p>个股特征在每个交易日的截面内部做标准化；市场环境特征同日所有股票共享，采用固定尺度映射保留其时序信息，不参与截面标准化。</p>
+<h2>三、特征与标签</h2>
+<h3>3.1 五大类特征（共 35 项）</h3>
+<p>全部特征由截至 t 日收盘的历史行情计算，不含任何未来信息。输入窗口长度 L 标准配置为 60 个交易日，可配置为 120 日。</p>
+<table>
+<thead>
+<tr>
+<th>特征大类</th>
+<th style="text-align: right;">数量</th>
+<th>特征列表</th>
+<th>经济含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>价格与收益</td>
+<td style="text-align: right;">11</td>
+<td><code>ret_1d</code>、<code>ret_5d</code>、<code>ret_10d</code>、<code>ret_20d</code>、<code>ret_60d</code>、<code>overnight_ret</code>、<code>intraday_ret</code>、<code>high_low_range</code>、<code>close_to_ma5</code>、<code>close_to_ma20</code>、<code>close_to_ma60</code></td>
+<td>多期限累计收益、隔夜跳空、日内走势、日内振幅与均线偏离度</td>
+</tr>
+<tr>
+<td>动量</td>
+<td style="text-align: right;">8</td>
+<td><code>mom_5</code>、<code>mom_10</code>、<code>mom_20</code>、<code>mom_60</code>、<code>rsi_14</code>、<code>macd</code>、<code>macd_signal</code>、<code>macd_hist</code></td>
+<td>多窗口趋势动量、相对强弱与 MACD 体系</td>
+</tr>
+<tr>
+<td>波动率与风险</td>
+<td style="text-align: right;">6</td>
+<td><code>vol_5</code>、<code>vol_20</code>、<code>vol_60</code>、<code>atr_14</code>、<code>rolling_mdd_60</code>、<code>beta_csi300_60</code></td>
+<td>多尺度实现波动率、平均真实波幅、滚动最大回撤、相对指数的滚动贝塔</td>
+</tr>
+<tr>
+<td>成交量与流动性</td>
+<td style="text-align: right;">5</td>
+<td><code>volume_ratio_5_20</code>、<code>amount_ratio_5_20</code>、<code>turnover_rate</code>、<code>turnover_change_1d</code>、<code>amihud_illiquidity_20</code></td>
+<td>量能与成交额的短期脉冲比率、换手水平及其变化、Amihud 非流动性</td>
+</tr>
+<tr>
+<td>市场与相对强弱</td>
+<td style="text-align: right;">5</td>
+<td><code>csi300_ret_1d</code>、<code>csi300_mom_20</code>、<code>csi300_vol_20</code>、<code>stock_excess_ret_1d</code>、<code>industry_rel_strength_20</code></td>
+<td>指数的收益、动量与波动环境，个股超额收益与相对强弱</td>
+</tr>
+</tbody>
+</table>
+<p>其中隔夜收益为 $O_{t} / C_{t-1} - 1$，日内收益为 $C_{t} / O_{t} - 1$，振幅为 $(H_{t} - L_{t}) / C_{t-1}$，Amihud 非流动性为 $|r_{t}| / \text{amount}_{t}$ 的滚动均值。</p>
+<h3>3.2 标准化：个股与市场环境分流</h3>
+<p>个股特征只在同一交易日 t 的有效成分股截面内部做 Z-score 标准化，并截断极端值：</p>
+<p>$$z_{i,t,f} = \operatorname{clip}\left(\frac{x_{i,t,f} - \mu_{t,f}}{\sigma_{t,f} + 10^{-8}},\, -3.0,\, 3.0\right)$$</p>
+<p>市场环境特征同日所有股票共享同一数值，若参与截面标准化会因当日截面方差为零而失真，因此采用固定先验尺度映射，保留其时序上的宏观状态信息：<code>csi300_ret_1d / 0.015</code>、<code>csi300_mom_20 / 0.05</code>、<code>(csi300_vol_20 - 0.012) / 0.006</code>。</p>
+<h3>3.3 标签</h3>
 <p>标签采用一致的复权价格口径。个股 i 在 t 日之后 k 日的收益定义为：</p>
 <p>$$r_{i,t,k} = \frac{P^{\text{adj}}_{i,t+k}}{P^{\text{adj}}_{i,t}} - 1$$</p>
-<p>其中 k 取 5、10、20 个交易日；相对沪深 300 的超额收益为个股收益减去同期指数收益；另设未来一段时间的波动与下行风险作为辅助风险标签。</p>
-<h2>四、双层 Transformer 与多目标学习（框架）</h2>
-<p>模型分两层，对应市场的两种结构：</p>
+<p>其中 k 取 5、10、20 个交易日；相对沪深 300 的超额收益为：</p>
+<p>$$r^{\text{excess}}_{i,t,k} = r_{i,t,k} - r^{\text{CSI300}}_{t,k}$$</p>
+<p>另设未来持有期的实现波动率与下行风险作为辅助风险标签。所有未来标签严格隔离出特征矩阵，并由训练切分的隔离带保护。</p>
+<h2>四、双层 Transformer 与多目标学习</h2>
+<p>模型分两层，对应市场的两种结构。标准配置下，输入张量为 X ∈ R^(B×N×L×F)，其中 N 为当日有效成分股数、L 为窗口长度、F = 35 为特征数。</p>
 <ul>
-<li><strong>第一层（时序）</strong>：对单只股票过去一段窗口的日频特征序列做自注意力编码，把每只股票在 t 日的状态压缩成一个表征向量；</li>
-<li><strong>第二层（截面）</strong>：把同一交易日全部成分股的表征放在一起再做一层自注意力，让模型显式学习同日股票之间的相对强弱、资金跷跷板与联动关系，并支持股票数可变与停牌缺失的掩码处理。</li>
+<li><strong>第一层（时序编码）</strong>：对单只股票长度 L 的特征序列做自注意力编码——线性投影至 d_model = 128，叠加位置编码，经 3 层多头自注意力编码器（注意力头 4、前馈维度 256、dropout 0.1），再用注意力池化把整段隐状态聚合成每只股票在 t 日的状态表征 h_{i,t} ∈ R^128；</li>
+<li><strong>第二层（截面交互）</strong>：把同一交易日全部股票的表征拼成截面序列 H_{t}，引入行业嵌入与市场环境向量，经 2 层截面自注意力编码，配合掩码（key padding mask）处理可变股票数与停牌缺失，显式学习同日股票之间的资金跷跷板效应、动量拥挤度与相对强弱结构。</li>
 </ul>
-<p>预测头同时输出三类量：预期收益、截面排序得分与风险估计。训练目标由三部分加权组成：收益回归、截面成对排序与风险回归。其中排序部分只在真实收益差异足够大、超过噪声阈值的股票对上计算，避免模型去拟合标签噪声。最终选股得分在预期收益上按风险估计做折扣，收益与风险由模型自己定价。</p>
+<p>预测头输出三个量：预期收益、排序得分与风险估计，其中进入最终排序的是前两个预测头的结果——预期超额收益 r̂_{i,t} 与预期未来风险 σ̂_{i,t}，综合得分按风险厌恶系数 λ = 0.25 做收益-风险权衡：</p>
+<p>$$s_{i,t} = \hat{r}_{i,t} - 0.25 \cdot \hat{\sigma}_{i,t}$$</p>
+<p>训练目标为多任务加权损失（当前配置 α = 1.0、β = 1.0、γ = 0.5）：</p>
+<p>$$\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{return}} + \beta \mathcal{L}_{\text{rank}} + \gamma \mathcal{L}_{\text{risk}}$$</p>
+<p>其中收益与风险两项为回归损失（均方误差，可切换为 Huber 鲁棒回归）；排序项为截面成对排序损失，先在当日截面内对得分做标准差归一化以消除量级漂移，再只在真实收益差异超过噪声阈值的股票对上计算：</p>
+<p>$$\mathcal{L}_{\text{rank}} = \operatorname{mean}_{|r_{i} - r_{j}| &gt; \tau_{\text{pair}}}\left(\log\left(1 + \exp\left(-(\tilde{s}_{i} - \tilde{s}_{j}) \cdot \operatorname{sign}(r_{i} - r_{j})\right)\right)\right)$$</p>
+<p>这一设计的目的很明确：选股最终用的是同一天股票之间的相对次序，而不是跨日可比的绝对数值；让损失函数直接对相对次序负责，并对收益与风险分别定价，模型才有可能学到「高收益预期必须同时报告高风险」这种对组合真正有用的结构。</p>
 <h2>五、训练验证与回测规范</h2>
 <ul>
-<li><strong>时间切分</strong>：训练 2015—2020 年、验证 2021—2022 年、测试 2023—2024 年，后续按滚动窗口（Walk-forward）更新；切分边界强制设置隔离带（purge 与 embargo），防止多日标签重叠造成泄漏。</li>
-<li><strong>交易成本</strong>：按 A 股真实费率结构建模，含买卖佣金（有最低收费）、卖出印花税、过户费与双边滑点，全部可配置。</li>
+<li><strong>时间切分</strong>：训练 2015—2020 年、验证 2021—2022 年、测试 2023—2024 年，后续按滚动窗口（Walk-forward）更新；切分边界强制设置隔离带（purge 与 embargo 均不少于 5 个交易日），防止多日标签重叠造成泄漏。</li>
+<li><strong>交易成本</strong>：买/卖佣金 0.025%（最低 5.00 元）、卖出印花税 0.05%、过户费 0.001%、双边滑点 5 个基点，全部可配置。</li>
 <li><strong>汇报指标</strong>：扣费前后对比的年化收益、年化波动率、夏普比率、最大回撤、卡玛比率、胜率、平均持有期、换手率、总交易成本、超额收益与信息比率。</li>
 </ul>
 <p>下一篇（第一篇）将给出这套系统在真实样本上的第一次端到端试跑：数据质检、硬件基准与样本外回测的全部校验结果。</p>
