@@ -115,6 +115,8 @@ tr:nth-child(even) td{background:#fafbfc}
 blockquote{border-left:3px solid #ccc;margin:.7em 0;padding:6px 12px;color:#555;background:#f7f7f7;font-size:.88rem}
 ul,ol{padding-left:1.4em}
 img{max-width:100%;height:auto;display:block;margin:14px auto}
+.mermaid{text-align:center;overflow-x:auto;margin:1em 0}
+.mermaid svg{max-width:100%;height:auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
 details.older-records{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 16px;margin:12px 0 20px}
 details.older-records summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0}
@@ -260,7 +262,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261107a">
+<link rel="stylesheet" href="assets/style.css?v=20261116a">
 {themeinit}
 </head>
 <body>
@@ -314,8 +316,9 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261107a">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261116a">
 {mathjax}
+{mermaid}
 {themeinit}
 </head>
 <body>
@@ -356,6 +359,20 @@ MATHJAX = """<script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>"""
+
+# Mermaid：只有正文含 ```mermaid 代码块时才加载。fenced_code 把它渲染为
+# <pre><code class="language-mermaid">，页面脚本先转成 <div class="mermaid">
+# 再调用 mermaid.run() 出图；主题跟随站点深浅（手动 data-theme 优先，否则跟系统）。
+MERMAID = """<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+document.querySelectorAll('pre > code.language-mermaid').forEach(function(code){
+var div=document.createElement('div');div.className='mermaid';div.textContent=code.textContent;code.parentElement.replaceWith(div);});
+var t=document.documentElement.getAttribute('data-theme');
+var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+mermaid.initialize({startOnLoad:false,theme:dark?'dark':'default',securityLevel:'strict'});
+mermaid.run();});
+</script>"""
 
 
 def md_to_html(text):
@@ -584,7 +601,7 @@ def build_messages_page(messages):
         title="及时快讯", body=content,
         meta_line=bi(f"共 {len(messages)} 条 · 按时间倒序",
                      f"{len(messages)} alerts - newest first"), root="", mathjax="",
-        themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+        mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
         backhash="", prevnext="")
     with open(os.path.join(SITE, "messages.html"), "w",
               encoding="utf-8") as f:
@@ -857,6 +874,7 @@ def build():
             title=htmlmod.escape(p["title"]), body=p["body"],
             meta_line=p["meta_line"],
             root="../", mathjax=MATHJAX if "$" in p["body"] else "",
+            mermaid=MERMAID if "language-mermaid" in p["body"] else "",
             themeinit=THEME_INIT, donatefloat=donatefloat_html("../"),
             backhash="#daily",
             prevnext=prevnext_html(_daily_order, _i, "../"))
@@ -946,6 +964,7 @@ def build():
             title=htmlmod.escape(p["title"]), body=p["body"],
             meta_line=p["meta_line"],
             root="../../", mathjax=MATHJAX if "$" in p["body"] else "",
+            mermaid=MERMAID if "language-mermaid" in p["body"] else "",
             themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"),
             backhash="#" + p["tab_id"],
             prevnext=prevnext_html(_order, _idx, "../../"))
@@ -1020,7 +1039,7 @@ def build_archives(daily_cards, tab_cards):
             title=f"每日报告归档 {ym}", body=body,
             meta_line=bi(f"{ym} · 共 {len(months[ym])} 篇",
                          f"{ym} - {len(months[ym])} reports"), root="",
-            mathjax="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+            mathjax="", mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
             backhash="#daily", prevnext="")
         with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
                   encoding="utf-8") as f:
@@ -1034,7 +1053,7 @@ def build_archives(daily_cards, tab_cards):
         page = PAGE_TMPL.format(
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
             meta_line=bi(f"共 {len(cards)} 篇", f"{len(cards)} posts"), root="", mathjax="",
-            themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
+            mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
             backhash="#" + tab_id, prevnext="")
         with open(os.path.join(SITE, fname), "w",
                   encoding="utf-8") as f:

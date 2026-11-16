@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第二篇-技术报告.html" title="DrX-Transformer 实操 · 第二篇：技术报告——系统设计与实证结果"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html" title="DrX-Transformer 实操 · 第 0 篇：双层 Transformer 选股系统的架构与研究规范"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验</span><span class="le">DrX-Transformer in Practice, Part 1: First End-to-End Trial Run on Real Data and Full-Pipeline Validation</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 1 of the series reports the first end-to-end trial run of the two-stage Transformer stock-selection system on real CSI 300 data from January 2024 — 22 trading days, 297 tradable constituents and 6,528 panel rows — with the validation results placed first. The data pipeline passed its Phase 1 acceptance checks with zero missing values across all core fields, under an explicit survivorship-bias warning. On a MacBook Air M4 with 32 GB of unified memory, the Metal backend accelerated forward inference by about 3.11 times and full training steps by about 3.50 times relative to CPU. In the purged out-of-sample window, the two-stage Transformer returned +1.02% net of all trading costs against -0.51% for the CSI 300, ahead of equal-weight, momentum, XGBoost and random forest baselines. All 13 automated tests passed, including a future-price perturbation test confirming zero look-ahead leakage. The sample is deliberately short: the run validates engineering correctness rather than establishing alpha.</p></div>
+<p>本篇是双层 Transformer 沪深 300 选股系统的开发日志整理版。按结果优先的顺序，先把真实样本的试跑与校验结果完整放在前面——数据质检、硬件基准、端到端回测与最新信号，开发过程的回放放在后面。出于知识产权保护，过程部分只记阶段与结论，省略实现细节。本篇为量化研究记录，不构成投资建议。</p>
+<blockquote>
+<p>系列导览：<a href="2026-11-16-DrX-Transformer实操第0篇-架构与研究规范.html">第 0 篇：架构与研究规范</a> · 第一篇（本篇）开发日志与试跑校验 · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a></p>
+</blockquote>
+<h2>一、真实样本试跑与校验结果（2024 年 1 月样本）</h2>
+<h3>1. 数据质检：Phase 1 验收通过</h3>
+<p>第一次真实数据接入使用 2024 年 1 月的沪深 300 样本（2024-01-02 至 2024-01-31，共 22 个交易日）。清洗后的面板共 6,528 条记录、297 只实际可交易的成分股（当期成分名单中有 3 只在 2024 年 1 月尚未上市，有效池自然少于 300 只，这本身就是数据未被伪造填充的旁证）。质检结论：</p>
+<ul>
+<li>主键重复行 0、非正收盘价行 0、零成交量行 0；</li>
+<li>12 个核心字段（开高低收、昨收、成交量、成交额、复权因子、换手率、流通市值、成分标记与权重等）缺失率全部为 0.00%；</li>
+<li>数据验收标记 <code>phase1_acceptance_passed = true</code>，数据来源为多源真实行情。</li>
+</ul>
+<p>需要如实标注的一点：本次成分名单因历史成分接口权限不足，退化为当前快照回退，质检报告中带有幸存者偏差警告（SURVIVORSHIP_BIAS_WARNING）；补齐历史时点成分是下一阶段的最高优先级事项。</p>
+<h3>2. 硬件基准：先量算力，再谈训练</h3>
+<p>训练开始前先在 MacBook Air M4（32.00 GB 统一内存）上跑了硬件基准（基准规模的双层 Transformer，约 68.48 万参数，标准输入为单日 300 只股票、60 日窗口）：</p>
+<ul>
+<li>前向推理：CPU 273.84 毫秒，MPS 88.18 毫秒，MPS 约 3.11 倍加速；</li>
+<li>前向加反向（完整训练步）：CPU 1,353.86 毫秒，MPS 387.14 毫秒，MPS 约 3.50 倍加速；</li>
+<li>批量从 1 增至 4 时吞吐基本持平、单步延迟近似线性上升——单个交易日截面本身已经把 GPU 并行度填满，因此这台机器上推荐小批量加基准规模模型的配置。</li>
+</ul>
+<h3>3. 端到端试跑：样本外回测（扣费后）</h3>
+<p>在短样本上启用自适应切分：训练 8 个交易日、隔离带 3 个交易日、样本外测试 7 个交易日，训练与测试之间用隔离带杜绝前向标签重叠泄漏。双层 Transformer 在 MPS 上训练 20 个轮次，训练损失由 0.95 平滑收敛至 0.67。样本外区间（2024-01-24 至 2024-01-31）按 t 日收盘出信号、t+1 日开盘成交、扣全部费用后的净收益对比如下（同期沪深 300 为 -0.51%）：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th style="text-align: right;">样本外净收益</th>
+<th style="text-align: right;">相对基准超额</th>
+<th style="text-align: right;">最大回撤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>双层 Transformer</td>
+<td style="text-align: right;">+1.02%</td>
+<td style="text-align: right;">+1.53%</td>
+<td style="text-align: right;">-2.61%</td>
+</tr>
+<tr>
+<td>等权沪深 300</td>
+<td style="text-align: right;">+0.60%</td>
+<td style="text-align: right;">+1.11%</td>
+<td style="text-align: right;">-2.08%</td>
+</tr>
+<tr>
+<td>动量基线</td>
+<td style="text-align: right;">-0.61%</td>
+<td style="text-align: right;">-0.09%</td>
+<td style="text-align: right;">-2.96%</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td style="text-align: right;">-3.18%</td>
+<td style="text-align: right;">-2.66%</td>
+<td style="text-align: right;">-5.38%</td>
+</tr>
+<tr>
+<td>随机森林</td>
+<td style="text-align: right;">-7.02%</td>
+<td style="text-align: right;">-6.50%</td>
+<td style="text-align: right;">-9.34%</td>
+</tr>
+</tbody>
+</table>
+<p>必须强调：这只是一个月的短样本、样本外仅数日，这组数字的用途是验证特征、防泄漏切分、多模型对比与真实撮合回测的端到端工程正确性，不构成任何长期超额收益的结论。完整的多年度滚动验证在下一阶段。</p>
+<h3>4. 最新信号：2024-01-31 收盘 Top 10</h3>
+<p>试跑产出的最后一个交易日（2024-01-31）收盘信号，前 10 名候选如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">排名</th>
+<th>代码</th>
+<th>名称</th>
+<th>信号等级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>300015.SZ</td>
+<td>爱尔眼科</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>603259.SH</td>
+<td>药明康德</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>002594.SZ</td>
+<td>比亚迪</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>601633.SH</td>
+<td>长城汽车</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>600000.SH</td>
+<td>浦发银行</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>601166.SH</td>
+<td>兴业银行</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>002352.SZ</td>
+<td>顺丰控股</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>000001.SZ</td>
+<td>平安银行</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>600570.SH</td>
+<td>恒生电子</td>
+<td>强候选</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>601398.SH</td>
+<td>工商银行</td>
+<td>候选</td>
+</tr>
+</tbody>
+</table>
+<p>这份名单呈现出清晰的杠铃结构：一端是短期深度超跌、弹性大的成长龙头（爱尔眼科、药明康德、比亚迪、长城汽车、恒生电子），模型给出高预期收益的同时也给出高风险估计；另一端是低波动、正动量的银行股（浦发银行、兴业银行、平安银行、工商银行），预期收益温和但风险估计显著更低，经风险折扣后稳步进入前十。收益与风险由模型的两个预测头分别定价，这是双层结构自发形成的配置形态。</p>
+<h3>5. 全量测试</h3>
+<p>全部 13 项自动化测试通过，其中包括一项关键的防泄漏检测：人为扰动未来价格后，历史特征必须保持不变——通过，说明特征管线不存在前视泄漏。</p>
+<h2>二、开发过程回放（2026-11-16 凌晨）</h2>
+<p>整个 MVP 在一夜之间分五个阶段推进：</p>
+<ol>
+<li><strong>工程初始化与环境检查</strong>：搭好目录结构、集中配置与环境自检，先确认工作区与依赖的真实状态，不假设任何东西已经就绪。</li>
+<li><strong>硬件基准模块</strong>：在写训练代码之前先建基准套件（硬件侦测、内存监测、多规模压测、跨机对比），因为双层 Transformer 的截面自注意力开销随股票数平方增长，算力边界决定了后面所有参数选择。</li>
+<li><strong>环境就绪与首次实测</strong>：在正式的 Python 3.11 环境中装齐依赖，确认 MPS 后端可用，完成第 2 节的基准实测；期间还处理了一个 macOS 上深度学习框架与树模型运行时同进程冲突导致的崩溃问题，定位后以平台自适应设置解决。</li>
+<li><strong>多数据源适配</strong>：原定的主数据源在真实探测中暴露权限与限频问题（部分接口无权限、部分接口触发小时级限额），另一公开接口在连续请求时限流断开。方案随之改为多源路由：以稳定通道为主、原数据源为可选增强、再设备用通道兜底；验收标准同步调整为「至少有一个真实数据源完整提供所需核心字段」，各字段来源逐项登记。</li>
+<li><strong>端到端链路搭建</strong>：依次完成无泄漏特征与前向标签、双层 Transformer 与多任务损失、防泄漏切分与训练、按 A 股真实制度撮合的回测引擎，以及日度信号与选股报告输出，跑通第 3 节的试跑。</li>
+</ol>
+<h2>三、下一步</h2>
+<ul>
+<li>扩展历史区间做全量回填，进入多年度滚动（Walk-forward）验证与大窗口训练；</li>
+<li>补齐历史时点成分股与行业元数据，消除幸存者偏差警告与行业特征缺口；</li>
+<li>在 Mac Studio M5 Max（64.00 GB）上完成双机硬件基准对比与大模型压测；</li>
+<li>做多任务损失的消融实验，定量评估排序目标与风险目标各自的边际贡献。</li>
+</ul>
+<p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

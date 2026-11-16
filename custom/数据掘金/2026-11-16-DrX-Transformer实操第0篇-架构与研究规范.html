@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrX-Transformer 实操 · 第 0 篇：双层 Transformer 选股系统的架构与研究规范 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+document.querySelectorAll('pre > code.language-mermaid').forEach(function(code){
+var div=document.createElement('div');div.className='mermaid';div.textContent=code.textContent;code.parentElement.replaceWith(div);});
+var t=document.documentElement.getAttribute('data-theme');
+var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+mermaid.initialize({startOnLoad:false,theme:dark?'dark':'default',securityLevel:'strict'});
+mermaid.run();});
+</script>
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html" title="DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-06-SGu-双基金策略设计与回测.html" title="SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">DrX-Transformer 实操 · 第 0 篇：双层 Transformer 选股系统的架构与研究规范</span><span class="le">DrX-Transformer in Practice, Part 0: Architecture and Research Specification of a Two-Stage Transformer Stock-Selection System</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 0 opens a hands-on series documenting the design and validation of a two-stage Transformer stock-selection system for CSI 300 constituents. It states four non-negotiable research principles: zero look-ahead bias, zero survivorship bias through point-in-time constituents, strict alignment between signal generation at the close of day t and execution at the open of day t+1, and a strict ban on fabricated data in any reported result. The article then presents the end-to-end architecture — multi-source data routing, leakage-free feature engineering, purged time splits, a temporal encoder followed by a cross-sectional encoder, and a multi-task objective combining return regression, pairwise ranking and risk regression — together with the feature and label framework, the walk-forward validation protocol, the trading-cost model and the reporting metrics. Implementation details are deliberately omitted to protect intellectual property; the series reports methods, constraints and verified results only.</p></div>
+<p>本系列记录一个面向沪深 300 成分股的双层 Transformer 量化选股系统从设计、搭建到实证的完整实操过程。第 0 篇是开篇，讲系统的总体架构与研究规范；第一篇是开发日志，把真实样本试跑与校验结果放在最前面；第二篇是完整技术报告的公开版。出于知识产权保护，本系列博客只讲方法框架、研究约束与验证结果，省略实现层面的技术细节。本系列为量化研究记录，不构成投资建议。</p>
+<blockquote>
+<p>系列导览：第 0 篇（本篇）架构与研究规范 · <a href="2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html">第一篇：真实样本试跑与全链路校验</a> · <a href="2026-11-16-DrX-Transformer实操第二篇-技术报告.html">第二篇：技术报告——系统设计与实证结果</a></p>
+</blockquote>
+<h2>一、核心研究原则（不可妥协）</h2>
+<p>这套系统在设计时先立规矩、再写模型。四条原则在管线的各个环节强制执行：</p>
+<ol>
+<li><strong>零未来信息泄漏。</strong> 时刻 t 收盘后只能使用 t 日及以前已知的数据计算特征；横截面标准化只在单个交易日内部完成；时序统计量只能在训练窗口内拟合；预测标签（未来收益）只作监督目标，严禁混入特征矩阵。</li>
+<li><strong>零幸存者偏差。</strong> 每个交易日的有效股票池必须由当日（或截至当日最近一期）的历史成分股名单决定；若因数据权限退化为当前成分股快照，必须在日志、输出元数据与报告中显式标注幸存者偏差警告，不隐瞒。</li>
+<li><strong>信号与成交时序严格对齐。</strong> 信号在 t 日收盘后生成，只允许在 t+1 日开盘后执行交易，严禁以 t 日收盘价成交；回测须模拟涨跌停不可成交、停牌不可成交、剔除 ST 与 A 股 T+1 等真实制度约束。</li>
+<li><strong>严禁伪造数据与实验结果。</strong> 离线冒烟测试若使用合成数据，必须打上明确的模拟数据标记，与真实行情产出严格隔离，不得用于任何正式回测结论或性能汇报。</li>
+</ol>
+<h2>二、系统架构与数据流</h2>
+<p>系统按「数据 → 特征 → 模型 → 回测 → 报告」的链条组织，另有一条硬件基准线贯穿训练环节，用来在动手训练之前先量清手头算力的边界：</p>
+<pre><code class="language-mermaid">flowchart TD
+    A[&quot;多源行情数据：主通道加备用通道&quot;] --&gt; B[&quot;增量加载与口径规约&quot;]
+    B --&gt; C[&quot;数据清洗与质量检验&quot;]
+    C --&gt; D[&quot;无泄漏特征工程与前向标签&quot;]
+    D --&gt; E[&quot;Purged 时序切分与张量构建&quot;]
+    E --&gt; F[&quot;双层 Transformer：时序编码与截面交互&quot;]
+    E --&gt; G[&quot;基线模型：动量、随机森林、XGBoost&quot;]
+    F --&gt; H[&quot;多任务预测：收益、排序与风险&quot;]
+    H --&gt; I[&quot;t 日收盘生成选股信号&quot;]
+    H --&gt; J[&quot;t+1 日开盘撮合回测&quot;]
+    I --&gt; K[&quot;日度选股报告&quot;]
+    J --&gt; K
+</code></pre>
+<p>数据层支持多数据源路由：单一数据源在权限、限频或连接稳定性上出问题时自动降级到备用通道，各字段的实际来源逐项记录在数据质量报告里。特征与标签、模型、训练与回测各层之间只通过落盘的数据产物衔接，任何一层都可以单独复跑与核验。</p>
+<h2>三、特征与标签（框架）</h2>
+<p>特征分五大类，全部由截至 t 日收盘的历史行情计算，不含任何未来信息：</p>
+<ul>
+<li><strong>价格与收益</strong>：多期限收益、隔夜与日内收益、振幅、价格相对多周期均线的位置；</li>
+<li><strong>动量</strong>：多窗口动量与常用动量类技术指标；</li>
+<li><strong>波动率与风险</strong>：多尺度波动率、真实波幅、滚动回撤、个股相对指数的滚动贝塔；</li>
+<li><strong>成交量与流动性</strong>：量能与成交额的短期脉冲比率、换手率及其变化、非流动性度量；</li>
+<li><strong>市场与相对强弱</strong>：指数自身的收益、动量与波动环境，个股相对指数的超额收益与相对强弱。</li>
+</ul>
+<p>个股特征在每个交易日的截面内部做标准化；市场环境特征同日所有股票共享，采用固定尺度映射保留其时序信息，不参与截面标准化。</p>
+<p>标签采用一致的复权价格口径。个股 i 在 t 日之后 k 日的收益定义为：</p>
+<p>$$r_{i,t,k} = \frac{P^{\text{adj}}_{i,t+k}}{P^{\text{adj}}_{i,t}} - 1$$</p>
+<p>其中 k 取 5、10、20 个交易日；相对沪深 300 的超额收益为个股收益减去同期指数收益；另设未来一段时间的波动与下行风险作为辅助风险标签。</p>
+<h2>四、双层 Transformer 与多目标学习（框架）</h2>
+<p>模型分两层，对应市场的两种结构：</p>
+<ul>
+<li><strong>第一层（时序）</strong>：对单只股票过去一段窗口的日频特征序列做自注意力编码，把每只股票在 t 日的状态压缩成一个表征向量；</li>
+<li><strong>第二层（截面）</strong>：把同一交易日全部成分股的表征放在一起再做一层自注意力，让模型显式学习同日股票之间的相对强弱、资金跷跷板与联动关系，并支持股票数可变与停牌缺失的掩码处理。</li>
+</ul>
+<p>预测头同时输出三类量：预期收益、截面排序得分与风险估计。训练目标由三部分加权组成：收益回归、截面成对排序与风险回归。其中排序部分只在真实收益差异足够大、超过噪声阈值的股票对上计算，避免模型去拟合标签噪声。最终选股得分在预期收益上按风险估计做折扣，收益与风险由模型自己定价。</p>
+<h2>五、训练验证与回测规范</h2>
+<ul>
+<li><strong>时间切分</strong>：训练 2015—2020 年、验证 2021—2022 年、测试 2023—2024 年，后续按滚动窗口（Walk-forward）更新；切分边界强制设置隔离带（purge 与 embargo），防止多日标签重叠造成泄漏。</li>
+<li><strong>交易成本</strong>：按 A 股真实费率结构建模，含买卖佣金（有最低收费）、卖出印花税、过户费与双边滑点，全部可配置。</li>
+<li><strong>汇报指标</strong>：扣费前后对比的年化收益、年化波动率、夏普比率、最大回撤、卡玛比率、胜率、平均持有期、换手率、总交易成本、超额收益与信息比率。</li>
+</ul>
+<p>下一篇（第一篇）将给出这套系统在真实样本上的第一次端到端试跑：数据质检、硬件基准与样本外回测的全部校验结果。</p>
+<p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
