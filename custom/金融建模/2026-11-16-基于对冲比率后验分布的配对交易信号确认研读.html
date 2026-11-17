@@ -16,62 +16,70 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <div class="wrap">
 <div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-16-基于时间序列深度学习的配对交易研读.html" title="基于时间序列深度学习的配对交易：面板残差方向预测——Yilmaz &amp; Sefer（JFDS 2025）研读"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第八讲.html" title="DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
-<h1><span class="lz">基于对冲比率后验分布的配对交易信号确认——Quadros 等（Quantitative Finance 2026）研读</span><span class="le">Pairs-Trading Signal Confirmation Based on the Posterior Distribution of the Hedge Ratio: A Reading Report on Quadros, Higgins &amp; Silverstein (Quantitative Finance 2026)</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report reviews Quadros, Higgins and Silverstein (Quantitative Finance, 2026), studied through the first author&#x27;s Kansas State University dissertation (2025, Chapter 2), whose Bayesian pairs-trading method leaves the classical cointegration strategy intact and adds a confirmation layer: a Bayesian regression with a truncated-normal prior on the hedge ratio yields its full conditional distribution, whose quantiles gate the spread signals asymmetrically - entries require the current hedge ratio to lie inside the central posterior band, while stop-losses fire only when it falls outside. On U.S. and Brazilian 30-minute data (2023-2025, gross of transaction costs), the gated strategy beats the standard benchmark on all tested pairs (e.g., QQQ-QQQM Sharpe -0.01 to 0.87), and its sampling-based filter rejects about 78% of false-positive cointegration pairs in simulations. We assess its strengths and its main weakness - no transaction costs despite higher turnover - dissect how Bayesian the method really is, and set out how the confirmation layer will be tested as an add-on gate within our M3 pairs-trading benchmark.</p></div>
-<p>本篇研读 Quadros、Higgins 与 Silverstein 发表于 Quantitative Finance 的《A Bayesian approach to generating distribution-based signals in pairs trading》。这篇论文不发明新的配对策略，而是在经典协整策略外面加了一层把关：用贝叶斯方法得到对冲比率的完整分布，再拿这条分布的分位数去确认或否决价差信号。它与上一篇研读的 <a href="2026-11-16-基于时间序列深度学习的配对交易研读.html">Yilmaz &amp; Sefer（JFDS 2025）</a> 同为本项目 M3 里程碑的对照文献，但路线完全不同——那篇是数据驱动的信号生成，这篇是概率化的信号确认。版本说明：期刊版（2026）获取受限，本文依据第一作者的博士论文（堪萨斯州立大学，2025）第二章研读，该章即期刊版的原始版本；文中数字均为论文版、且为未扣交易成本的毛收益，引用时以期刊版为准。本篇为研究记录，不构成投资建议。</p>
-<p><strong>要点速览（代表性配对，贝叶斯版 vs 标准协整基准）</strong></p>
+<h1><span class="lz">基于对冲比率后验分布的配对交易信号确认——Quadros 等（Quantitative Finance 2026）研读</span><span class="le">Pairs-Trading Signal Confirmation Based on the Posterior Distribution of the Hedge Ratio: A Reading Report on Quadros, Higgins &amp; Silverstein (Quantitative Finance 2026)</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report reviews Quadros, Higgins and Silverstein (Quantitative Finance, 2026), revised against the published journal version (26(5): 777-797) after it was obtained with the kind assistance of Dr TJ; the method itself is unchanged from the first author&#x27;s 2025 Kansas State dissertation, but the journal sample, pairs and all reported figures differ. The method leaves the classical cointegration strategy intact and adds a confirmation layer: a Bayesian regression with a truncated-normal prior on the hedge ratio yields its full conditional distribution, whose quantiles gate spread signals asymmetrically - entries require the current hedge-ratio estimate to lie inside the central posterior band, while stop-losses fire only when it falls outside. Across 41 pairs (29 U.S., sample 2015-2025; 12 Brazilian, 2020-2025; 30-minute bars, gross of transaction costs), the gated strategy beats the benchmark on 62% of U.S. and 58% of Brazilian pairs while trading about 24% less often, and its sampling-based filter rejects about 78% of false-positive cointegration pairs in simulations. We assess its strengths, dissect how Bayesian the method really is, and set out how the confirmation layer will be tested as an add-on gate within our M3 pairs-trading benchmark.</p></div>
+<p>本篇研读 Quadros、Higgins 与 Silverstein 发表于 Quantitative Finance 的《A Bayesian approach to generating distribution-based signals in pairs trading》。这篇论文不发明新的配对策略，而是在经典协整策略外面加了一层把关：用贝叶斯方法得到对冲比率的完整分布，再拿这条分布的分位数去确认或否决价差信号。它与上一篇研读的 <a href="2026-11-16-基于时间序列深度学习的配对交易研读.html">Yilmaz &amp; Sefer（JFDS 2025）</a> 同为本项目 M3 里程碑的对照文献，但路线完全不同——那篇是数据驱动的信号生成，这篇是概率化的信号确认。版本说明：本文初稿依据第一作者的博士论文（堪萨斯州立大学，2025）第二章研读，该章即期刊版的原始版本；2026-11-17 取得期刊版全文后已逐项核对修订——<strong>方法部分两版同源，但期刊版的样本、配对与全部结果数字均不同于论文版，本文现以期刊版为准</strong>；收益数字为未扣交易成本的毛收益。本篇为研究记录，不构成投资建议。</p>
+<p><strong>鸣谢</strong>：本文所据期刊版全文，承蒙 Dr TJ 慷慨协助取得，使本研读得以依据正式发表版本逐项核对、修订，谨在此致以诚挚谢意。</p>
+<p><strong>要点速览（期刊版，代表性配对，贝叶斯版 vs 标准协整基准）</strong></p>
 <table>
 <thead>
 <tr>
 <th>配对</th>
-<th>市场与样本</th>
+<th>市场</th>
 <th style="text-align: right;">基准夏普</th>
 <th style="text-align: right;">贝叶斯夏普</th>
-<th>备注</th>
+<th>累计收益倍数（基准 → 贝叶斯）</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>QQQ–QQQM</td>
-<td>美国 ETF，2023-02 至 2025-01</td>
-<td style="text-align: right;">-0.01</td>
-<td style="text-align: right;">0.87</td>
-<td>累计约 +30.00% vs 基准微亏</td>
-</tr>
-<tr>
-<td>IWM–VTWO</td>
-<td>美国 ETF，2023-02 至 2025-01</td>
-<td style="text-align: right;">0.22</td>
-<td style="text-align: right;">1.20</td>
-<td>同指数小盘 ETF 对</td>
+<td>AMAT–KLAC</td>
+<td>美国·半导体设备</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.74</td>
+<td>1.05 → 1.33，全场最大差距</td>
 </tr>
 <tr>
 <td>LEN–DHI</td>
-<td>美国股票，2023-02 至 2025-01</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td>累计收益倍数 1.66 vs 0.81</td>
+<td>美国·地产建筑</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.45</td>
+<td>0.97 → 1.11，由亏转盈</td>
 </tr>
 <tr>
-<td>PETR4–PETR3</td>
-<td>巴西股票，同股异类对</td>
-<td style="text-align: right;">0.93</td>
-<td style="text-align: right;">1.18</td>
-<td>长样本表现同样占优</td>
+<td>DOW–LYB</td>
+<td>美国·材料</td>
+<td style="text-align: right;">-0.72</td>
+<td style="text-align: right;">0.29</td>
+<td>0.91 → 1.03</td>
+</tr>
+<tr>
+<td>PETR3–PETR4</td>
+<td>巴西·同股异类</td>
+<td style="text-align: right;">1.49</td>
+<td style="text-align: right;">1.63</td>
+<td>1.14 → 1.17</td>
+</tr>
+<tr>
+<td>HAL–SLB</td>
+<td>美国·能源（反例）</td>
+<td style="text-align: right;">0.64</td>
+<td style="text-align: right;">0.22</td>
+<td>1.25 vs 1.08，基准明显更好</td>
 </tr>
 </tbody>
 </table>
-<p>另有一项结构性结果：在模拟研究中，这套方法的附带过滤器能剔除约 78.00% 的协整假阳性配对（汇总 235/302）。</p>
+<p>总体口径：共 41 个配对（美国 29、巴西 12），贝叶斯版在美国 62.00%（18/29）、巴西 58.00%（7/12）的配对上占优，并非全胜；交易次数平均减少约 24.00%。另有一项结构性结果：在模拟研究中，这套方法的附带过滤器能剔除约 78.00% 的协整假阳性配对（汇总 235/302）。</p>
 <h2>一、论文出处</h2>
 <ul>
-<li>作者：Allan Vieira de Castro Quadros（堪萨斯州立大学统计系博士，2025；现任教于北佛罗里达大学）、Michael Higgins（堪萨斯州立大学）、Brian Silverstein（南卡罗来纳大学）；</li>
-<li>出处：Quantitative Finance, 26(5), 2026, 777–797，DOI：10.1080/14697688.2026.2644357；</li>
+<li>作者：Allan Vieira de Castro Quadros（堪萨斯州立大学统计系博士，2025；现任教于北佛罗里达大学管理系）、Michael Higgins（堪萨斯州立大学统计系）、Brian Silverstein（南卡罗来纳大学金融系）；</li>
+<li>出处：Quantitative Finance, 26(5), 2026, 777–797，DOI：10.1080/14697688.2026.2644357；2025-04-13 收稿，2026-03-06 接受，2026-04-01 在线发表；</li>
 <li>原始版本：第一作者博士论文《Statistical methods with applications to pairs trading and equipment lifetime modeling》（Kansas State University, 2025）第二章，机构库开放获取，全文 147 页，其中配对交易部分为第 17–47 页。</li>
 </ul>
 <h2>二、方法：底层不动，只加一层确认</h2>
 <h3>2.1 底层：标准协整策略</h3>
 <p>底层是教科书式的协整配对交易，运行在 30 分钟 K 线上：滚动形成窗（长度 w = 65 或 130 根 K 线，约 2–4 周）内做协整检验并估计回归</p>
 <p>$$y_{t} = \beta_{0} + \beta_{1} x_{t} + \varepsilon_{t}$$</p>
-<p>价差标准化后得到 z 分数：越过 ±1 开仓（±2 的设定也做了对照）、回到 0 止盈、越过 ±(1 + ξ) 触发止损候选（ξ = 1）。执行价取每根 K 线开盘价与调整收盘价的中点。</p>
+<p>价差标准化后得到 z 分数：越过 ±1 开仓（±2 的设定也做了对照）、回到 0 止盈、越过 ±(1 + ξ) 触发止损候选（ξ = 1）。期刊版的回测协议比论文版更完整：信号在 30 分钟 K 线上生成、执行价取 5 分钟数据的实际成交价；参数不靠手工指定，而是外层滚动校准——每 3 个月校准窗内在阈值（±1/±2）、α（0.05/0.15）与窗长 w（65/130）的网格上按累计收益倍数选优，冻结后用于下一个月的样本外测试，逐月滚动（ξ = 1 全程固定）。</p>
 <h3>2.2 贝叶斯层：对冲比率的完整条件分布</h3>
 <p>作者的核心主张是：协整关系若要破裂，最先出问题的一定是对冲比率 β1——它漂移、变号，价差才跟着失衡。因此不该把 β1 当成一个点估计常数，而应监控它的分布。具体做法：对上式做贝叶斯线性回归，β 取截断多元正态先验（截断在 β1 &gt; 0，编码「同向运动资产的对冲比率为正」这一信念），σ² 取逆伽马先验；先验超参数用截至当前的 OLS 估计初始化。由共轭性，β1 的完整条件分布仍是截断正态，用 Gibbs 采样（截断部分拒绝采样）抽出这条分布，后验均值即为当期对冲比率。</p>
 <h3>2.3 不对称确认规则（全文最关键的设计）</h3>
@@ -86,18 +94,20 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </ul>
 <p>这套不对称正对着经典策略的两个已知痛点：关系已经扭曲时误进场、价差暂时走阔时被止损洗出去。</p>
 <h3>2.4 附带产物：选对过滤器</h3>
-<p>Gibbs 抽样时若前 m = 30 个 β1 抽样全部为负，说明数据与「β1 为正」的先验强烈冲突，直接丢弃该配对。模拟研究（对已知真值的协整/非协整序列反复试验）显示，该过滤器汇总剔除约 78.00% 的协整假阳性，在真 β1 较大的设定下可达 100.00%。</p>
+<p>Gibbs 抽样时若连续 m 个 β1 抽样全部为负（m 为预设的负值容忍阈值），说明数据与「β1 为正」的先验强烈冲突，直接丢弃该配对。模拟研究（对已知真值的协整/非协整序列反复试验）显示，该过滤器汇总剔除约 78.00% 的协整假阳性，在真 β1 较大的设定下可达 100.00%。</p>
 <h2>三、主要结果</h2>
-<p>数据为美国与巴西两市的 30 分钟行情，主样本 2023-02-01 至 2025-01-31（个别巴西配对回溯至 2014 年），配对以同指数/同板块 ETF 为主（SPY–IVV、VOO–IVV、QQQ–QQQM、VUG–IWF、IWM–VTWO、VNQ–IYR、REMX–LIT、GLD–IAU 等），加少数股票对（LEN–DHI、KO–PEP）与巴西同股异类对（PETR4–PETR3 等）。作者口径下，贝叶斯版在全部所测配对上优于基准（见文首速览表）：VNQ–IYR 累计收益超过 +100.00%，REMX–LIT 的累计收益倍数达 2.63（毛收益）。参数敏感性方面：±1 阈值最优，但 ±2 下贝叶斯版仍胜基准；w = 65 与 130 无一致赢家；α 越小确认越严、交易越少。值得注意的是，贝叶斯版的交易次数通常<strong>多于</strong>基准（如 GLD–IAU 由 720 次增至 1,204 次）——它赢在信号精度而非交易克制，与 JFDS 那篇深度模型靠低换手胜出恰好相反。</p>
+<p>数据为美国与巴西两市的 30 分钟行情：美股样本 2015-02-01 至 2025-01-31（整十年，含 2020 年疫情冲击），巴西样本 2020-06-22 至 2025-01-31。配对共 41 个（美国 29、巴西 12），选对方式是系统性相关筛选加经济动机两条腿：美国侧以同板块个股对为主（按 GICS 行业组织），巴西侧清一色是同股异类对（同一公司的普通股与优先股）。</p>
+<p><strong>总体战绩是「多数占优、不是全胜」</strong>：贝叶斯版在 18/29 个美国配对（62.00%）与 7/12 个巴西配对（58.00%）上跑赢基准。差距最大的几对（按累计收益倍数差，百分点）是 AMAT–KLAC（+27.90pp，夏普 0.17 → 0.74）、GM–F（+16.40pp）、LEN–DHI（+14.10pp，夏普 -0.18 → 0.45，由亏转盈）、DOW–LYB（+11.60pp，夏普 -0.72 → 0.29）与 PEP–KO（+9.00pp，夏普 0.15 → 0.54）；反例同样醒目：HAL–SLB 上基准以 16.30pp 反超（夏普 0.64 vs 0.22），KLAC–LRCX、AMD–NVDA 等对上贝叶斯版也落败。作者对此不回避，板块分解显示优势集中在波动较大的配对与同股异类对上：美国三对双类股（GOOGL–GOOG、FOXA–FOX、NWSA–NWS）全部占优；巴西双类股的绝对水平更高（ITUB3–ITUB4 夏普 3.12 → 3.74，PETR3–PETR4 为 1.49 → 1.63），作者归因于同股异类的结构性均值回归加上新兴市场更低的定价效率。稳定的低波动配对（如 MET–PRU、RSG–WM）上两法几乎打平——确认层只在价差真的容易失真时才有边际价值，这个图景是可信的。</p>
+<p><strong>与论文版最大的出入在交易次数</strong>：期刊版里贝叶斯版的交易次数平均比基准<strong>少约 24.00%</strong>（美国 -22.50%、巴西 -26.60%，逐对在 -15% 至 -29% 之间），作者把「选择性更强 → 交易更少 → 成本暴露更低」立为主要卖点之一。也就是说期刊版口径下，它与 JFDS 那篇深度模型在「靠交易克制省成本」上是同向的，只是克制的方式不同：一边是后验分位数门控的事前筛选，一边是面板信号本身的低换手。参数方面（校准窗自动选择的结果）：±1 阈值被绝大多数配对与时段选中，±2 只偶尔胜出；w = 65 与 130 无一致赢家、逐对逐期而异；α 在 0.05 与 0.15 之间也没有主导值，同一配对不同时期会切换——作者据此强调参数必须逐对校准、没有全局最优。</p>
 <h2>四、质量评价</h2>
 <p><strong>长处</strong>：切入点真实——对冲比率的估计误差与漂移是配对失效的一阶原因，把它分布化是顺理成章的修补；数学上干净，共轭结构使完整条件分布有解析形式、无黑箱，每条规则都有明确的统计含义；评估包含完整的参数敏感性与专门的选对模拟研究，不只展示收益表。</p>
 <p><strong>短板</strong>：</p>
 <ol>
-<li><strong>未扣交易成本</strong>（作者在结论中自认待补）：30 分钟频率、且交易次数高于基准，成本对该策略的侵蚀只会比基准更重，毛收益倍数不可直接当真；</li>
-<li>配对为人工挑选（「基于历史共同运动与适用性」），同指数 ETF 对近乎机械套利，向筛选型股票对的外推需打折；</li>
-<li>主样本只有两年且无危机期，结论的状态覆盖有限；</li>
+<li><strong>未扣交易成本</strong>：全部结果仍是毛收益，作者把「纳入现实成本模型」明列为未来工作。不过期刊版的交易次数比基准低约 24.00%，成本侵蚀的方向对它相对有利，毛收益与净收益之间的落差应当小于高换手策略——这只是方向判断，净收益数字仍不存在，不可直接当真；</li>
+<li>胜率只有六成上下且逐板块异质性很大：能源、金融里都有基准明显更好或贝叶斯版明显落败的配对（HAL–SLB、AMD–NVDA），确认层不是无条件增益，对新配对的预期应按「六成胜率、幅度靠右尾」来设；</li>
+<li>巴西侧的高夏普（3 以上）全部来自同股异类对——同一公司两种股票之间的价差回归近乎结构性套利，加上新兴市场的宽价差环境，这组数字不能外推到一般股票对；巴西样本也只有约五年；</li>
 <li>基准只有标准协整一家，没有与 OU 相对价值、随机控制或机器学习路线对照；</li>
-<li>m = 30 与 α 的取值是启发式，作者明说没有理论保证。</li>
+<li>ξ = 1 与负值容忍阈值 m 是启发式固定，α、w、阈值虽改为校准窗自动选择，但「以校准窗累计收益最大」选参本身有过拟合校准期的风险，作者没有做这层稳健性讨论。</li>
 </ol>
 <h2>五、它的 Bayes 体现在哪里</h2>
 <p>研读中值得单独辨析的问题：这篇的「贝叶斯」含量究竟有多少？</p>
@@ -109,7 +119,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <li><strong>确认层是策略无关组件，可直接嫁接</strong>：它不替换底层策略，只做把关。在 M3 三臂对照（经典 RV/OU、HJB-DGM 最优交易区、面板 Transformer）之外，增加一个「贝叶斯确认层开/关」的消融维度——同一臂加与不加各跑一遍，直接量化这层门控在 A 股配对与我方成本口径下的边际价值。这是对上一篇研读所定 M3 计划的一个具体补充；</li>
 <li><strong>止损不对称与本项目的既有纪律同构</strong>：本项目在新金路与 100 万组合中一直执行「止损看结构是否真破位、不因单边走阔而砍仓」的口径，这篇给出了该思想的概率化实现，可作为规则表述与参数化（α、ξ）的参考；</li>
 <li><strong>它指出 HJB 框架的一个盲区</strong>：本项目的 OU/HJB 模型把参数当已知常数，这篇提示参数不确定性可以显式进入信号层。更进一步的方向是把 β1 的后验与值函数交易区耦合（例如以后验离散度调节不交易区宽度），而不只是外挂确认——列为 M3 之后的探索项；</li>
-<li><strong>引用定位</strong>：本文列入 M3 文献清单的贝叶斯路线代表，与 JFDS（机器学习路线）、本项目 DGM 工作（随机控制路线）构成 Krauss 五分法下三条路线的对照组；正式引用其结果时须用期刊版数字，并注明论文版未扣成本这一条。</li>
+<li><strong>引用定位</strong>：本文列入 M3 文献清单的贝叶斯路线代表，与 JFDS（机器学习路线）、本项目 DGM 工作（随机控制路线）构成 Krauss 五分法下三条路线的对照组；本文数字已于 2026-11-17 全部换为期刊版口径，引用时仍须注明未扣交易成本这一条。</li>
 </ol>
 <h2>参考文献</h2>
 <ul>
@@ -118,7 +128,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <li>Engle, R. F., Granger, C. W. J. Co-integration and error correction: Representation, estimation, and testing. Econometrica, 55(2), 1987, 251–276.</li>
 <li>Krauss, C. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), 2017, 513–545.</li>
 </ul>
-<p class="meta"><span class="lz">2026-11-16 发布 · 类型：金融建模</span><span class="le">Published 2026-11-16 · Financial Modeling</span></p>
+<p class="meta"><span class="lz">2026-11-16 发布 · 2026-11-17 更新 · 类型：金融建模</span><span class="le">Published 2026-11-16 · Updated 2026-11-17 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 <div id="donatefloat">
