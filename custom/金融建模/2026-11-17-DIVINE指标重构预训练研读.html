@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>以指标重构做预训练：DIVINE 跨市场选股表示学习研读 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261116a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-16-基于时间序列深度学习的配对交易研读.html" title="基于时间序列深度学习的配对交易：面板残差方向预测——Yilmaz &amp; Sefer（JFDS 2025）研读"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">以指标重构做预训练：DIVINE 跨市场选股表示学习研读</span><span class="le">Pretraining by Indicator Reconstruction: A Reading of DIVINE, a Cross-Market Stock Representation Learning Paper</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This reading examines DIVINE (arXiv:2610.02866), a 2026 preprint from SinoPac Holdings that rethinks the supervision signal for financial time-series pretraining. Instead of reconstructing masked prices or fitting future returns, DIVINE pretrains a per-stock encoder to reconstruct 77 targets derived from 16 standard technical indicators across multiple period scales, jointly on six equity markets, and transfers only the encoder to downstream cross-sectional ranking. With a 0.05M-parameter GRU encoder it reaches an average Sharpe of 1.40 and Calmar of 1.79 over 2021-2024, beating the strongest pretraining baseline PatchTST (1.01/1.20) and the Kronos-small foundation model (1.26/1.40) with roughly 1/490 of its parameters. Clean ablations attribute the gains to supervision design and market diversity rather than scale. We note two discounts - headline results exclude transaction costs and the fixed stock universes carry survivorship effects - and map out a concrete transplant experiment: adding indicator-reconstruction pretraining to our CSI 300 dual-layer Transformer stock-selection system once its formal training phase begins.</p></div>
+<p>本篇研读永丰金控团队的预印本《DIVINE: Simple Cross-Market Stock Pretraining via Diverse Indicator Reconstruction》。这篇论文讨论的不是交易策略，而是一个更靠前的问题：金融时间序列预训练到底该用什么监督信号。它给出的答案出人意料地朴素——让模型从原始 OHLCV 出发，去重构一组经典技术指标——而实验结果显示，这个朴素答案打败了包括金融基础大模型在内的几乎所有对照。本文完整报告它的方法与结果、给出质量评价，并说明它对本项目沪深 300 双层 Transformer 选股系统的直接用途。本篇为研究记录，不构成投资建议。</p>
+<p><strong>要点速览（六个市场，测试期 2021–2024，长仓 top-k 组合，主表未扣交易成本）</strong></p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align: right;">参数量</th>
+<th style="text-align: right;">平均夏普</th>
+<th style="text-align: right;">平均卡玛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PatchTST（掩码重构预训练，最强基线）</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">1.01</td>
+<td style="text-align: right;">1.20</td>
+</tr>
+<tr>
+<td>Kronos-small（金融基础模型）</td>
+<td style="text-align: right;">24.5M</td>
+<td style="text-align: right;">1.26</td>
+<td style="text-align: right;">1.40</td>
+</tr>
+<tr>
+<td><strong>DIVINE（GRU 编码器）</strong></td>
+<td style="text-align: right;"><strong>0.05M</strong></td>
+<td style="text-align: right;"><strong>1.40</strong></td>
+<td style="text-align: right;"><strong>1.79</strong></td>
+</tr>
+</tbody>
+</table>
+<p>一句话：预训练的胜负手在监督设计与数据多样性，不在模型规模——0.05M 参数的编码器以约 1/490 的参数量压过 Kronos-small，两项优势在 25 组种子×偏移评估上均统计显著。</p>
+<h2>一、论文出处</h2>
+<ul>
+<li>作者：Kuan-Yu Chen、Shu-Cheng Zheng、Yu-Chen Den、Wei-Cheng Liao、Tien-Hao Chang，永丰金控（SinoPac Holdings，台北）；</li>
+<li>出处：arXiv:2610.02866v1 [cs.LG]，2026-10-02 提交。<strong>预印本，尚未经同行评审</strong>，引用其数字时应带上这一限定；</li>
+<li>性质定位：选股表示学习（截面排序）论文，不是配对交易论文，也没有入场、出场与仓位控制环节；它与本项目的接口在选股系统的预训练阶段，见第五节。</li>
+</ul>
+<h2>二、方法：把技术指标从「特征」改成「监督」</h2>
+<p>主流金融预训练有三条路线：重构被掩码的价格、以对比学习组织样本关系、用未来收益做监督。作者指出三条路线各有硬伤：价格重构学到的多是局部平滑结构，与收益预测对不齐；未来收益监督则把市场噪声直接写进了标签。DIVINE 的做法是换一个监督来源：</p>
+<ul>
+<li><strong>监督目标</strong>：16 个标准技术指标（SMA、EMA、MACD、TR、ATR、ROC、RSI、TRIX、RSV、随机指标 %K/%D、方向运动指标等），每个指标再取多个周期参数（多为 $k \in \lbrace 3, 5, 10, 14, 20 \rbrace$，MACD 固定 (12, 26, 9)），共 <strong>77 个「指标×周期」重构目标</strong>，全部由已观测的 OHLCV 计算得到，定义跨市场一致；</li>
+<li><strong>预训练</strong>：六个市场（沪深 300、中证 500、日经 225、标普 500、富时 100、台股 TWSE300）联合训练一个逐股编码器（默认 GRU，另有 Transformer 与 Mamba 变体），损失为对 77 个目标的重构误差；</li>
+<li><strong>下游迁移</strong>：只迁移编码器，接排序头做截面收益排序。下游输入为 20 日窗口的标准化 OHLCV 加三条均线偏离特征，预测目标为未来 5 日收益，组合为长仓 top-k。</li>
+</ul>
+<p>设计上的关键判断是：技术指标是几十年交易实践沉淀下来的「量价动态摘要」，用它们当监督，等于让编码器先学会人类交易员看盘时提取的那组结构，再去学排序——监督本身携带了与收益预测对齐的归纳偏置，而又不引入任何未来信息。</p>
+<h2>三、主要结果与消融</h2>
+<p><strong>主结果</strong>（六市场平均，DIVINE-GRU 分市场夏普/卡玛）：沪深 300 为 1.52/1.64，中证 500 为 1.98/2.21，日经 225 为 1.25/1.15，标普 500 为 1.65/3.77，富时 100 为 0.57/0.41，台股为 1.42/1.55。同一 DIVINE 目标换上 Transformer 或 Mamba 编码器同样领先全部预训练基线，说明增益来自监督设计而非某个骨干网络。参数量大得多的 FinCast（991.4M）甚至跑不赢从零训练的模型——「金融基础模型越大越好」在这组对照里不成立。</p>
+<p><strong>消融链条</strong>（这是全文最有说服力的部分，三步拆清增益来源）：</p>
+<ol>
+<li>指标当<strong>输入特征</strong>喂给从零训练的模型，平均夏普/卡玛只有 0.83/0.94 一线；把同一批指标改作<strong>重构目标</strong>做预训练，显著更高——指标的价值在监督端，不在特征端；</li>
+<li>单市场预训练为 1.18/1.42，六市场联合预训练升至 1.40/1.79——市场多样性是独立增益来源，逐个剔除任一市场的实验（leave-one-market-out）方向一致；</li>
+<li>下游用编码器隐状态（1.40/1.79）优于直接用重构出的指标值（1.33/1.57）——编码器学到的不止是它被要求重构的那组指标本身。</li>
+</ol>
+<p><strong>两条设计原则</strong>：其一，指标<strong>种类</strong>的多样性远比周期尺度的多样性重要——4 种指标配齐多周期（约 20 个目标）仍不如 16 种指标只取单周期（16 个目标），增益来自覆盖更多种不同的市场动态，而非目标数量；其二，数据效率很高——只用 10% 的预训练语料，DIVINE 已超过用全量语料训练的全部对照基线。评估协议本身也值得记一笔：每种设置跑 5 个随机种子 × 5 个交错起始偏移共 25 组评估，报告标准差，并对与 Kronos-small 的比较做了配对 t 检验。</p>
+<h2>四、质量评价</h2>
+<p><strong>长处</strong>：问题提得准（监督设计而非架构竞赛）；消融干净且层层对照；对自家方法的短板不回避（见下）；结论克制，把「监督设计 + 跨市场多样性」而非「某个新架构」立为贡献。</p>
+<p><strong>短板与折扣项</strong>：</p>
+<ol>
+<li><strong>主表不含交易成本</strong>。附录补了分市场的成本情景（佣金、交易所与监管费率分列），DIVINE 在扣成本后仍保持平均第一，但费率取得偏低（A 股卖出侧约 0.056%），且 5 日周期 top-k 组合的真实换手成本会更高，引用夏普时必须注明「主表未扣成本」；</li>
+<li><strong>固定股票池、非时点 universe</strong>。作者明说各市场用覆盖全研究期的固定成分、缺失率过滤，这不是 point-in-time 可投资回测，存在幸存者效应，绝对收益只能当受控对照读，不能当实盘预期；</li>
+<li><strong>逐股编码器不建模股票间关系</strong>，这正是它在最小的富时 100（81 只）上明显吃亏、被显式建模截面关系的方法追平或反超的原因，作者在正文里承认了这一局限；</li>
+<li>IC/RankIC 与组合指标在单个市场上有分歧（例如台股上 PatchTST 的 IC 更高而 DIVINE 的组合夏普更高），作者以「top-k 组合才是实际用途」为主指标口径作了说明，平均意义上 DIVINE 的 IC/RankIC 仍居首，但单市场引用时要小心。</li>
+</ol>
+<p>总评：方法学扎实的工业界预印本。它证明的命题——<strong>预训练监督的设计比模型规模重要</strong>——对所有做选股表示学习的人都成立，值得留档并做复现实验。</p>
+<h2>五、与本项目的结合</h2>
+<h3>5.1 对沪深 300 双层 Transformer 选股系统：一个现成的预训练实验</h3>
+<p>本项目的双层 Transformer 选股系统（见 <a href="../数据掘金/2026-11-16-DrX-Transformer实操开篇-架构与研究规范.html">Transformer 实操系列</a>）目前是时序编码 + 截面交互双层结构、多任务损失（收益回归 + 截面排序 + 风险回归）、从零训练。DIVINE 给出的可移植件非常具体：</p>
+<ul>
+<li><strong>加一个预训练阶段</strong>：在现有训练之前，先以「从 OHLCV 重构 77 个指标×周期目标」预训练时序编码层，再接原多任务损失微调，与现版本做同口径对照（同一 Purged 切分、同一 t+1 开盘撮合、同一成本口径）。这是低成本、高信息量的单变量实验：DIVINE 的消融预测它应当有正增益，且增益应主要出现在样本外排序的稳定性上；</li>
+<li><strong>两边恰好互补</strong>：DIVINE 的已知短板是逐股编码、无截面建模；我们的第二层截面交互正对这个缺口。若预训练实验成立，「指标重构预训练 + 截面交互」就是一个完整的故事，也是这篇预印本没有做、我们可以补上的组合；</li>
+<li><strong>评估协议可直接借用</strong>：多种子 × 交错偏移的 25 组评估加标准差报告，比单次切分的说服力高一个量级，适合并入后续 Phase 的验收口径。</li>
+</ul>
+<p><strong>执行时点</strong>：本系统当前冻结待选定付费数据供应商、全量回填后再进入正式训练（见 <a href="../数据掘金/2026-11-16-DrX-Transformer实操第四篇-Phase3技术报告.html">第四篇：Phase 3 技术报告</a>）。指标重构预训练实验已记入待办，将在正式训练批次启动时一并排入，不单独为它开一轮训练。</p>
+<h3>5.2 与配对交易线（M3）的关系：只作特征层参考</h3>
+<p>需要把定位说清：DIVINE 没有价差建模、没有最优交易区、不涉及 HJB 决策层，因此<strong>不进 M3 的三臂对照</strong>（经典 RV/OU、HJB-DGM、面板 Transformer 的格局不变，标准对照文献仍是 Yilmaz &amp; Sefer，见 <a href="2026-11-16-基于时间序列深度学习的配对交易研读.html">上一篇研读</a>）。它至多作为 ML 臂的一个候选特征提取器出现。把它放对抽屉，比夸大它的覆盖面更重要。</p>
+<h2>参考文献</h2>
+<ul>
+<li>Chen, K.-Y., Zheng, S.-C., Den, Y.-C., Liao, W.-C., Chang, T.-H. DIVINE: Simple Cross-Market Stock Pretraining via Diverse Indicator Reconstruction. arXiv:2610.02866v1, 2026.</li>
+<li>Nie, Y., Nguyen, N. H., Sinthong, P., Kalagnanam, J. A Time Series is Worth 64 Words: Long-term Forecasting with Transformers (PatchTST). ICLR 2023. arXiv:2211.14730.</li>
+<li>Shi, Y., et al. Kronos: A Foundation Model for the Language of Financial Markets. arXiv:2508.02739, 2025.</li>
+</ul>
+<p class="meta"><span class="lz">2026-11-17 发布 · 类型：金融建模</span><span class="le">Published 2026-11-17 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
