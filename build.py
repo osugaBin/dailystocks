@@ -1112,8 +1112,9 @@ def build():
         shown = cards[:HOME_LIMIT]
         inner = "\n".join(shown) if shown else f'<p class="empty">{bi("暂无内容", "No content yet")}</p>'
         if len(cards) > HOME_LIMIT and archive_href:
+            _total = len(tab_order[tid]) if tid in tab_order else len(cards)
             inner += (f'<p class="more"><a href="{archive_href}">'
-                      + bi(f"查看全部 {len(cards)} 篇 →", f"View all {len(cards)} →")
+                      + bi(f"查看全部 {_total} 篇 →", f"View all {_total} →")
                       + "</a></p>")
         hid = "" if tid == "daily" else " hidden"
         parts.append(
