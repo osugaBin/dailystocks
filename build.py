@@ -120,6 +120,12 @@ img{max-width:100%;height:auto;display:block;margin:14px auto}
 figcaption,.imgcap{text-align:center;color:var(--muted);font-size:.82rem;margin:-6px 0 14px}
 details.older-records{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 16px;margin:12px 0 20px}
 details.older-records summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0}
+details.series-group{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 16px;margin:12px 0}
+details.series-group summary{cursor:pointer;font-weight:700;font-size:1.02rem;color:var(--accent);padding:6px 0}
+.series-list{list-style:none;padding:0;margin:6px 0 10px}
+.series-list li{padding:7px 0;border-bottom:1px dashed var(--line)}
+.series-list li:last-child{border-bottom:none}
+.series-list .sdate{color:var(--muted);font-size:.82rem;margin-left:8px;white-space:nowrap}
 /* 及时快讯浮窗 */
 #msgfloat{position:fixed;right:16px;bottom:16px;z-index:60;
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
@@ -262,7 +268,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261116a">
+<link rel="stylesheet" href="assets/style.css?v=20261119a">
 {themeinit}
 </head>
 <body>
@@ -316,7 +322,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261116a">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261119a">
 {mathjax}
 {mermaid}
 {themeinit}
@@ -818,6 +824,71 @@ def prevnext_html(order, idx, root):
     return "".join(parts)
 
 
+SERIES_LECTURE_PHASES = [
+    (1, 8, "第一阶段 · 经典变分", "Phase 1 · Classical Calculus of Variations"),
+    (9, 11, "第二阶段 · 随机变分与大偏差",
+     "Phase 2 · Stochastic Variational Methods and Large Deviations"),
+    (12, 99, "第三阶段 · 最优控制与随机控制",
+     "Phase 3 · Optimal and Stochastic Control"),
+]
+
+
+def build_series_page(model_by_slug):
+    """变分法与金融数学专题页：导读 + 逐讲研读（按讲次正序、按阶段折叠）
+    + 专题研究。讲义新讲发布后按文件名自动纳入对应阶段，无需改代码。"""
+    intro_slugs = ["2026-11-03-DrX-变分法学习路径与策略实现规划",
+                   "2026-11-03-DrX-HJ方程到BS方程"]
+    study_slugs = ["2026-11-08-DrX-变分法研究方案第二讲",
+                   "2026-11-03-DrX-美式期权变分不等式与自由边界"]
+    lectures = []  # (讲次, slug)
+    for slug in model_by_slug:
+        m = re.search(r"变分学讲义第([一二三四五六七八九十两]+|\d+)讲", slug)
+        if m:
+            n = int(m.group(1)) if m.group(1).isdigit() else _cn_num(m.group(1))
+            lectures.append((n, slug))
+    lectures.sort()
+
+    def _li(slug):
+        href, title = model_by_slug[slug]
+        return (f'<li><a href="{href}">{htmlmod.escape(title)}</a>'
+                f'<span class="sdate">{slug[:10]}</span></li>')
+
+    groups = []  # (summary_html, [li...], 是否默认展开)
+    _intro = [_li(s) for s in intro_slugs if s in model_by_slug]
+    if _intro:
+        groups.append((bi("导读与总览", "Orientation and Overview"),
+                       _intro, True))
+    for lo, hi, zh, en in SERIES_LECTURE_PHASES:
+        _items = [_li(s) for n, s in lectures if lo <= n <= hi]
+        if _items:
+            groups.append((bi(zh, en), _items, False))
+    _study = [_li(s) for s in study_slugs if s in model_by_slug]
+    if _study:
+        groups.append((bi("专题研究与应用", "Research Studies and Applications"),
+                       _study, False))
+    total = sum(len(g[1]) for g in groups)
+    parts = ["<p>" + bi(
+        "本专题汇集「变分法与金融数学」系列全部文章：以张恭庆《变分学讲义》逐讲研读为主线，辅以导读、研究方案与期权定价应用。逐讲研读按讲次正序排列、按阶段折叠，点阶段标题即可展开；新讲发布后自动归入对应阶段。",
+        "This series collects all articles of the Calculus of Variations and Financial Mathematics programme: lecture-by-lecture readings of Zhang Gongqing's Lectures on the Calculus of Variations, with orientation pieces, research studies and options-pricing applications. Lectures are listed in reading order, grouped into collapsible phases.") + "</p>"]
+    for summ, items, opened in groups:
+        parts.append(
+            f'<details class="series-group"{" open" if opened else ""}>'
+            f'<summary>{summ} · '
+            + bi(str(len(items)) + " 篇", str(len(items)) + " posts")
+            + f'</summary><ul class="series-list">{"".join(items)}</ul></details>')
+    page = PAGE_TMPL.format(
+        title="专题 · 变分法与金融数学", body="\n".join(parts),
+        meta_line=bi(f"专题 · 共 {total} 篇 · 金融建模",
+                     f"Series · {total} posts · Financial Modeling"),
+        root="", mathjax="", mermaid="", themeinit=THEME_INIT,
+        donatefloat=donatefloat_html(""), backhash="#model", prevnext="")
+    with open(os.path.join(SITE, "series-variational.html"), "w",
+              encoding="utf-8") as f:
+        f.write(page)
+    print(f"page: series-variational.html ({total} 篇)")
+    return total
+
+
 def build():
     messages = collect_messages()
     build_messages_page(messages)
@@ -957,6 +1028,21 @@ def build():
                              + [h for k, h in data_order_keyed
                                 if k not in _pinned])
 
+    # 金融建模置顶：变分法专题入口卡（不进 tab_order 的前一篇/后一篇序列，
+    # 栏目标题计数时减去这一张，见 tabbar 处）
+    _model_by_slug = {os.path.basename(p["href"])[:-5]: (p["href"], p["title"])
+                      for p in custom_pages if p["tab_id"] == "model"}
+    build_series_page(_model_by_slug)
+    _series_date = max((s[:10] for s in _model_by_slug if "变分" in s),
+                       default="2026-11-03")
+    tab_cards["model"].insert(0, card(
+        "series-variational.html", "model", "2026-11-03",
+        "专题 · 变分法与金融数学（全系列汇编）",
+        "张恭庆《变分学讲义》逐讲研读全系列：经典变分、随机变分与大偏差、最优控制与随机控制，附导读与专题研究——按阶段折叠汇编，一页读完整个系列。",
+        "2026-11-03", update_date=_series_date,
+        title_html=bi("专题 · 变分法与金融数学（全系列汇编）",
+                      "Series · Calculus of Variations and Financial Mathematics")))
+
     for p in custom_pages:
         _order = tab_order[p["tab_id"]]
         _idx = [h for h, _ in _order].index(p["href"])
@@ -988,7 +1074,7 @@ def build():
     HOME_LIMIT = 10  # 首页每栏最多显示条数，超出进归档页
     tabbar = ['<div class="tabs" role="tablist">']
     for tid in order:
-        n = len(panels[tid][1])
+        n = len(panels[tid][1]) - (1 if tid == "model" else 0)  # 减去变分法专题入口卡
         active = " active" if tid == "daily" else ""
         tabbar.append(
             f'<button class="tab{active}" data-tab="{tid}" role="tab">'
@@ -1050,9 +1136,10 @@ def build_archives(daily_cards, tab_cards):
                           ("model", "archive-model.html")):
         cards = tab_cards[tab_id]
         body = "\n".join(cards) if cards else f'<p class="empty">{bi("暂无内容", "No content yet")}</p>'
+        _n = len(cards) - (1 if tab_id == "model" else 0)  # 减去变分法专题入口卡
         page = PAGE_TMPL.format(
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
-            meta_line=bi(f"共 {len(cards)} 篇", f"{len(cards)} posts"), root="", mathjax="",
+            meta_line=bi(f"共 {_n} 篇", f"{_n} posts"), root="", mathjax="",
             mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
             backhash="#" + tab_id, prevnext="")
         with open(os.path.join(SITE, fname), "w",
