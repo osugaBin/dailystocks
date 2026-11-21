@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第二篇-Phase1技术报告.html" title="DrX-Transformer 实操 · 第二篇：Phase 1 技术报告——系统设计与实证结果"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操开篇-架构与研究规范.html" title="DrX-Transformer 实操 · 开篇：双层 Transformer 选股系统的架构与研究规范"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验</span><span class="le">DrX-Transformer in Practice, Part 1: First End-to-End Trial Run on Real Data and Full-Pipeline Validation</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 1 of the series reports the first end-to-end trial run of the two-stage Transformer stock-selection system on real CSI 300 data from January 2024 — 22 trading days, 297 tradable constituents and 6,528 panel rows — with the validation results placed first. The data pipeline passed its Phase 1 acceptance checks with zero missing values across all core fields, under an explicit survivorship-bias warning. On a MacBook Air M4 with 32 GB of unified memory, the Metal backend accelerated forward inference by about 3.11 times and full training steps by about 3.50 times relative to CPU. In the purged out-of-sample window, the two-stage Transformer returned +1.02% net of all trading costs against -0.51% for the CSI 300, ahead of equal-weight, momentum, XGBoost and random forest baselines. All 13 automated tests passed, including a future-price perturbation test confirming zero look-ahead leakage. The sample is deliberately short: the run validates engineering correctness rather than establishing alpha.</p></div>
 <p>本篇是双层 Transformer 沪深 300 选股系统的开发日志整理版。按结果优先的顺序，先把真实样本的试跑与校验结果完整放在前面——数据质检、硬件基准、端到端回测与最新信号，开发过程的回放放在后面。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开。本篇为量化研究记录，不构成投资建议。</p>
@@ -264,6 +264,7 @@
 <li>在 Mac Studio M5 Max（64.00 GB）上完成双机硬件基准对比与大模型压测；</li>
 <li>做多任务损失的消融实验，定量评估排序目标与风险目标各自的边际贡献。</li>
 </ul>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -337,5 +338,6 @@
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

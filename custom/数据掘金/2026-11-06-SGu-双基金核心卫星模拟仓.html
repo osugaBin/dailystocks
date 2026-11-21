@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SGu-双基金核心-卫星模拟仓：每日运行记录 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 
 
 <script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-10-14-DrX-新金路箱体回归模拟交易.html" title="DrX-新金路箱体回归模拟交易"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第四篇-Phase3技术报告.html" title="DrX-Transformer 实操 · 第四篇：Phase 3 技术报告——数据源核查、诊断试点与付费数据准入"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">SGu-双基金核心-卫星模拟仓：每日运行记录</span><span class="le">SGu Core-Satellite Dual-Fund Portfolio: Daily Simulation Record</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This page is the daily operating record of a CNY 1,000,000 simulated core-satellite portfolio built for SGu: 70% in China Merchants Quantitative Selection Fund (001917) and 30% in Yongying Technology Select Fund (022364), with the two sleeves accounted independently. A rotating operation card at the top states the current positions, the orders to be executed at the next published NAV, and the trigger levels for the day. Below it, a brief rule summary is followed by the current status of both sleeves, the latest indicator charts, and a dated log of every signal, trade and equity reading since inception. The design rationale, mathematical models, complete rule set and backtest are documented in the companion theory article; this page records execution only.</p></div>
 <blockquote>
@@ -142,6 +142,7 @@
 <li>启动信号（截至 2026-11-05 净值）：001917 单位净值 3.3119（当日 +2.51%），Z-Score -1.30、Alpha_{20d} +3.05%，状态 NEUTRAL ——按规则建立 60% 标准底仓，挂单于今晚净值执行申购（约 420,000.00 元）；022364 单位净值 3.7014（当日 -2.89%），累计净值 3.7014 远低于 MA60 清仓线 5.0157，MA60 斜率 -0.02106/日，距 60 日高点回撤 -35.62%，状态 HARD_EXIT——30 万元全额现金空仓观望。</li>
 <li>两年回测见理论篇（2026-11-06 修订：档位触发与 FIFO 分档费率口径）：双状态机组合最大回撤 -17.84%，买入持有组合 -34.61%。</li>
 </ul>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-06 发布 · 2026-11-21 更新 · 类型：数据掘金</span><span class="le">Published 2026-11-06 · Updated 2026-11-21 · Data Mining</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -215,5 +216,6 @@
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

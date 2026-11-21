@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-Transformer 实操 · 第二篇：Phase 1 技术报告——系统设计与实证结果 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -23,7 +23,7 @@ mermaid.run();});
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第三篇-Phase2技术报告.html" title="DrX-Transformer 实操 · 第三篇：Phase 2 技术报告——数据审计、工程修复与 Walk-Forward 验收"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操第一篇-真实样本试跑与全链路校验.html" title="DrX-Transformer 实操 · 第一篇：真实样本试跑与全链路校验"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-Transformer 实操 · 第二篇：Phase 1 技术报告——系统设计与实证结果</span><span class="le">DrX-Transformer in Practice, Part 2: Phase 1 Technical Report — System Design and Out-of-Sample Results</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Part 2 presents the public edition of the full technical report for the two-stage Transformer CSI 300 stock-selection system. It summarises the design — a leakage-free feature framework, calendar-aligned forward labels, a temporal encoder followed by a cross-sectional encoder, and a scale-invariant multi-task loss combining return regression, pairwise ranking and risk regression — and the multi-source data engineering that replaced permission-limited and rate-limited primary feeds with a routed fallback architecture, passing Phase 1 quality acceptance on 6,528 real panel rows with zero missing core fields. Hardware benchmarks on a MacBook Air M4 show Metal acceleration of about 3.11 times for inference and 3.50 times for training steps. The purged out-of-sample comparison shows the Transformer returning +1.02% net of costs, a net excess of +1.53% over the CSI 300 at -0.51%, and documents a clear divergence between full-cross-section correlation metrics and top-10 portfolio returns. Limitations and the multi-year walk-forward roadmap are stated in full.</p></div>
 <p>本篇是双层 Transformer 沪深 300 选股系统的完整技术报告的公开版，系统整理研究约束、系统设计、多数据源工程、硬件基准与样本外实证结果。本系列只对源代码与实现细节保密，方法逻辑、公式与全部验证结果完整公开，以求自洽。本篇为量化研究记录，不构成投资建议。</p>
@@ -820,6 +820,7 @@ mermaid.run();});
 <li><strong>多任务损失消融与结构调优</strong>：逐项开关排序目标与风险目标（仅回归、无风险、无排序、完整四种模式），并对比 5、10、20 日多个预测期限，定量评估各部分对夏普比率与换手率的边际贡献；</li>
 <li><strong>双机基准与精度配置</strong>：在 Mac Studio M5 Max 上完成完整基准（含半精度测试）并与本次 M4 结果对比，确定全量多年训练的最优算力平台与精度配置。</li>
 </ol>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-16 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-16 · Data Mining</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -893,5 +894,6 @@ mermaid.run();});
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

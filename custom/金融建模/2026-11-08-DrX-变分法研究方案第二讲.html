@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX-变分法研究方案 · 第二讲：用 Euler-Lagrange 方程攻打例 1.6——bang-bang 解的由来与 Merton 问题对照 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第六讲.html" title="DrX-张恭庆《变分学讲义》第六讲：含多重积分的变分问题——Euler-Lagrange 方程、Legendre-Hadamard 条件与 Jacobi 场"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-11-07-DrX-变分学讲义第五讲.html" title="DrX-张恭庆《变分学讲义》第五讲：Hamilton-Jacobi 理论——程函、Legendre 变换与完全积分"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DrX-变分法研究方案 · 第二讲：用 Euler-Lagrange 方程攻打例 1.6——bang-bang 解的由来与 Merton 问题对照</span><span class="le">Lecture 2 of the Variational Methods Research Programme: Attacking Example 1.6 with the Euler-Lagrange Equation - the Bang-Bang Solution and the Merton Problem</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Lecture 2 of the variational-methods research programme takes option (B) from Lecture 1&#x27;s preview: it attacks Example 1.6 of Zhang Gongqing&#x27;s Lectures, the commodity reinvestment problem, with the Euler-Lagrange equation. Eliminating the control gives a functional with density L = q - q&#x27;/alpha, whose Euler-Lagrange equation degenerates to the false identity 1 = 0: the functional has no stationary curve, so the maximum lies on the boundary of the admissible set. A complete elementary proof follows from the identity J = integral of q dt - (q(T) - q0)/alpha and a split-point estimate that eliminates the terminal term at s* = T - 1/alpha, yielding the unique bang-bang optimum; for alpha = 0.50 and T = 3.00 the optimal total output is 329.74 against 300.00 for never investing (+9.91%). The same machinery applied to the deterministic Merton problem succeeds and produces the Ramsey rule c&#x27;/c = (r - rho)/gamma, while the stochastic Merton problem is solved through the HJB equation with the constant fraction (b - r)/(sigma^2 gamma). The dividing line is curvature: linearity in the control gives switching solutions, strict concavity gives interior ones.</p></div>
 <p><strong>DrX Quantitative Research</strong> · 2026年11月8日</p>
@@ -237,6 +237,7 @@ $$</p>
 <p>[1] 张恭庆. 变分学讲义. 北京: 高等教育出版社, 2011. ISBN 978-7-04-031958-3.（本文引用第一讲 §1.4 例 1.6；E-L 方程与角点条件见第二讲，Weierstrass 过剩函数见第四讲，Hamilton-Jacobi 理论见第五讲，对偶作用原理见第十四讲，最优控制与最大值原理见第十九讲）</p>
 <p>[2] Øksendal, B. Stochastic Differential Equations: An Introduction with Applications. 5th edition. Berlin: Springer, 1998（2000 年修正印次）.（本文引用 §1.5 问题 6 与 Ch. 11 随机最优控制与验证定理）</p>
 <p>[3] Nualart, D. The Malliavin Calculus and Related Topics. 2nd edition. Berlin: Springer, 2006.（本讲未直接引用其定理，仅沿用全系列三本书合读的框架）</p>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-08 发布 · 类型：金融建模</span><span class="le">Published 2026-11-08 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -310,5 +311,6 @@ $$</p>
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#data">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/数据掘金/2026-11-16-DrX-Transformer实操开篇-架构与研究规范.html" title="DrX-Transformer 实操 · 开篇：双层 Transformer 选股系统的架构与研究规范"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/数据掘金/2026-11-03-DrX-把最大亏损写成常数.html" title="DrX-把最大亏损写成常数：箱体回归数字规程的公式体系与两轮实盘对照"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">SGu-双基金核心-卫星组合：策略设计、数学模型与历史回测</span><span class="le">SGu Core-Satellite Dual-Fund Strategy: Design, Mathematical Models and Backtest</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This article documents the design of a CNY 1,000,000 simulated core-satellite portfolio for SGu, allocating 70% to China Merchants Quantitative Selection Fund (001917) and 30% to Yongying Technology Select Fund (022364). The core fund, whose detrended cumulative NAV is modelled as an Ornstein-Uhlenbeck process, is traded with a level-triggered Z-score state machine (100% below -2.5 sigma, 80% below -1.8 sigma, 30% above +2.0 sigma, 60% near the mean), guarded by an alpha filter and a CSI 500 circuit breaker. The satellite fund, modelled as a jump-diffusion, is traded with right-side momentum, a -12% drawdown cut and a hard MA60 exit. Portfolio variance is decomposed with an Euler risk attribution, and a two-year backtest on real NAV data with fund-schedule FIFO fees shows the combined state machines reducing maximum drawdown from -34.61% to -17.84% versus buy-and-hold.</p></div>
 <blockquote>
@@ -263,6 +263,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <p>第二，001917 状态机的累计收益（+21.72%）低于买入持有（+36.16%），波动由 20.45% 降至 12.28%，回撤由 -21.13% 收窄至 -11.98%；夏普比率 0.67，略低于买入持有的 0.71，卡玛比率 0.86，高于买入持有的 0.79。该窗口内基准以上涨为主，均值回归规则在净值上行至 +2σ 时减仓、在大部分时间只维持 60% 至 80% 仓位，因此收益低于满仓持有。这是该规则在单边上涨窗口中的预期表现。</p>
 <p>第三，组合层双状态机的最大回撤为 -17.84%，约为买入持有（-34.61%）的一半；年化波动由 29.86% 降至 18.77%；夏普比率由 1.42 升至 1.71，卡玛比率由 1.28 升至 1.92。</p>
 <p>局限：回测窗口只有两年，且只包含一轮科技股周期；022364 的历史自其成立日（2024-10-30）起，没有更早的样本。回测按公布净值成交，未考虑申购限额、确认延迟与巨额赎回限制。结果对窗口选择敏感，不应外推为未来收益的估计。</p>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-06 发布 · 类型：数据掘金</span><span class="le">Published 2026-11-06 · Data Mining</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -336,5 +337,6 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

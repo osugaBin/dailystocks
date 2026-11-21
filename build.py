@@ -270,7 +270,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DrX Daily · 每日市场洞察</title>
-<link rel="stylesheet" href="assets/style.css?v=20261119b">
+<link rel="stylesheet" href="assets/style.css?v=20261121a">
 {themeinit}
 </head>
 <body>
@@ -279,7 +279,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 <div class="head-row"><h1>DrX Daily · <span class="lz">每日市场洞察</span><span class="le">Daily Market Insights</span></h1><button type="button" class="theme-toggle lang-toggle">EN</button></div>
 <div class="sub-row">
 <p><span class="lz">数据驱动 · 行情复盘 · 金融建模</span><span class="le">Data-Driven · Market Review · Financial Modeling</span></p>
-<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a></div>
+<div class="head-btns"><button type="button" class="theme-toggle">深色模式</button><a class="msg-btn" href="messages.html"><span class="lz">及时快讯</span><span class="le">Market Alerts</span></a><a class="msg-btn drx-account-link" href="account.html"><span class="lz">账号</span><span class="le">Account</span></a></div>
 </div>
 </header>
 {content}
@@ -306,6 +306,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 </script>
 {msgfloat}
 {donatefloat}
+<script src="assets/community.js" defer></script>
 </body>
 </html>
 """
@@ -324,20 +325,22 @@ PAGE_TMPL = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · DrX Daily</title>
-<link rel="stylesheet" href="{root}assets/style.css?v=20261119b">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261121a">
 {mathjax}
 {mermaid}
 {themeinit}
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="{root}index.html{backhash}">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="{root}index.html{backhash}">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="{root}account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext">{prevnext}</span></p>
 {body}
+{comments}
 <p class="meta">{meta_line}</p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
 {donatefloat}
+<script src="{root}assets/community.js" defer></script>
 </body>
 </html>
 """
@@ -610,7 +613,7 @@ def build_messages_page(messages):
         meta_line=bi(f"共 {len(messages)} 条 · 按时间倒序",
                      f"{len(messages)} alerts - newest first"), root="", mathjax="",
         mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
-        backhash="", prevnext="")
+        backhash="", prevnext="", comments="")
     with open(os.path.join(SITE, "messages.html"), "w",
               encoding="utf-8") as f:
         f.write(page)
@@ -744,6 +747,34 @@ def donatefloat_html(root=""):
 
 _CN_DIGITS = {"一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5,
               "六": 6, "七": 7, "八": 8, "九": 9}
+
+
+def comments_html(root=""):
+    """文章页留言区挂载点：列表与表单由 assets/community.js 调 /api/* 渲染。
+    root 参数保留与 donatefloat_html 同形，挂载点本身不含路径。"""
+    return ('<section id="drx-comments" class="comments">'
+            '<h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2>'
+            '<div class="comments-list"></div><div class="comments-form"></div>'
+            '<p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span>'
+            '<span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p>'
+            '</section>')
+
+
+def build_community_pages():
+    """账号页与管理页：静态外壳 + community.js 动态渲染，数据走 /api/*。"""
+    pages = [
+        ("account.html", "账号", '<div id="drx-account"></div>'),
+        ("admin.html", "管理后台", '<div id="drx-admin"></div>'),
+    ]
+    for fname, title, mount in pages:
+        page = PAGE_TMPL.format(
+            title=title, body=mount,
+            meta_line=bi("账号系统 · 留言 / 会员 / 管理", "Accounts - comments / membership / admin"),
+            root="", mathjax="", mermaid="", themeinit=THEME_INIT,
+            donatefloat=donatefloat_html(""), backhash="", prevnext="", comments="")
+        with open(os.path.join(SITE, fname), "w", encoding="utf-8") as f:
+            f.write(page)
+        print(f"page: {fname}")
 
 
 def _cn_num(s):
@@ -894,7 +925,7 @@ def build_series_page(model_by_slug):
         meta_line=bi(f"专题 · 共 {total} 篇 · 金融建模",
                      f"Series · {total} posts · Financial Modeling"),
         root="", mathjax="", mermaid="", themeinit=THEME_INIT,
-        donatefloat=donatefloat_html(""), backhash="#model", prevnext="")
+        donatefloat=donatefloat_html(""), backhash="#model", prevnext="", comments="")
     with open(os.path.join(SITE, "series-variational.html"), "w",
               encoding="utf-8") as f:
         f.write(page)
@@ -960,7 +991,7 @@ def build():
             root="../", mathjax=MATHJAX if "$" in p["body"] else "",
             mermaid=MERMAID if "language-mermaid" in p["body"] else "",
             themeinit=THEME_INIT, donatefloat=donatefloat_html("../"),
-            backhash="#daily",
+            backhash="#daily", comments=comments_html("../"),
             prevnext=prevnext_html(_daily_order, _i, "../"))
         with open(os.path.join(SITE, "reports", p["slug"] + ".html"), "w",
                   encoding="utf-8") as f:
@@ -1077,7 +1108,7 @@ def build():
             root="../../", mathjax=MATHJAX if "$" in p["body"] else "",
             mermaid=MERMAID if "language-mermaid" in p["body"] else "",
             themeinit=THEME_INIT, donatefloat=donatefloat_html("../../"),
-            backhash="#" + p["tab_id"],
+            backhash="#" + p["tab_id"], comments=comments_html("../../"),
             prevnext=prevnext_html(_order, _idx, "../../"))
         with open(p["out"], "w", encoding="utf-8") as f:
             f.write(page)
@@ -1131,6 +1162,7 @@ def build():
     print(f"index: {len(daily_cards)} daily + {len(tab_cards['data'])} data"
           f" + {len(tab_cards['model'])} model")
 
+    build_community_pages()
     build_archives(daily_cards, tab_cards, tab_order)
 
 
@@ -1152,7 +1184,7 @@ def build_archives(daily_cards, tab_cards, tab_order):
             meta_line=bi(f"{ym} · 共 {len(months[ym])} 篇",
                          f"{ym} - {len(months[ym])} reports"), root="",
             mathjax="", mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
-            backhash="#daily", prevnext="")
+            backhash="#daily", prevnext="", comments="")
         with open(os.path.join(SITE, f"archive-{ym}.html"), "w",
                   encoding="utf-8") as f:
             f.write(page)
@@ -1167,7 +1199,7 @@ def build_archives(daily_cards, tab_cards, tab_order):
             title=f"{TAB_LABELS[tab_id]}全部存档", body=body,
             meta_line=bi(f"共 {_n} 篇", f"{_n} posts"), root="", mathjax="",
             mermaid="", themeinit=THEME_INIT, donatefloat=donatefloat_html(""),
-            backhash="#" + tab_id, prevnext="")
+            backhash="#" + tab_id, prevnext="", comments="")
         with open(os.path.join(SITE, fname), "w",
                   encoding="utf-8") as f:
             f.write(page)

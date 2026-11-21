@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>统计套利配对交易策略：Krauss (2015) 综述解读与展望 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-13-DGM求解高维偏微分方程的深度学习算法.html" title="DGM：求解高维偏微分方程的深度学习算法"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-10-12-配对交易最优规则与止损.html" title="配对交易最优规则：均值回归价差、三阈值与止损约束"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">统计套利配对交易策略：Krauss (2015) 综述解读与展望</span><span class="le">Statistical Arbitrage Pairs Trading: A Review of Krauss (2015) and Outlook</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Krauss (2015) is among the most cited surveys of pairs trading, reviewing more than ninety papers and organizing the field into five schools: the distance method, cointegration approaches, time-series models, stochastic control, and a residual category including copulas and machine learning. This study works through the survey school by school - the formation and trading periods, the canonical references (Gatev, Goetzmann &amp; Rouwenhorst&#x27;s distance method, with reported returns around 11% per year, is the benchmark), and Krauss&#x27;s assessment of what each approach can and cannot deliver - then turns to the survey&#x27;s forward-looking questions: declining profitability as the strategy crowds, the role of transaction costs and short-sale constraints, high-frequency implementations, and extensions from pairs to baskets and full multivariate statistical arbitrage. It closes with our own outlook on where the stochastic-control branch of the literature - the branch most of this column&#x27;s readings come from - is heading.</p></div>
 <p>这是配对交易领域引用最广的综述之一。Krauss (2015) 系统梳理了90余篇文献，把配对交易研究分成<strong>五大流派</strong>：距离法、协整法、时间序列法、随机控制法、其他方法，并逐一评估其优劣。本文做详细解读，最后给出结合市场的展望。</p>
@@ -139,6 +139,7 @@ $$</p>
 <p>上一篇解读的 Tie-Zhang-Zhang (2017)，正是Krauss综述出版后"随机控制法"方向的一个具体答案——在GBM（而非OU）假设下求出最优阈值闭式解。两篇连起来看，能看到这个领域从"经验规则"到"最优控制"的方法论升级。</p>
 <h2>附：原文链接</h2>
 <p><a href="https://hdl.handle.net/10419/116783">EconStor 官方页面</a>（按出版方要求，请从官方渠道获取原文）</p>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-10-12 发布 · 类型：金融建模</span><span class="le">Published 2026-10-12 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -212,5 +213,6 @@ $$</p>
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

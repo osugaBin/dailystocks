@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>做空与滑点下的均值回归交易：四阈值最优规则 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-12-股票质押贷款定价.html" title="股票质押贷款定价：区制切换均值回归模型下的闭式解"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-10-12-均值回归双阈值解析解.html" title="均值回归低买高卖：双阈值最优法则的解析解"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">做空与滑点下的均值回归交易：四阈值最优规则</span><span class="le">Mean-Reversion Trading with Short Selling and Slippage: The Four-Threshold Optimal Rule</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Kong &amp; Zhang (2010, Discrete and Continuous Dynamical Systems - Series B) extend the two-threshold buy-low-sell-high rule of Zhang &amp; Zhang (2008) in the two directions practice demands: short selling and execution slippage. The trader may now hold long, flat or short positions in a mean-reverting asset, and every trade pays both a proportional cost and a slippage term. The dynamic programming formulation leads to a quasi-variational inequality whose solution has a four-threshold structure: a buy-to-cover level and a short-entry level on the short side, mirrored by a long-entry and a take-profit level on the long side, with a no-trade band in the middle. Smooth-fit conditions again collapse the free-boundary problem into four quasi-algebraic equations. The study explains the geometry of the four regions, how slippage widens the no-trade band, and why the two-threshold rule is recovered when shorting is banned - a clean view of how constraints reshape optimal trading rules.</p></div>
 <p>这篇2010年发表于《Discrete and Continuous Dynamical Systems Series B》的论文（Kong &amp; Zhang），研究均值回归资产的最优买卖问题。它是 Zhang &amp; Zhang (2008) 的直接扩展——后者只允许"空仓/做多"两种仓位，本文把<strong>做空</strong>纳入框架，并计入<strong>滑点成本</strong>，证明最优策略可由四个阈值价格完全刻画，且求解化为四个拟代数方程。这是理解整个"最优交易规则"系列工作的起点。</p>
@@ -110,6 +110,7 @@ $$</p>
 <p>这篇是承上启下的一篇：<strong>Zhang &amp; Zhang (2008)</strong> 给出均值回归资产双阈值（无做空）→ <strong>本文 (2010)</strong> 加入做空与滑点，四阈值 → <strong>Song &amp; Zhang (2013)</strong> 把框架搬到配对交易价差，并加入止损 → <strong>Tie, Zhang &amp; Zhang (2017)</strong> 彻底去掉均值回归假设，在GBM下求解。沿着这条线读，能看到"最优交易"这个课题十年的方法论演进：从单资产到配对，从均值回归到一般扩散，从无约束到带止损约束。</p>
 <h2>附：原文链接</h2>
 <p><a href="https://doi.org/10.3934/dcdsb.2010.14.1403">DOI官方链接</a></p>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-10-12 发布 · 类型：金融建模</span><span class="le">Published 2026-10-12 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -183,5 +184,6 @@ $$</p>
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

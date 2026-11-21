@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>基于对冲比率后验分布的配对交易信号确认——Quadros 等（Quantitative Finance 2026）研读 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-16-基于时间序列深度学习的配对交易研读.html" title="基于时间序列深度学习的配对交易：面板残差方向预测——Yilmaz &amp; Sefer（JFDS 2025）研读"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-11-14-DrX-变分学讲义第八讲.html" title="DrX-张恭庆《变分学讲义》第八讲：守恒律与 Noether 定理——对称性如何生出守恒量"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">基于对冲比率后验分布的配对交易信号确认——Quadros 等（Quantitative Finance 2026）研读</span><span class="le">Pairs-Trading Signal Confirmation Based on the Posterior Distribution of the Hedge Ratio: A Reading Report on Quadros, Higgins &amp; Silverstein (Quantitative Finance 2026)</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This report reviews Quadros, Higgins and Silverstein (Quantitative Finance, 2026), revised against the published journal version (26(5): 777-797) after it was obtained with the kind assistance of Dr. TJ; the method itself is unchanged from the first author&#x27;s 2025 Kansas State dissertation, but the journal sample, pairs and all reported figures differ. The method leaves the classical cointegration strategy intact and adds a confirmation layer: a Bayesian regression with a truncated-normal prior on the hedge ratio yields its full conditional distribution, whose quantiles gate spread signals asymmetrically - entries require the current hedge-ratio estimate to lie inside the central posterior band, while stop-losses fire only when it falls outside. Across 41 pairs (29 U.S., sample 2015-2025; 12 Brazilian, 2020-2025; 30-minute bars, gross of transaction costs), the gated strategy beats the benchmark on 62% of U.S. and 58% of Brazilian pairs while trading about 24% less often, and its sampling-based filter rejects about 78% of false-positive cointegration pairs in simulations. We assess its strengths, dissect how Bayesian the method really is, and set out how the confirmation layer will be tested as an add-on gate within our M3 pairs-trading benchmark.</p></div>
 <p>本篇研读 Quadros、Higgins 与 Silverstein 发表于 Quantitative Finance 的《A Bayesian approach to generating distribution-based signals in pairs trading》。这篇论文不发明新的配对策略，而是在经典协整策略外面加了一层把关：用贝叶斯方法得到对冲比率的完整分布，再拿这条分布的分位数去确认或否决价差信号。它与上一篇研读的 <a href="2026-11-16-基于时间序列深度学习的配对交易研读.html">Yilmaz &amp; Sefer（JFDS 2025）</a> 同为本项目 M3 里程碑的对照文献，但路线完全不同——那篇是数据驱动的信号生成，这篇是概率化的信号确认。版本说明：本文初稿依据第一作者的博士论文（堪萨斯州立大学，2025）第二章研读，该章即期刊版的原始版本；2026-11-17 取得期刊版全文后已逐项核对修订——<strong>方法部分两版同源，但期刊版的样本、配对与全部结果数字均不同于论文版，本文现以期刊版为准</strong>；收益数字为未扣交易成本的毛收益。本篇为研究记录，不构成投资建议。</p>
@@ -128,6 +128,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <li>Engle, R. F., Granger, C. W. J. Co-integration and error correction: Representation, estimation, and testing. Econometrica, 55(2), 1987, 251–276.</li>
 <li>Krauss, C. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), 2017, 513–545.</li>
 </ul>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-16 发布 · 2026-11-17 更新 · 类型：金融建模</span><span class="le">Published 2026-11-16 · Updated 2026-11-17 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -201,5 +202,6 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>

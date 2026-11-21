@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DGM：求解高维偏微分方程的深度学习算法 · DrX Daily</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
 <script>
 window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
@@ -14,7 +14,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </head>
 <body>
 <div class="wrap">
-<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><button type="button" class="theme-toggle lang-toggle">EN</button></div>
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-10-13-动态配对交易的随机控制显式解.html" title="动态配对交易：随机控制方法的显式最优策略"><span class="lz">后一篇 ↑</span><span class="le">Next ↑</span></a><a href="../../custom/金融建模/2026-10-12-配对交易综述解读.html" title="统计套利配对交易策略：Krauss (2015) 综述解读与展望"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
 <h1><span class="lz">DGM：求解高维偏微分方程的深度学习算法</span><span class="le">DGM: A Deep Learning Algorithm for Solving High-Dimensional Partial Differential Equations</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>Finite differences need O(h^-(d+1)) grid points in d spatial dimensions, so classical solvers die in high dimensions. Sirignano &amp; Spiliopoulos (2018) propose the Deep Galerkin Method (DGM): a deep neural network approximates the PDE solution, and stochastic gradient descent trains it on randomly sampled space-time points to satisfy the differential operator, the initial condition and the boundary conditions simultaneously - no mesh anywhere, which is what makes problems with up to 200 dimensions tractable. This article explains the architecture (a gated, LSTM-like layer structure suited to sequential dependence), the least-squares loss over the PDE residual, and the paper&#x27;s approximation theorem for a class of quasilinear parabolic equations. The numerical evidence spans high-dimensional Hamilton-Jacobi-Bellman equations, Burgers&#x27; equation and the free-boundary PDE of an American option. DGM is the methodological backbone of this site&#x27;s own pairs-trading experiment, where its solution is benchmarked against a verified closed form.</p></div>
 <p><strong>论文</strong>：Justin Sirignano, Konstantinos Spiliopoulos, <em>DGM: A Deep Learning Algorithm for Solving Partial Differential Equations</em>, arXiv:<a href="https://arxiv.org/abs/1708.07469">1708.07469</a> [q-fin.MF], 2018年9月。</p>
@@ -80,6 +80,7 @@ $$</p>
 </ol>
 <hr />
 <p><em>解读人注：arXiv:1708.07469；200维实验基于 Blue Waters 超算。引用公式与定理编号请以原文为准。</em></p>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-10-13 发布 · 2026-11-04 更新 · 类型：金融建模</span><span class="le">Published 2026-10-13 · Updated 2026-11-04 · Financial Modeling</span></p>
 <footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
 </div>
@@ -153,5 +154,6 @@ $$</p>
   paint();
 })();
 </script>
+<script src="../../assets/community.js" defer></script>
 </body>
 </html>
