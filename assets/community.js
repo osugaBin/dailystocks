@@ -255,7 +255,32 @@
       row.appendChild(submit); row.appendChild(toggle);
       wrap.appendChild(row);
       wrap.appendChild(msg);
-      wrap.appendChild(el("p", "acct-note", T("忘记密码请联系管理员重置。", "Forgot your password? Ask the admin to reset it.")));
+      var forgotLink = el("button", "cmt-replybtn", T("忘记密码？", "Forgot password?"));
+      forgotLink.type = "button";
+      forgotLink.addEventListener("click", function () {
+        box.innerHTML = "";
+        var card = el("div", "acct-card");
+        card.appendChild(el("h2", "", T("找回密码", "Reset password")));
+        card.appendChild(el("p", "acct-note", T("输入注册邮箱，我们会把重置链接发到你的邮箱（1 小时内有效）。", "Enter your account email and we will send you a reset link (valid for 1 hour).")));
+        var em = el("input", "cmt-name"); em.type = "email"; em.placeholder = T("注册邮箱", "Account email"); em.value = email.value;
+        var m2 = el("p", "cmt-msg");
+        var send = el("button", "cmt-submit", T("发送重置链接", "Send reset link"));
+        send.type = "button";
+        send.addEventListener("click", function () {
+          send.disabled = true;
+          api("/api/forgot-password", { method: "POST", body: { email: em.value } }).then(function (j) {
+            send.disabled = false;
+            if (j.ok) { m2.style.color = "var(--muted)"; m2.textContent = T("如果该邮箱已注册，重置链接已经发出，请查收邮箱（也看看垃圾箱）。", "If that email is registered, a reset link is on its way. Please check your inbox (and spam folder)."); }
+            else m2.textContent = j.error || "Error";
+          }).catch(function () { send.disabled = false; m2.textContent = "Network error"; });
+        });
+        var back = el("button", "cmt-replybtn", T("返回登录", "Back to login"));
+        back.type = "button";
+        back.addEventListener("click", render);
+        card.appendChild(em); card.appendChild(send); card.appendChild(back); card.appendChild(m2);
+        box.appendChild(card);
+      });
+      wrap.appendChild(forgotLink);
       box.appendChild(wrap);
     }
     loadMe(render);
@@ -316,7 +341,8 @@
             var reset = el("button", "cmt-replybtn", T("重置密码", "Reset PW")); reset.type = "button";
             reset.addEventListener("click", function () {
               api("/api/admin/reset-password", { method: "POST", body: { id: u.id } }).then(function (r) {
-                if (r.ok) prompt(T("临时密码（只显示一次，请转告用户）", "Temporary password (shown once)"), r.temp_password);
+                if (r.ok && r.emailed) alert(T("重置链接已发送到该用户的注册邮箱", "Reset link emailed to the user"));
+                else if (r.ok) prompt(T("临时密码（只显示一次，请转告用户）", "Temporary password (shown once)"), r.temp_password);
                 else alert(r.error || "Error");
               });
             });
@@ -357,10 +383,46 @@
     loadMe(render);
   }
 
+  /* ---------------- 重置密码页 ---------------- */
+  function initReset() {
+    var box = document.getElementById("drx-reset");
+    if (!box) return;
+    var token = new URLSearchParams(location.search).get("token") || "";
+    var card = el("div", "acct-card");
+    card.appendChild(el("h2", "", T("设置新密码", "Set a new password")));
+    if (!token) {
+      card.appendChild(el("p", "cmt-msg", T("链接缺少令牌，请从邮件里的完整链接打开。", "This link is missing its token. Please open the full link from the email.")));
+      box.appendChild(card);
+      return;
+    }
+    var pw1 = el("input", "cmt-name"); pw1.type = "password"; pw1.placeholder = T("新密码（至少 8 位）", "New password (min 8 chars)");
+    var pw2 = el("input", "cmt-name"); pw2.type = "password"; pw2.placeholder = T("再输一次新密码", "Repeat new password");
+    var msg = el("p", "cmt-msg");
+    var submit = el("button", "cmt-submit", T("确认重置", "Reset password"));
+    submit.type = "button";
+    submit.addEventListener("click", function () {
+      if (pw1.value !== pw2.value) { msg.textContent = T("两次输入的密码不一致", "Passwords do not match"); return; }
+      submit.disabled = true;
+      api("/api/reset-password", { method: "POST", body: { token: token, password: pw1.value } }).then(function (j) {
+        submit.disabled = false;
+        if (j.ok) {
+          card.innerHTML = "";
+          card.appendChild(el("h2", "", T("密码已重置", "Password reset")));
+          card.appendChild(el("p", "", T("请用新密码重新登录。", "Please log in with your new password.")));
+          var a = el("a", "", T("去登录", "Go to login")); a.href = "account.html";
+          card.appendChild(a);
+        } else msg.textContent = j.error || "Error";
+      }).catch(function () { submit.disabled = false; msg.textContent = "Network error"; });
+    });
+    card.appendChild(pw1); card.appendChild(pw2); card.appendChild(submit); card.appendChild(msg);
+    box.appendChild(card);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initComments();
     initAccount();
     initAdmin();
+    initReset();
     if (!document.getElementById("drx-comments") && !document.getElementById("drx-account") && !document.getElementById("drx-admin")) {
       loadMe(null);
     }

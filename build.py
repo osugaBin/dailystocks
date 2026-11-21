@@ -765,6 +765,7 @@ def build_community_pages():
     pages = [
         ("account.html", "账号", '<div id="drx-account"></div>'),
         ("admin.html", "管理后台", '<div id="drx-admin"></div>'),
+        ("reset.html", "重置密码", '<div id="drx-reset"></div>'),
     ]
     for fname, title, mount in pages:
         page = PAGE_TMPL.format(

@@ -48,3 +48,11 @@ CREATE TABLE IF NOT EXISTS rate_events (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_rate ON rate_events(ip, action, created_at);
+
+-- 密码重置令牌（2026-11-21 追加；只存令牌 SHA-256，1 小时过期、用后即删）
+CREATE TABLE IF NOT EXISTS password_resets (
+  token_hash TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

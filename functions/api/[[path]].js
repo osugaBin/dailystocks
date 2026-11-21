@@ -99,6 +99,38 @@ async function startSession(env, userId) {
   ).bind(th, userId, `+${SESSION_DAYS} days`).run();
   return cookieHeader("drx_session", token, SESSION_DAYS * 86400);
 }
+async function sendMail(env, to, subject, text) {
+  // 经 Resend 发信；未配置 RESEND_API_KEY 时返回 false（调用方走兜底）。
+  if (!env.RESEND_API_KEY) return false;
+  const from = env.MAIL_FROM || "DrX Daily <noreply@drbin.top>";
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from, to, subject, text }),
+  });
+  if (!resp.ok) throw new Error("Resend 发信失败：" + resp.status);
+  return true;
+}
+
+async function createResetToken(env, userId) {
+  // 每人只保留最新一枚令牌；原文只出现在邮件链接里，库里只存 SHA-256。
+  await env.DB.prepare("DELETE FROM password_resets WHERE user_id = ?").bind(userId).run();
+  const token = [...crypto.getRandomValues(new Uint8Array(32))].map((x) => x.toString(16).padStart(2, "0")).join("");
+  const th = await sha256hex(token);
+  await env.DB.prepare(
+    "INSERT INTO password_resets (token_hash, user_id, expires_at) VALUES (?, ?, datetime('now', '+1 hour'))"
+  ).bind(th, userId).run();
+  return token;
+}
+
+async function mailResetLink(env, request, user) {
+  const token = await createResetToken(env, user.id);
+  const link = `${new URL(request.url).origin}/reset.html?token=${token}`;
+  const text = `你好，${user.nickname}：\n\n你正在重置 DrX Daily（xreport.drbin.top）的账号密码。` +
+    `请在 1 小时内打开下面的链接设置新密码：\n\n${link}\n\n如果不是你本人操作，请忽略这封邮件，你的密码不会被修改。`;
+  return await sendMail(env, user.email, "DrX Daily · 重置密码", text);
+}
+
 async function readBody(request) {
   try { return await request.json(); } catch { return {}; }
 }
@@ -278,11 +310,58 @@ async function handleAdminResetPassword(env, request) {
   const b = await readBody(request);
   const id = parseInt(b.id, 10);
   if (!id) return err("参数不正确");
+  const u = await env.DB.prepare("SELECT id, email, nickname FROM users WHERE id = ?").bind(id).first();
+  if (!u) return err("用户不存在");
+  if (env.RESEND_API_KEY) {
+    await mailResetLink(env, request, u);
+    return json({ ok: true, emailed: true });
+  }
   const temp = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"[x % 54]).join("");
   const hash = await hashPassword(temp);
   await env.DB.prepare("UPDATE users SET pass_hash = ? WHERE id = ?").bind(hash, id).run();
   await env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(id).run();
   return json({ ok: true, temp_password: temp });
+}
+
+// ---------------- 密码重置（自助） ----------------
+
+async function handleForgotPassword(env, request) {
+  // 无论邮箱是否存在都返回同样的成功口径，避免被用来探测注册邮箱。
+  const ip = clientIp(request);
+  if (await rateLimited(env, ip, "forgot", 5, 60)) return err("操作过于频繁，请稍后再试", 429);
+  const b = await readBody(request);
+  const email = cleanText(b.email, 120).toLowerCase();
+  await rateHit(env, ip, "forgot");
+  if (EMAIL_RE.test(email)) {
+    const u = await env.DB.prepare(
+      "SELECT id, email, nickname, status FROM users WHERE email = ?").bind(email).first();
+    if (u && u.status === "active") {
+      const recent = await env.DB.prepare(
+        "SELECT token_hash FROM password_resets WHERE user_id = ? AND created_at > datetime('now', '-5 minutes')"
+      ).bind(u.id).first();
+      if (!recent && env.RESEND_API_KEY) {
+        try { await mailResetLink(env, request, u); } catch { /* 发信失败不改变对外口径 */ }
+      }
+    }
+  }
+  return json({ ok: true });
+}
+
+async function handleResetPassword(env, request) {
+  const b = await readBody(request);
+  const token = cleanText(b.token, 100);
+  const password = String(b.password ?? "");
+  if (!token) return err("重置链接无效");
+  if (password.length < 8) return err("密码至少 8 位");
+  const th = await sha256hex(token);
+  const row = await env.DB.prepare(
+    "SELECT user_id FROM password_resets WHERE token_hash = ? AND expires_at > datetime('now')").bind(th).first();
+  if (!row) return err("重置链接无效或已过期，请重新申请");
+  const hash = await hashPassword(password);
+  await env.DB.prepare("UPDATE users SET pass_hash = ? WHERE id = ?").bind(hash, row.user_id).run();
+  await env.DB.prepare("DELETE FROM password_resets WHERE user_id = ?").bind(row.user_id).run();
+  await env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(row.user_id).run();
+  return json({ ok: true });
 }
 
 async function handleAdminComments(env, request, url) {
@@ -322,6 +401,8 @@ export async function onRequest(context) {
     if (path === "/api/register" && request.method === "POST") return await handleRegister(env, request);
     if (path === "/api/login" && request.method === "POST") return await handleLogin(env, request);
     if (path === "/api/logout" && request.method === "POST") return await handleLogout(env, request);
+    if (path === "/api/forgot-password" && request.method === "POST") return await handleForgotPassword(env, request);
+    if (path === "/api/reset-password" && request.method === "POST") return await handleResetPassword(env, request);
     if (path === "/api/me" && request.method === "GET") {
       const me = await currentUser(env, request);
       return json({ ok: true, user: me ? publicUser(me) : null });
