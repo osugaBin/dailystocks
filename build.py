@@ -307,6 +307,7 @@ INDEX_TMPL = """<!DOCTYPE html>
 {msgfloat}
 {donatefloat}
 <script src="assets/community.js" defer></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1b6ae6c4d5044050b11d2fb881fff0f6"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
 """
@@ -341,6 +342,7 @@ PAGE_TMPL = """<!DOCTYPE html>
 </div>
 {donatefloat}
 <script src="{root}assets/community.js" defer></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "1b6ae6c4d5044050b11d2fb881fff0f6"}}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
 """
