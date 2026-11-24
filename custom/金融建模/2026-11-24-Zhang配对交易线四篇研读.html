@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从GBM往返到状态切换：Zhang配对交易研究线四篇研读 · DrX Daily</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261121a">
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<script>(function(){try{var t=localStorage.getItem('drx_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script><script>(function(){try{var l=localStorage.getItem('drx_lang');if(l==='en'){document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';}}catch(e){}})();</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
+<p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-23-AllocFlow直接生成组合仓位研读.html" title="直接生成组合仓位：AllocFlow 端到端交易动作生成研读"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
+<h1><span class="lz">从GBM往返到状态切换：Zhang配对交易研究线四篇研读</span><span class="le">Four Cells Completed: A Reading of the Zhang Pairs-Trading Line — GBM Round Trips, Reversible Positions, Mean Reversion and Regime Switching</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This reading report surveys four 2023–2024 papers from Qing Zhang&#x27;s pairs-trading line that complete a two-by-two map: price dynamics (geometric Brownian motion versus a mean-reverting spread) crossed with regime structure (none versus two-state Markov switching). Das, Tie and Zhang (arXiv:2310.15803) solve the GBM round-trip problem through an HJB equation whose optimal entry and exit are threshold curves, first for long/flat initial positions and then for reversible long/flat/short ones. Das, Luu, Tie and Zhang (Numerical Algebra, Control and Optimization, 2024) treat a mean-reverting spread with two-state switching via an HJB quasi-variational inequality; the thresholds x1 = -0.282615, x3 = 0.295314 and x4 = 0.498290 match the journal&#x27;s Table 1. Luu, Song, Tie and Zhang (Pure and Applied Functional Analysis, 2024) combine GBM with switching and determine thresholds from an algebraic system; their six numerical cases (K = 0.001, discount rate 0.50, transcribed from the dissertation version) are tabulated in full, with CASE4 flagged as doubtful and CASE2/CASE6 recorded as identical parameters with different roots. The report closes with the analytic benchmarks this line offers HJB-DGM numerics.</p></div>
+<p>本站 2026 年 10 月 12 日发过 Tie、Zhang 与 Zhang 发表于 JOTA 2017 的 GBM 配对交易研读；那只是这条研究线的早期一环。2023 至 2024 年，Das、Luu、Song 等人先后与 Tie、Zhang 合作，把这条线补成完整的四格：GBM 往返交易、GBM 可逆持仓、均值回归价差加两态状态切换、GBM 加两态状态切换。本文逐篇研读这四篇工作的模型、方法与阈值结果，给出四格对照与谱系，完整摘录 PAFA 的六个数值例，并如实标注两处存疑与本次核验的范围。本篇为研究记录，不构成投资建议。</p>
+<h2>一、出处与材料</h2>
+<p>四篇工作的出处如下：</p>
+<ul>
+<li><strong>第一、二格</strong>：Das, Tie &amp; Zhang, "Optimal Strategies for Round-Trip Pairs Trading Under Geometric Brownian Motions", arXiv:2310.15803（2023）。第二格是同一篇的第二种初始仓位情形，arXiv 摘要里明写分两步推进，Das 的博士论文第 3 章有展开；它不是一篇独立的期刊论文，本文不就其期刊版本作任何断言。</li>
+<li><strong>第三格</strong>：Das, Luu, Tie &amp; Zhang, "Pairs trading with regime switching", <em>Numerical Algebra, Control and Optimization</em> 14(4): 636–652 (2024)，DOI 10.3934/naco.2023023，下称 NACO 篇。</li>
+<li><strong>第四格</strong>：Luu, Song, Tie &amp; Zhang, "Pairs trading under geometric Brownian motions with regime switching", <em>Pure and Applied Functional Analysis</em> 9(3): 783–810 (2024)，下称 PAFA 篇。</li>
+</ul>
+<p>阅读材料：Das 2024 年佐治亚大学博士论文（132 页，第 2 章为 GBM 往返、第 3 章为含空头初始仓位、第 4 章即 NACO 篇）与 Song 2023 年佐治亚大学博士论文（77 页，PAFA 篇为其第 2 章，本站存有 54 页抽章版）。PAFA 期刊 PDF 为订阅制，未能取得，<strong>本文涉及 PAFA 的一切数字均以学位论文版为准，未与期刊版核对</strong>。四篇的证明过程未逐条核验，本文涉及证明思路处均为结构级概述，最后一节有完整的核验范围说明。</p>
+<h2>二、谱系：从单阈值卖出到四格补齐</h2>
+<p>按 PAFA 篇第 2 章引言梳理的谱系，这条线二十多年的推进路径是：</p>
+<ul>
+<li>Zhang (2001)：双阈值卖出规则；</li>
+<li>Guo &amp; Zhang (2005)：切换 GBM 下的卖出规则；</li>
+<li>Song &amp; Zhang (2013)：均值回归配对交易的阈值；</li>
+<li>Tie &amp; Zhang (2018)：切换 GBM 下的卖出问题（推广 Hu &amp; Øksendal 1998）；</li>
+<li>Tie 等 (2020)：GBM 配对交易买卖双阈值曲线的闭式解；</li>
+<li>Tie, Zhang &amp; Zhang (2017, JOTA)：GBM 配对交易的最优策略与闭式阈值，本站已有研读，是这条线的更早一环；</li>
+<li>2023–2024 四篇：补齐买入部分与切换情形，形成下节的四格。</li>
+</ul>
+<p>可以看到一条清晰的脉络：先解决"何时卖"，再解决"何时买、何时卖"的完整往返，最后把市场状态切换装进往返问题里。</p>
+<h2>三、四格对照</h2>
+<table>
+<thead>
+<tr>
+<th>格</th>
+<th>篇目</th>
+<th>标的模型</th>
+<th>状态切换</th>
+<th>交易结构</th>
+<th>方法与阈值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Das, Tie &amp; Zhang, arXiv:2310.15803 (2023)</td>
+<td>两只股票一般 GBM，不预设相关性与配对关系</td>
+<td>无</td>
+<td>一轮往返，先开后平；初始仓位先限多头/空仓</td>
+<td>HJB 方程；最优开平仓由阈值曲线刻画；固定单笔佣金，最大化总回报</td>
+</tr>
+<tr>
+<td>2</td>
+<td>同上，第二种情形（Das 论文第 3 章）</td>
+<td>同 GBM</td>
+<td>无</td>
+<td>同上，但初始仓位可多头/空仓/空头（可逆持仓）</td>
+<td>同一 HJB 阈值曲线框架；数值例用 WMT/TGT 2010–2020 收盘价，两个方向各给一组阈值</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Das, Luu, Tie &amp; Zhang, NACO 14(4): 636–652 (2024)</td>
+<td>价差均值回归</td>
+<td>两态 Markov 切换</td>
+<td>开平仓阈值</td>
+<td>HJB 拟变分不等式；四阈值刻画；数值与期刊 Table 1 对得上</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Luu, Song, Tie &amp; Zhang, PAFA 9(3): 783–810 (2024)</td>
+<td>两只股票 GBM</td>
+<td>两态 Markov 切换</td>
+<td>一轮往返，买入后卖出</td>
+<td>smooth-fit 方法；阈值曲线由代数方程组确定，附最优性充分条件；数值例分六种阈值次序情形</td>
+</tr>
+</tbody>
+</table>
+<p>四格的两个维度是：价格动态（GBM 对均值回归价差）与状态结构（无切换对两态切换）。JOTA 2017 篇落在第 1 格的邻域（GBM、无切换），但做的是可重复往返的闭式解；下面逐格看四篇各自多走了哪一步。</p>
+<h2>四、逐篇研读</h2>
+<h3>1. GBM 往返交易（arXiv:2310.15803 主情形）</h3>
+<p>模型设定：两只股票的价格各服从一般的几何布朗运动，结构级地写即</p>
+<p>$$
+dS^i_{t} = S^i_{t} \left( \mu_{i} \, dt + \sigma_{i} \, dW^i_{t} \right), \quad i = 1, 2
+$$</p>
+<p>关键在于"一般"二字：不预设两只股票的相关结构，不要求价差均值回归，也不要求先验的配对关系。这与传统配对交易形成对照——传统框架先用协整或相关性筛出"会回归"的配对，再在均值回归假设下谈最优阈值；这篇把顺序倒过来，先在最一般的 GBM 下把一轮往返的最优时机问题解出来。</p>
+<p>交易结构是一轮往返：先开仓、后平仓。第一步先把初始仓位限制在多头与空仓两种状态。每笔交易收固定佣金，目标是在贴现意义下最大化一轮往返的总回报。方法上是动态规划导出的 HJB 方程，最优开仓与平仓时机由价格平面上的<strong>阈值曲线</strong>刻画，而不是 JOTA 2017 篇里价格比意义下的常数阈值——一般 GBM 下两只股票的漂移与波动不对称，最优边界没有理由退化成过原点的射线，曲线形态正是"一般"二字的代价与收获。</p>
+<h3>2. GBM 可逆持仓（同一篇的第二种情形）</h3>
+<p>第二种情形把初始仓位放宽到多头、空仓、空头三态，即所谓可逆持仓：交易者进场时手里可能已经有一笔反向头寸，最优规则必须同时回答"已有空头时何时平、何时反手"。方法仍是同一套 HJB 阈值曲线框架，只是状态多了一格，边界也随之成对出现。</p>
+<p>数值例用 Walmart（WMT）与 Target（TGT）2010–2020 年收盘价，两个交易方向各给出一组阈值，记为 (k1, k2) 与 (ke1, ke2)。这里要再次强调出处纪律：这一格出自 arXiv:2310.15803 的第二种情形与 Das 博士论文第 3 章，<strong>不是一篇独立的期刊论文</strong>；把它列为"四格"之一，是按模型情形计数，不是按篇目计数。</p>
+<h3>3. 均值回归价差 + 两态切换（NACO 2024）</h3>
+<p>第三格换了价格动态：标的不再是两只股票各自的 GBM，而是直接对价差建模，价差服从均值回归扩散，结构级地写即 Ornstein–Uhlenbeck 型过程</p>
+<p>$$
+dx_{t} = \kappa \left( \theta - x_{t} \right) dt + \sigma \, dW_{t}
+$$</p>
+<p>并叠加一个两态 Markov 链驱动的市场状态切换：每个状态下均值回归的参数可以不同。交易问题相应地写成 HJB 拟变分不等式（QVI），结构级示意为</p>
+<p>$$
+\min\lbrace \rho v - \mathcal{L} v, \ v - \mathcal{M} v \rbrace = 0
+$$</p>
+<p>其中 $\mathcal{L}$ 是当前状态下价差扩散的生成元，$\mathcal{M}$ 是开仓或平仓的干预算子；两个状态各有一份这样的不等式，经 Markov 切换项耦合。最优策略由四个阈值刻画。本次核验把数值例与期刊 Table 1 逐个对照，摘录到的三个阈值为</p>
+<p>$$
+x_{1} = -0.282615, \quad x_{3} = 0.295314, \quad x_{4} = 0.498290
+$$</p>
+<p>与期刊发表值一致。还有一个容易误读的术语需要澄清：这篇没有价格跳跃，文中所谓 boundary jump 指的是<strong>市场状态切换时最优交易边界随之跳变</strong>——同一个价差水平，在状态 1 里可能还不到开仓线，切到状态 2 就已经越线了，边界是状态相依的分段函数而非一条固定直线。</p>
+<h3>4. GBM + 两态切换（PAFA 2024）</h3>
+<p>第四格把前两格的要素叠满：两只股票各服从 GBM，同时市场在两个状态间按 Markov 链切换，两个状态下漂移、波动整套参数都可以不同；交易仍是一轮往返，买入后卖出。方法与前三格不同：不用数值解 HJB，而是走 smooth-fit 路线——先猜测最优边界的阈值曲线形态，把值函数在每个区域写成 Euler 方程通解的组合，再用边界处的光滑衔接条件把待定系数与阈值一起解出来，阈值曲线最终由一个<strong>代数方程组</strong>确定；论文同时给出最优性的充分条件，把"猜出来的解确实最优"这一步补齐（以上为结构级概述，证明未逐条核验）。</p>
+<p>数值例（学位论文版 §2.6）按四个阈值 k1、k2、k3、k4 的相对次序分成六种情形逐一展示，每种情形都给出值函数与切换区域，并声称已验证全部变分不等式成立；例如买入规则出现 k4 &lt; k3 这类次序的情形，就由其 Theorem 4 处理。六种情形的完整参数与阈值见下一节——那是本文摘录的重点，也是这条线留给数值工作者的一份现成的复现清单。</p>
+<h2>五、PAFA 六个数值例全表与两处存疑</h2>
+<p>六例的共同参数：佣金 K = 0.001（买入、卖出价格系数相应为 $\beta_{b} = 1 + K$、$\beta_{s} = 1 - K$），贴现率 ρ = 0.50。下表按学位论文版 §2.6 原样摘录：μ 列依次为 μ1(1)、μ2(1)、μ1(2)、μ2(2)（括号内为市场状态），σ(1)、σ(2) 为两状态下的波动率矩阵，阈值列依次为 k1、k2、k3、k4。<strong>期刊版数字未核</strong>，引用时请连同这一限定。</p>
+<table>
+<thead>
+<tr>
+<th>例</th>
+<th>标称次序</th>
+<th>μ1(1), μ2(1), μ1(2), μ2(2)</th>
+<th>σ(1)</th>
+<th>σ(2)</th>
+<th>λ1, λ2</th>
+<th>k1, k2, k3, k4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CASE1</td>
+<td>k3&lt;k1&lt;k4&lt;k2</td>
+<td>0.30, 0.27, -0.43, -0.66</td>
+<td>[0.44, 0.27; 0.31, 0.60]</td>
+<td>[0.19, 0.65; 0.28, 0.15]</td>
+<td>6.0, 10.0</td>
+<td>0.597020, 0.690976, 0.578407, 0.601707</td>
+</tr>
+<tr>
+<td>CASE2</td>
+<td>k3&lt;k4&lt;k1&lt;k2</td>
+<td>-0.26, -0.56, -0.40, 0.22</td>
+<td>[0.37, 0.46; 0.59, 0.59]</td>
+<td>[0.47, 0.31; 0.28, 0.68]</td>
+<td>6.0, 10.0</td>
+<td>0.929500, 0.962000, 0.678861, 0.810852</td>
+</tr>
+<tr>
+<td>CASE3</td>
+<td>k3&lt;k4&lt;k2&lt;k1</td>
+<td>0.20, 0.25, -0.30, -0.35</td>
+<td>[0.30, 0.10; 0.10, 0.35]</td>
+<td>[0.40, 0.20; 0.20, 0.45]</td>
+<td>6.0, 10.0</td>
+<td>1.379000, 1.212000, 0.723277, 0.737941</td>
+</tr>
+<tr>
+<td>CASE4</td>
+<td>k4&lt;k2&lt;k3&lt;k1（标称，存疑）</td>
+<td>0.839, 0.61, -0.70, -0.50</td>
+<td>[0.31, 0.27; 0.31, 0.60]</td>
+<td>[0.19, 0.65; 0.28, 0.25]</td>
+<td>3.0, 10.0</td>
+<td>0.813147, 0.607323, 0.187446, 0.051505</td>
+</tr>
+<tr>
+<td>CASE5</td>
+<td>k4&lt;k3&lt;k2&lt;k1</td>
+<td>0.55, 0.44, -0.35, -0.65</td>
+<td>[0.40, 0.22; 0.30, 0.90]</td>
+<td>[0.65, 0.05; 0.28, 0.50]</td>
+<td>3.0, 9.0</td>
+<td>0.810635, 0.492463, 0.044080, 0.038756</td>
+</tr>
+<tr>
+<td>CASE6</td>
+<td>k4&lt;k3&lt;k1&lt;k2</td>
+<td>-0.26, -0.56, -0.40, 0.22（与 CASE2 全同）</td>
+<td>[0.37, 0.46; 0.59, 0.59]（同 CASE2）</td>
+<td>[0.47, 0.31; 0.28, 0.68]（同 CASE2）</td>
+<td>6.0, 10.0</td>
+<td>0.105684, 0.258372, 0.088878, 0.051627</td>
+</tr>
+</tbody>
+</table>
+<p><strong>存疑 a：CASE4 的标称次序与自身数值矛盾，本表中最不可靠的一行。</strong> 它标称的次序是 k4&lt;k2&lt;k3&lt;k1，但所列数值的实际排序是 k4 (0.051505) &lt; k3 (0.187446) &lt; k2 (0.607323) &lt; k1 (0.813147)，那是 CASE5 的次序；更值得警惕的是，其后给出的 B1…E2 系数与 CASE1 的逐字相同（例如 B1 = -1082.994378），疑为复制粘贴残留。因此 <strong>CASE4 的阈值数字不宜直接引用</strong>，需要期刊版核对后才能定案，本文只照录并标注存疑。</p>
+<p><strong>存疑 b：CASE2 与 CASE6 参数全同、阈值不同，只能并列为"同参数、不同根"。</strong> 两例的 μ、σ、λ1 = 6.0、λ2 = 10.0 连同共同的 K、ρ 逐字相同，阈值四元组却完全不同：CASE2 为 (0.929500, 0.962000, 0.678861, 0.810852)，CASE6 为 (0.105684, 0.258372, 0.088878, 0.051627)。一种可能的解释是：同一次序族的代数方程组在不同次序假设下有多组根，两例各取了一组；另一种可能只是誊录问题。本次核验无法裁决，本文如实并列两组数，不取舍。</p>
+<p>其余四例的标称次序与数值自洽，本次核验逐一验算无误：CASE1 为 0.578407 &lt; 0.597020 &lt; 0.601707 &lt; 0.690976，CASE2 为 0.678861 &lt; 0.810852 &lt; 0.929500 &lt; 0.962000，CASE3 为 0.723277 &lt; 0.737941 &lt; 1.212000 &lt; 1.379000，CASE5 为 0.038756 &lt; 0.044080 &lt; 0.492463 &lt; 0.810635，CASE6 为 0.051627 &lt; 0.088878 &lt; 0.105684 &lt; 0.258372（各按其标称次序排列）。</p>
+<h2>六、一个必须分清的归属：DGM 复现的 k1、k2 不是这四篇的</h2>
+<p>本站此前的 DGM 复现工作中有一组广为人知的边界值 k1 = 1.0380、k2 = 1.2831。整理四篇对照时一度出现一个问题：这组数对应四篇里的哪一篇？核验后的答案是：<strong>哪一篇都不是</strong>。这组数复现的是 Tie, Zhang &amp; Zhang (2017, JOTA) 第 6 节 Target/Walmart 校准——原文报告 k1 = 1.039、k2 = 1.282，复现值与之相对误差约 0.1%，在三位小数舍入范围内。它验证的是 2017 篇，不是 2023–2024 这四篇；把张冠李戴的数字写进对照表，比缺一个数字糟糕得多。</p>
+<p>这四篇自己的解析对照点是现成的：PAFA 篇的阈值由代数方程组确定（上一节六例），NACO 篇的四阈值有期刊发表数值（第三节摘录的三个已逐个对上）。后续数值工作要校验 HJB-DGM 的求解精度，应当拿这两组数去比。</p>
+<h2>七、对本项目配对交易研究线（M3）的三点含义</h2>
+<ol>
+<li><strong>解析校验点有了。</strong> PAFA 篇阈值由代数方程组给出、NACO 篇四阈值有发表数值，HJB-DGM 数值解从此可以拿这两组外部解析结果做对照，不只和自己的另一种实现互比。校验点的可信度直接决定数值结论的可信度，这是四篇里对本项目最直接的用处。</li>
+<li><strong>模型四格已齐，状态切换是两臂共同的缺口。</strong> M3 现行三臂里，经典 RV/OU 臂对应四格中的均值回归格，HJB-DGM 臂对应 GBM 格；两态状态切换是两个臂目前都没有的维度。四篇把切换情形的解析结构（QVI 耦合、边界跳变、六种阈值次序）全部铺好了，它是后续自然的扩展方向——但这不构成现在改动三臂设计的理由，现行对照先按原计划跑完。</li>
+<li><strong>PAFA 六种情形是一份现成的 DGM 复现清单。</strong> 逐情形复现值函数与切换区域，比单组参数的复现更有说服力：六种次序对应六种区域拓扑，数值方法在哪种拓扑下先露馅，一跑便知。而 CASE4 的存疑与 CASE2/CASE6 的同参数不同根，恰好可以由复现反过来检验——数值上把方程组独立解一遍，哪组根能通过变分不等式验证，哪组就站得住；把存疑公开写出来，正是为了让这一步检验有人去做。</li>
+</ol>
+<h2>八、核验范围与限度</h2>
+<ul>
+<li>本次研读核对了：四篇的摘要、引言与目录；NACO 篇数值例与期刊 Table 1 的三个阈值；PAFA 学位论文版 §2.4 的六种情形结构与 §2.6 的全部参数、阈值与次序自洽性。</li>
+<li><strong>未做到的</strong>：四篇的证明过程未逐条核验，文中涉及证明与方法思路处均为结构级概述；PAFA 的数字未与期刊版核对（期刊 PDF 订阅制，未能取得）；CASE4 与 CASE2/CASE6 两处存疑未做裁决，只照录并标注。</li>
+<li>第二格（可逆持仓）的出处以 arXiv:2310.15803 与 Das 博士论文第 3 章为据；本文未就其是否存在期刊版本作任何断言。</li>
+<li>本篇为研究记录，不构成投资建议。</li>
+</ul>
+<section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
+<p class="meta"><span class="lz">2026-11-24 发布 · 类型：金融建模</span><span class="le">Published 2026-11-24 · Financial Modeling</span></p>
+<footer class="site-foot"><span class="lz">本站内容由定时任务自动生成，仅供学习参考，不构成投资建议。</span><span class="le">Content on this site is generated automatically on a schedule, for study and reference only. Not investment advice.</span></footer>
+</div>
+<div id="donatefloat">
+  <button id="donatefloat-open" type="button" hidden><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></button>
+  <div id="donatefloat-panel">
+    <button id="donatefloat-close" type="button" aria-label="关闭打赏窗口">&times;</button>
+    <div class="donate-title"><span class="lz">赞赏我的开发</span><span class="le">Buy me a coffee</span></div>
+    <img class="donate-coffee" src="../../assets/donate-coffee.jpg" alt="Buy me a coffee">
+    <img class="donate-qr" src="../../assets/donate-wechat2.png" alt="微信支付收款码">
+    <div class="donate-label"><span class="lz">微信</span><span class="le">WeChat</span></div>
+    <img class="donate-qr" src="../../assets/donate-alipay2.png" alt="支付宝收款码">
+    <div class="donate-label"><span class="lz">支付宝</span><span class="le">Alipay</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var panel=document.getElementById('donatefloat-panel'),
+      openBtn=document.getElementById('donatefloat-open'),
+      closeBtn=document.getElementById('donatefloat-close');
+  function setClosed(closed,save){
+    panel.hidden=closed;
+    openBtn.hidden=!closed;
+    if(save){try{localStorage.setItem('drx_donate_closed',closed?'1':'0');}catch(e){}}
+  }
+  var wasClosed=false;
+  try{wasClosed=localStorage.getItem('drx_donate_closed')==='1';}catch(e){}
+  if(window.matchMedia&&matchMedia('(max-width:600px)').matches){wasClosed=true;}
+  setClosed(wasClosed,false);
+  closeBtn.addEventListener('click',function(){setClosed(true,true);});
+  openBtn.addEventListener('click',function(){setClosed(false,true);});
+})();
+</script><script>
+(function(){
+  function effective(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark'||t==='light') return t;
+    return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    var label=effective()==='dark'?(en?'Light Mode':'浅色模式'):(en?'Dark Mode':'深色模式');
+    document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){b.textContent=label;});
+  }
+  window.drxPaintTheme=paint;
+  document.querySelectorAll('.theme-toggle:not(.lang-toggle)').forEach(function(b){
+    b.addEventListener('click',function(){
+      var nxt=effective()==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',nxt);
+      try{localStorage.setItem('drx_theme',nxt);}catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script><script>
+(function(){
+  function paint(){
+    var en=document.documentElement.getAttribute('data-lang')==='en';
+    document.querySelectorAll('.lang-toggle').forEach(function(b){b.textContent=en?'中文':'EN';});
+    if(window.drxPaintTheme)window.drxPaintTheme();
+  }
+  document.querySelectorAll('.lang-toggle').forEach(function(b){
+    b.addEventListener('click',function(){
+      var en=document.documentElement.getAttribute('data-lang')==='en';
+      if(en){document.documentElement.removeAttribute('data-lang');document.documentElement.lang='zh-CN';try{localStorage.setItem('drx_lang','zh');}catch(e){}}
+      else{document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('drx_lang','en');}catch(e){}}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+<script src="../../assets/community.js" defer></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1b6ae6c4d5044050b11d2fb881fff0f6"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
