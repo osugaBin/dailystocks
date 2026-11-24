@@ -191,6 +191,64 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 .prevnext a{border:1px solid var(--line);background:#fff;border-radius:8px;
   padding:5px 12px;font-size:.85rem;color:var(--ink);text-decoration:none;white-space:nowrap}
 .prevnext a:hover{border-color:var(--accent)}
+/* 留言 / 账号 / 管理（community.js 渲染；类名与 JS 约定一致，勿改名） */
+.comments{margin-top:36px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:18px 20px}
+.comments-h{margin-top:0}
+.comments-note{color:var(--muted);font-size:.82rem;margin:14px 0 0;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.cmt-empty{color:var(--muted);margin:6px 0}
+.cmt{border-top:1px solid var(--line);padding:12px 0 6px}
+.comments-list>.cmt:first-child{border-top:none;padding-top:4px}
+.cmt-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cmt-author{font-weight:700}
+.cmt-time{color:var(--muted);font-size:.78rem}
+.cmt-badge{font-size:.7rem;border-radius:20px;padding:1px 8px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.cmt-badge.badge-admin{background:#fee2e2;color:#b91c1c}
+.cmt-badge.badge-member{background:#e0f2fe;color:#0369a1}
+.cmt-body{margin:6px 0;white-space:pre-wrap;overflow-wrap:break-word}
+.cmt-acts{display:flex;align-items:center;gap:4px}
+.cmt-like,.cmt-replybtn{background:none;border:none;color:var(--accent);cursor:pointer;
+  font-size:.82rem;padding:2px 6px;border-radius:6px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.cmt-like:hover,.cmt-replybtn:hover{background:var(--line)}
+.cmt-like.liked{color:#e05d52;font-weight:700}
+.cmt-kids{margin-left:16px;border-left:2px solid var(--line);padding-left:14px}
+.cmt-replyslot:empty{display:none}
+.cmt-form{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.cmt-text{order:1;flex:1 1 100%;width:100%;min-height:84px;resize:vertical}
+.cmt-name{order:2;flex:1 1 220px;min-width:0}
+.cmt-as{order:2;flex:1 1 auto;margin:0;align-self:center;color:var(--muted);font-size:.9rem}
+.cmt-formrow{order:3;display:flex;align-items:center;gap:10px}
+.cmt-name,.cmt-text{font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);
+  border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.cmt-name:focus,.cmt-text:focus{outline:none;border-color:var(--accent)}
+.cmt-submit{background:#1a3a6b;color:#fff;border:1px solid #1a3a6b;border-radius:8px;
+  padding:9px 22px;font-size:.92rem;cursor:pointer;white-space:nowrap;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.cmt-submit:hover{background:#24487f}
+.cmt-submit:disabled{opacity:.55;cursor:default}
+.cmt-msg{color:#c0392b;font-size:.85rem}
+@media(max-width:600px){
+  .comments{padding:14px}
+  .cmt-name{flex-basis:100%}
+  .cmt-formrow{flex-basis:100%}
+}
+/* 账号 / 重置密码页 */
+.acct-card{max-width:460px;margin:24px auto;border:1px solid var(--line);border-radius:10px;
+  background:var(--card);padding:22px;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.acct-card h2{border:none;padding:0;margin-top:0}
+.acct-card .cmt-name{display:block;width:100%;margin:0 0 12px}
+.acct-role{color:var(--muted)}
+.acct-note{color:var(--muted);font-size:.88rem}
+/* 管理页 */
+.adm-table select,.adm-table input{font:inherit;font-size:.85rem;color:var(--ink);
+  background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.adm-cmt{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:10px 0}
+.adm-cmt-main{flex:1;min-width:0}
+.adm-cmt .cmt-acts{flex:none}
 /* 深色配色：系统自适应 + 手动切换（data-theme 由切换按钮写入、优先于系统；两组规则内容相同，改一处须同步另一组） */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d;color-scheme:dark}
@@ -215,6 +273,10 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
   :root:not([data-theme="light"]) .donate-label{color:#cbd5e1}
   :root:not([data-theme="light"]) #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
   :root:not([data-theme="light"]) #donatefloat-close:hover{background:rgba(255,255,255,.28)}
+  :root:not([data-theme="light"]) .cmt-badge.badge-admin{background:#3f1d22;color:#f28b82}
+  :root:not([data-theme="light"]) .cmt-badge.badge-member{background:#16324a;color:#7dd3fc}
+  :root:not([data-theme="light"]) .cmt-msg{color:#f28b82}
+  :root:not([data-theme="light"]) .cmt-like:hover, :root:not([data-theme="light"]) .cmt-replybtn:hover{background:#1e293b}
 }
 :root[data-theme="dark"]{--ink:#e2e8f0;--muted:#94a3b8;--accent:#7db8f7;--line:#2b3648;--card:#151d2b;--bg:#0f141d;color-scheme:dark}
 :root[data-theme="dark"] .site-head{border-bottom-color:#e2e8f0}
@@ -238,9 +300,13 @@ footer.site-foot{border-top:1px solid var(--line);margin-top:40px;padding-top:14
 :root[data-theme="dark"] .donate-label{color:#cbd5e1}
 :root[data-theme="dark"] #donatefloat-close{background:rgba(255,255,255,.14);color:#fff}
 :root[data-theme="dark"] #donatefloat-close:hover{background:rgba(255,255,255,.28)}
+:root[data-theme="dark"] .cmt-badge.badge-admin{background:#3f1d22;color:#f28b82}
+:root[data-theme="dark"] .cmt-badge.badge-member{background:#16324a;color:#7dd3fc}
+:root[data-theme="dark"] .cmt-msg{color:#f28b82}
+:root[data-theme="dark"] .cmt-like:hover, :root[data-theme="dark"] .cmt-replybtn:hover{background:#1e293b}
 @page{size:A4;margin:18mm 15mm}
 @media print{
-  .back,.actions,footer.site-foot,#msgfloat,#donatefloat{display:none!important}
+  .back,.actions,footer.site-foot,#msgfloat,#donatefloat,#drx-comments{display:none!important}
   :root[data-theme="dark"],:root:not([data-theme="light"]){--ink:#222;--muted:#666;--accent:#2a6cb6;--line:#e5e7eb;--card:#f8fafc;--bg:#fff}
   [data-theme="dark"] h1,:root:not([data-theme="light"]) h1{color:#111;border-bottom-color:#333}
   [data-theme="dark"] h2,:root:not([data-theme="light"]) h2{color:#1a1a1a}
