@@ -16,8 +16,8 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <div class="wrap">
 <div class="top-row"><p class="back"><a href="../../index.html#model">← <span class="lz">全部报告</span><span class="le">All Reports</span></a></p><span class="top-btns"><a class="msg-btn drx-account-link" href="../../account.html"><span class="lz">账号</span><span class="le">Account</span></a><button type="button" class="theme-toggle lang-toggle">EN</button></span></div>
 <p class="actions"><button type="button" onclick="window.print()"><span class="lz">下载 PDF / 打印</span><span class="le">Download PDF / Print</span></button> <button type="button" class="theme-toggle">深色模式</button><span class="prevnext"><a href="../../custom/金融建模/2026-11-23-AllocFlow直接生成组合仓位研读.html" title="直接生成组合仓位：AllocFlow 端到端交易动作生成研读"><span class="lz">前一篇 ↓</span><span class="le">Prev ↓</span></a></span></p>
-<h1><span class="lz">从GBM往返到状态切换：Zhang配对交易研究线四篇研读</span><span class="le">Four Cells Completed: A Reading of the Zhang Pairs-Trading Line — GBM Round Trips, Reversible Positions, Mean Reversion and Regime Switching</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This reading report surveys four 2023–2024 papers from Qing Zhang&#x27;s pairs-trading line that complete a two-by-two map: price dynamics (geometric Brownian motion versus a mean-reverting spread) crossed with regime structure (none versus two-state Markov switching). Das, Tie and Zhang (arXiv:2310.15803) solve the GBM round-trip problem through an HJB equation whose optimal entry and exit are threshold curves, first for long/flat initial positions and then for reversible long/flat/short ones. Das, Luu, Tie and Zhang (Numerical Algebra, Control and Optimization, 2024) treat a mean-reverting spread with two-state switching via an HJB quasi-variational inequality; the thresholds x1 = -0.282615, x3 = 0.295314 and x4 = 0.498290 match the journal&#x27;s Table 1. Luu, Song, Tie and Zhang (Pure and Applied Functional Analysis, 2024) combine GBM with switching and determine thresholds from an algebraic system; their six numerical cases (K = 0.001, discount rate 0.50, transcribed from the dissertation version) are tabulated in full, with CASE4 flagged as doubtful and CASE2/CASE6 recorded as identical parameters with different roots. The report closes with the analytic benchmarks this line offers HJB-DGM numerics.</p></div>
-<p>本站 2026 年 10 月 12 日发过 Tie、Zhang 与 Zhang 发表于 JOTA 2017 的 GBM 配对交易研读；那只是这条研究线的早期一环。2023 至 2024 年，Das、Luu、Song 等人先后与 Tie、Zhang 合作，把这条线补成完整的四格：GBM 往返交易、GBM 可逆持仓、均值回归价差加两态状态切换、GBM 加两态状态切换。本文逐篇研读这四篇工作的模型、方法与阈值结果，给出四格对照与谱系，完整摘录 PAFA 的六个数值例，并如实标注两处存疑与本次核验的范围。本篇为研究记录，不构成投资建议。</p>
+<h1><span class="lz">从GBM往返到状态切换：Zhang配对交易研究线四篇研读</span><span class="le">From GBM Round Trips to Regime Switching: A Self-Contained Reading of Four Papers in the Zhang Pairs-Trading Line, with a Strategy Synthesis</span></h1><div class="abstract"><h3><span class="lz">英文摘要</span><span class="le">Abstract</span></h3><p>This expanded reading report gives a self-contained account of four 2023–2024 papers from Qing Zhang&#x27;s pairs-trading line, which complete a two-by-two map: price dynamics (geometric Brownian motion versus a mean-reverting spread) crossed with regime structure (none versus two-state Markov switching). For each paper we present the full theory: model setup, payoff and value functions, the HJB equation or quasi-variational inequality, the smooth-fit conditions, and the closed-form or algebraic characterisation of the optimal thresholds. Das, Tie and Zhang (arXiv:2310.15803) solve the GBM round trip by a homogeneity reduction to the price ratio; for Walmart/Target calibrated on 2010–2015 data (K = 0.001, discount rate 0.5) the thresholds are k1 = 0.85527 and k2 = 1.28061, and allowing short initial positions widens the entry side to 1.32175 while the four candidate thresholds collapse to two. Das, Luu, Tie and Zhang (Numerical Algebra, Control and Optimization, 2024) model the spread directly as a regime-switching Ornstein–Uhlenbeck process with an absorbing second state and a fixed per-trade cost; the base case gives x1 = -0.118156, x2 = 0.132020, x3 = 0.295314, x4 = 0.498290. Luu, Song, Tie and Zhang (Pure and Applied Functional Analysis, 2024) combine GBM with two-way switching: selling thresholds come in fractional closed form and buying thresholds solve a 2x2 algebraic system for each of six orderings, tabulated in full (CASE4 flagged as internally inconsistent; PAFA numbers are from the dissertation version, the journal PDF being paywalled). A closing synthesis — the site&#x27;s own, not any paper&#x27;s claim — turns the four models into an implementable strategy covering model selection, calibration, threshold computation, execution costs and the risks the theory does not cover.</p></div>
+<p>本站 2026 年 10 月 12 日发过 Tie、Zhang 与 Zhang 发表于 JOTA 2017 的 GBM 配对交易研读；那只是这条研究线的早期一环。2023 至 2024 年，Das、Luu、Song 等人先后与 Tie、Zhang 合作，把这条线补成完整的四格：GBM 往返交易、GBM 可逆持仓、均值回归价差加两态状态切换、GBM 加两态状态切换。本文逐篇研读这四篇工作，给出每篇的完整理论刻画——模型设定、值函数与回报函数、HJB 方程或拟变分不等式、自由边界的光滑衔接条件、阈值的闭式解或代数方程组、最优策略的停时表述——并附四格对照与谱系、PAFA 六个数值例全表与两处存疑，最后新增一节，把四篇的理论落成一套可执行的配对交易策略框架。本文力求自成一体，读者不需要另找原文即可跟下全部推导主线。本篇为研究记录，不构成投资建议。</p>
 <h2>一、出处与材料</h2>
 <p>四篇工作的出处如下：</p>
 <ul>
@@ -25,7 +25,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <li><strong>第三格</strong>：Das, Luu, Tie &amp; Zhang, "Pairs trading with regime switching", <em>Numerical Algebra, Control and Optimization</em> 14(4): 636–652 (2024)，DOI 10.3934/naco.2023023，下称 NACO 篇。</li>
 <li><strong>第四格</strong>：Luu, Song, Tie &amp; Zhang, "Pairs trading under geometric Brownian motions with regime switching", <em>Pure and Applied Functional Analysis</em> 9(3): 783–810 (2024)，下称 PAFA 篇。</li>
 </ul>
-<p>阅读材料：Das 2024 年佐治亚大学博士论文（132 页，第 2 章为 GBM 往返、第 3 章为含空头初始仓位、第 4 章即 NACO 篇）与 Song 2023 年佐治亚大学博士论文（77 页，PAFA 篇为其第 2 章，本站存有 54 页抽章版）。PAFA 期刊 PDF 为订阅制，未能取得，<strong>本文涉及 PAFA 的一切数字均以学位论文版为准，未与期刊版核对</strong>。四篇的证明过程未逐条核验，本文涉及证明思路处均为结构级概述，最后一节有完整的核验范围说明。</p>
+<p>阅读材料：Das 2024 年佐治亚大学博士论文（132 页，第 2 章为 GBM 往返、第 3 章为含空头初始仓位、第 4 章即 NACO 篇）与 Song 2023 年佐治亚大学博士论文（77 页，PAFA 篇为其第 2 章，本站存有 54 页抽章版）。PAFA 期刊 PDF 为订阅制，未能取得，<strong>本文涉及 PAFA 的一切数字均以学位论文版为准，未与期刊版核对</strong>。四篇的证明过程未逐条核验，本文涉及证明思路处会标明是概述还是原文结论，最后一节有完整的核验范围说明。</p>
 <h2>二、谱系：从单阈值卖出到四格补齐</h2>
 <p>按 PAFA 篇第 2 章引言梳理的谱系，这条线二十多年的推进路径是：</p>
 <ul>
@@ -57,7 +57,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <td>两只股票一般 GBM，不预设相关性与配对关系</td>
 <td>无</td>
 <td>一轮往返，先开后平；初始仓位先限多头/空仓</td>
-<td>HJB 方程；最优开平仓由阈值曲线刻画；固定单笔佣金，最大化总回报</td>
+<td>HJB 方程；最优开平仓由阈值曲线刻画；比例佣金（费率 K），最大化贴现总回报</td>
 </tr>
 <tr>
 <td>2</td>
@@ -72,7 +72,7 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 <td>Das, Luu, Tie &amp; Zhang, NACO 14(4): 636–652 (2024)</td>
 <td>价差均值回归</td>
 <td>两态 Markov 切换</td>
-<td>开平仓阈值</td>
+<td>可重复往返的开平仓阈值</td>
 <td>HJB 拟变分不等式；四阈值刻画；数值与期刊 Table 1 对得上</td>
 </tr>
 <tr>
@@ -86,123 +86,633 @@ window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{
 </tbody>
 </table>
 <p>四格的两个维度是：价格动态（GBM 对均值回归价差）与状态结构（无切换对两态切换）。JOTA 2017 篇落在第 1 格的邻域（GBM、无切换），但做的是可重复往返的闭式解；下面逐格看四篇各自多走了哪一步。</p>
-<h2>四、逐篇研读</h2>
+<h2>四、共同框架：配对头寸、成本结构与目标函数</h2>
+<p>四篇的记号大体一致，先把共同骨架立好，后面逐篇时只写各自的增量。</p>
+<p><strong>配对头寸。</strong> 两只股票记为 S1、S2，价格过程记为 $X^{1}_{t}$、$X^{2}_{t}$。一个单位的配对头寸 Z 定义为：一股 S1 多头加一股 S2 空头。做多 Z 即买入 S1、卖空 S2；做空 Z 反之。GBM 三篇（第 1、2、4 格）都用这个"一股对一股"的头寸；PAFA 篇还指出这并不失一般性：任意股数 $n_{1}$ 多、$n_{2}$ 空的头寸，只需把状态变量换成 $(n_{1} X^{1}_{t}, n_{2} X^{2}_{t})$，GBM 的方程形式不变（其 Remark 1）。NACO 篇的头寸定义不同，见其本节。</p>
+<p><strong>比例成本（第 1、2、4 格）。</strong> 每笔买入或卖出按成交价的固定比例 K 收佣金，记</p>
+<p>$$
+\beta_{b} = 1 + K, \quad \beta_{s} = 1 - K
+$$</p>
+<p>于是开一笔多头 Z 的现金流出与平仓时的现金流入分别是</p>
+<p>$$
+\text{开仓成本} = \beta_{b} X^{1} - \beta_{s} X^{2}, \quad \text{平仓所得} = \beta_{s} X^{1} - \beta_{b} X^{2}
+$$</p>
+<p>买腿按 $\beta_{b}$ 付、卖腿按 $\beta_{s}$ 收，成本在价格里直接扣。注意成本的这一结构决定了后文一切阈值的位置：没有成本时 $\beta_{b} = \beta_{s} = 1$，后文将看到若干存在性条件恰好等价于 $\beta_{b} / \beta_{s} &gt; 1$，即等价于 K &gt; 0。</p>
+<p><strong>固定金额成本（第 3 格）。</strong> NACO 篇直接对价差 Z 建模，成本是每笔交易的固定金额 K：买入 Z 时付 $Z + K$，卖出 Z 时收 $Z - K$。同一个字母 K，两种成本口径，引用时不可混。</p>
+<p><strong>目标。</strong> 四篇都是在贴现因子 $\rho &gt; 0$ 下最大化期望贴现净收益；决策变量是开仓、平仓的停时（第 3 格是可重复的停时序列）。值函数是回报函数对一切容许停时的上确界，动态规划把它变成 HJB 方程（第 1、2、4 格）或带干预项的拟变分不等式（第 3 格的方程组在形式上同为 min 型，见其本节）。</p>
+<h2>五、逐篇研读</h2>
 <h3>1. GBM 往返交易（arXiv:2310.15803 主情形）</h3>
-<p>模型设定：两只股票的价格各服从一般的几何布朗运动，结构级地写即</p>
+<p><strong>模型。</strong> 两只股票的价格服从一般的几何布朗运动：</p>
 <p>$$
-dS^i_{t} = S^i_{t} \left( \mu_{i} \, dt + \sigma_{i} \, dW^i_{t} \right), \quad i = 1, 2
+dX^{1}_{t} = X^{1}_{t} \left( \mu_{1} dt + \sigma_{11} dW^{1}_{t} + \sigma_{12} dW^{2}_{t} \right)
 $$</p>
-<p>关键在于"一般"二字：不预设两只股票的相关结构，不要求价差均值回归，也不要求先验的配对关系。这与传统配对交易形成对照——传统框架先用协整或相关性筛出"会回归"的配对，再在均值回归假设下谈最优阈值；这篇把顺序倒过来，先在最一般的 GBM 下把一轮往返的最优时机问题解出来。</p>
-<p>交易结构是一轮往返：先开仓、后平仓。第一步先把初始仓位限制在多头与空仓两种状态。每笔交易收固定佣金，目标是在贴现意义下最大化一轮往返的总回报。方法上是动态规划导出的 HJB 方程，最优开仓与平仓时机由价格平面上的<strong>阈值曲线</strong>刻画，而不是 JOTA 2017 篇里价格比意义下的常数阈值——一般 GBM 下两只股票的漂移与波动不对称，最优边界没有理由退化成过原点的射线，曲线形态正是"一般"二字的代价与收获。</p>
+<p>$$
+dX^{2}_{t} = X^{2}_{t} \left( \mu_{2} dt + \sigma_{21} dW^{1}_{t} + \sigma_{22} dW^{2}_{t} \right)
+$$</p>
+<p>其中 $\mu_{i}$ 为收益率，$\sigma_{ij}$ 为波动率常数，$(W^{1}_{t}, W^{2}_{t})$ 为二维标准布朗运动。关键在于"一般"二字：不预设两只股票的相关结构，不要求价差均值回归，也不要求先验的配对关系。这与传统配对交易形成对照——传统框架先用协整或相关性筛出"会回归"的配对，再在均值回归假设下谈最优阈值；这篇把顺序倒过来，先在最一般的 GBM 下把一轮往返的最优时机问题解出来。全文假设 $\rho &gt; \mu_{1}$ 且 $\rho &gt; \mu_{2}$。</p>
+<p><strong>问题与值函数。</strong> 交易结构是一轮往返：先开仓、后平仓。初始净头寸记为 i：i = 1 表示已持有一股 Z（多头），只需选一个平仓停时 $\tau_{0}$；i = 0 表示空仓，需先选开仓停时 $\tau_{1}$、再选平仓停时 $\tau_{2} \ge \tau_{1}$。给定初始价格 $(x_{1}, x_{2})$，回报函数为</p>
+<p>$$
+J_{0} (x_{1}, x_{2}, \Lambda_{0}) = E \left\lbrack e^{- \rho \tau_{2}} \left( \beta_{s} X^{1}_{\tau_{2}} - \beta_{b} X^{2}_{\tau_{2}} \right) 1_{\lbrace \tau_{2} &lt; \infty \rbrace} - e^{- \rho \tau_{1}} \left( \beta_{b} X^{1}_{\tau_{1}} - \beta_{s} X^{2}_{\tau_{1}} \right) 1_{\lbrace \tau_{1} &lt; \infty \rbrace} \right\rbrack
+$$</p>
+<p>$$
+J_{1} (x_{1}, x_{2}, \Lambda_{1}) = E \left\lbrack e^{- \rho \tau_{0}} \left( \beta_{s} X^{1}_{\tau_{0}} - \beta_{b} X^{2}_{\tau_{0}} \right) 1_{\lbrace \tau_{0} &lt; \infty \rbrace} \right\rbrack
+$$</p>
+<p>值函数 $V_{i} (x_{1}, x_{2}) = \sup_{\Lambda_{i}} J_{i} (x_{1}, x_{2}, \Lambda_{i})$。原文先证了值函数的基本界（其 Lemma 1）：</p>
+<p>$$
+0 \le V_{0} (x_{1}, x_{2}) \le 2 x_{1} + 2 x_{2}, \quad \beta_{s} x_{1} - \beta_{b} x_{2} \le V_{1} (x_{1}, x_{2}) \le x_{1}
+$$</p>
+<p>下界来自"立即平仓"与"永不开仓"两个平凡策略，上界来自贴现与 $\rho &gt; \mu_{i}$ 的假设；线性增长界是后面验证定理里控制尾项的关键。</p>
+<p><strong>HJB 方程。</strong> 与扩散对应的二阶算子为</p>
+<p>$$
+\mathcal{A} = \frac{1}{2} \left( a_{11} x_{1}^{2} \frac{\partial^{2}}{\partial x_{1}^{2}} + 2 a_{12} x_{1} x_{2} \frac{\partial^{2}}{\partial x_{1} \partial x_{2}} + a_{22} x_{2}^{2} \frac{\partial^{2}}{\partial x_{2}^{2}} \right) + \mu_{1} x_{1} \frac{\partial}{\partial x_{1}} + \mu_{2} x_{2} \frac{\partial}{\partial x_{2}}
+$$</p>
+<p>其中 $a_{11} = \sigma_{11}^{2} + \sigma_{12}^{2}$、$a_{12} = \sigma_{11} \sigma_{21} + \sigma_{12} \sigma_{22}$、$a_{22} = \sigma_{21}^{2} + \sigma_{22}^{2}$。HJB 方程组为（$x_{1}, x_{2} &gt; 0$）</p>
+<p>$$
+\min \lbrace \rho v_{0} - \mathcal{A} v_{0}, \ v_{0} - v_{1} + \beta_{b} x_{1} - \beta_{s} x_{2} \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \rho v_{1} - \mathcal{A} v_{1}, \ v_{1} - \beta_{s} x_{1} + \beta_{b} x_{2} \rbrace = 0
+$$</p>
+<p>每式两项取 min 为零，读法是：两项都非负、且至少一项取零。第一项为零的区域是"等待区"（继续持有当前状态），第二项为零的区域是"行动区"（立即开仓或平仓不亏于等待）。第二式与 $v_{0}$ 无关，可以先解；第一式再以 $v_{1}$ 为障碍求解——这个先后次序是全部求解的骨架。</p>
+<p><strong>齐次降维。</strong> 回报与方程对 $(x_{1}, x_{2})$ 是一次齐次的，于是作代换 $y = x_{2} / x_{1}$、$v_{i} (x_{1}, x_{2}) = x_{1} w_{i} (y)$，二维问题降为一维。算子 $\mathcal{A}$ 在新变量下化为 $x_{1} \mathcal{L} w_{i}$，其中</p>
+<p>$$
+\mathcal{L} w (y) = \lambda y^{2} w^{\prime \prime} (y) + \left( \mu_{2} - \mu_{1} \right) y w^{\prime} (y) + \mu_{1} w (y), \quad \lambda = \frac{a_{11} - 2 a_{12} + a_{22}}{2} = \frac{1}{2} \left\lbrack \left( \sigma_{11} - \sigma_{21} \right)^{2} + \left( \sigma_{12} - \sigma_{22} \right)^{2} \right\rbrack
+$$</p>
+<p>$\lambda$ 是价格比 $y$ 的相对波动强度：两只股票的波动结构越接近，$\lambda$ 越小；$\lambda = 0$ 时价格比是确定性运动，问题退化为一阶情形，原文只处理 $\lambda \ne 0$。降维后的 HJB 为</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{L} \right) w_{0} (y), \ w_{0} (y) - w_{1} (y) + \beta_{b} - \beta_{s} y \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{L} \right) w_{1} (y), \ w_{1} (y) - \beta_{s} + \beta_{b} y \rbrace = 0
+$$</p>
+<p><strong>Euler 方程与两个根。</strong> 等待区内 $(\rho - \mathcal{L}) w = 0$ 是 Euler 型方程，试探解 $w = y^{\delta}$ 给出特征方程</p>
+<p>$$
+\delta^{2} - \left( 1 + \frac{\mu_{1} - \mu_{2}}{\lambda} \right) \delta - \frac{\rho - \mu_{1}}{\lambda} = 0
+$$</p>
+<p>两个根为</p>
+<p>$$
+\delta_{1} = \frac{1}{2} \left( 1 + \frac{\mu_{1} - \mu_{2}}{\lambda} + \sqrt{ \left( 1 + \frac{\mu_{1} - \mu_{2}}{\lambda} \right)^{2} + \frac{4 \left( \rho - \mu_{1} \right)}{\lambda} } \right)
+$$</p>
+<p>$$
+\delta_{2} = \frac{1}{2} \left( 1 + \frac{\mu_{1} - \mu_{2}}{\lambda} - \sqrt{ \left( 1 + \frac{\mu_{1} - \mu_{2}}{\lambda} \right)^{2} + \frac{4 \left( \rho - \mu_{1} \right)}{\lambda} } \right)
+$$</p>
+<p>在 $\rho &gt; \mu_{1}$、$\rho &gt; \mu_{2}$ 下有 $\delta_{1} &gt; 1$、$\delta_{2} &lt; 0$，并满足恒等式</p>
+<p>$$</p>
+<ul>
+<li>\delta_{1} \delta_{2} = \frac{\rho - \mu_{1}}{\lambda}, \quad \delta_{1} + \delta_{2} = 1 + \frac{\mu_{1} - \mu_{2}}{\lambda}, \quad \left( \delta_{1} - 1 \right) \left( 1 - \delta_{2} \right) = \frac{\rho - \mu_{2}}{\lambda}
+$$</li>
+</ul>
+<p>等待区的通解是 $w (y) = c_{1} y^{\delta_{1}} + c_{2} y^{\delta_{2}}$；增长条件把每个区域里能保留的幂次筛掉一半，这是后面各区域解式的来源。</p>
+<p><strong>先解平仓问题（$w_{1}$）。</strong> 猜测存在阈值 $k_{1}$：$y \le k_{1}$ 时立即平仓最优，$w_{1}$ 等于平仓所得；$y &gt; k_{1}$ 时等待。注意 $y = X^{2} / X^{1}$ 小意味着 S1 相对贵——持多头 Z 时正是兑现的时机。分段解为</p>
+<p>$$
+w_{1} (y) = \beta_{s} - \beta_{b} y, \quad 0 \le y \le k_{1}
+$$</p>
+<p>$$
+w_{1} (y) = C_{2} y^{\delta_{2}}, \quad y \ge k_{1}
+$$</p>
+<p>在 $k_{1}$ 处要求值与一阶导数都连续（smooth fit）：</p>
+<p>$$
+\beta_{s} - \beta_{b} k_{1} = C_{2} k_{1}^{\delta_{2}}, \quad - \beta_{b} = C_{2} \delta_{2} k_{1}^{\delta_{2} - 1}
+$$</p>
+<p>两式相除消去 $C_{2}$，得 $k_{1}$ 的闭式解与系数：</p>
+<p>$$
+k_{1} = \frac{\beta_{s}}{\beta_{b}} \cdot \frac{- \delta_{2}}{1 - \delta_{2}}, \quad C_{2} = \frac{\beta_{b}}{\left( - \delta_{2} \right) k_{1}^{\delta_{2} - 1}}
+$$</p>
+<p>$k_{1}$ 只通过比值 $\beta_{s} / \beta_{b}$ 依赖成本：成本越高，$k_{1}$ 越小，平仓线压得越低——要更极端的价格比才肯兑现。</p>
+<p><strong>再解开仓问题（$w_{0}$）。</strong> 猜测存在阈值 $k_{2} &gt; k_{1}$：$y \ge k_{2}$ 时立即开仓（S2 相对贵、S1 相对便宜，正是做多 Z 的入场点），$w_{0}$ 等于开仓后的价值减开仓成本；$y &lt; k_{2}$ 时等待：</p>
+<p>$$
+w_{0} (y) = C_{1} y^{\delta_{1}}, \quad 0 \le y \le k_{2}
+$$</p>
+<p>$$
+w_{0} (y) = C_{2} y^{\delta_{2}} - \beta_{b} + \beta_{s} y, \quad y \ge k_{2}
+$$</p>
+<p>在 $k_{2}$ 处 smooth fit：</p>
+<p>$$
+C_{1} k_{2}^{\delta_{1}} = C_{2} k_{2}^{\delta_{2}} - \beta_{b} + \beta_{s} k_{2}, \quad C_{1} \delta_{1} k_{2}^{\delta_{1} - 1} = C_{2} \delta_{2} k_{2}^{\delta_{2} - 1} + \beta_{s}
+$$</p>
+<p>两式按比例消去 $C_{1}$，得到关于 $k_{2}$ 的单个方程</p>
+<p>$$
+f \left( k_{2} \right) := C_{2} \left( \delta_{1} - \delta_{2} \right) k_{2}^{\delta_{2}} + \beta_{s} \left( \delta_{1} - 1 \right) k_{2} - \beta_{b} \delta_{1} = 0
+$$</p>
+<p>原文证明：$f$ 在 $(0, \infty)$ 上严格凸，两端趋于 $+ \infty$，其最小值非正等价于一个可以由算术–几何平均不等式验证的条件，而该条件最终归结为 $\beta_{b} / \beta_{s} &gt; 1$，即 K &gt; 0——<strong>有成本才有内点解</strong>；$f = 0$ 有两个根，取较大者为 $k_{2}$。随后 $C_{1}$ 由衔接条件给出：</p>
+<p>$$
+C_{1} = \frac{C_{2} \delta_{2} k_{2}^{\delta_{2} - 1} + \beta_{s}}{\delta_{1} k_{2}^{\delta_{1} - 1}}
+$$</p>
+<p>并可证 $C_{1} &gt; 0$。价格比平面被两条过原点的射线 $x_{2} = k_{1} x_{1}$ 与 $x_{2} = k_{2} x_{1}$ 分成三个区域：</p>
+<p>$$
+\Gamma_{1} = \left( 0, k_{1} \right\rbrack, \quad \Gamma_{2} = \left( k_{1}, k_{2} \right), \quad \Gamma_{3} = \left\lbrack k_{2}, \infty \right)
+$$</p>
+<p>这正是"阈值曲线"在本篇里的确切形态：齐次性把曲线化简为射线，阈值退化为价格比上的两个常数。原文随后逐区域验证所构造的 $(w_{0}, w_{1})$ 满足全部变分不等式（等待区里障碍项非负、行动区里 $(\rho - \mathcal{L}) w \ge 0$），再由验证定理（其 Theorem 1，用 Dynkin 公式与 Fatou 引理对任意停时做上下夹逼）确认 $v_{i} (x_{1}, x_{2}) = x_{1} w_{i} (x_{2} / x_{1}) = V_{i} (x_{1}, x_{2})$。</p>
+<p><strong>最优策略（停时形式）。</strong> 初始空仓时，最优开平仓是首达时：</p>
+<p>$$
+\tau_{1}^{\ast} = \inf \lbrace t \ge 0 : \left( X^{1}_{t}, X^{2}_{t} \right) \in \Gamma_{3} \rbrace, \quad \tau_{2}^{\ast} = \inf \lbrace t \ge \tau_{1}^{\ast} : \left( X^{1}_{t}, X^{2}_{t} \right) \in \Gamma_{1} \rbrace
+$$</p>
+<p>初始多头时，最优平仓时为 $\tau_{0}^{\ast} = \inf \lbrace t \ge 0 : (X^{1}_{t}, X^{2}_{t}) \in \Gamma_{1} \rbrace$。用价格比读：$y \ge k_{2}$ 开仓做多 Z，$y \le k_{1}$ 平仓；中间带 $\Gamma_{2}$ 是不行动区。开仓线与平仓线分离（$k_{1} &lt; k_{2}$）正是成本造成的迟滞。</p>
+<p><strong>数值例（WMT/TGT）。</strong> 用 Walmart（S1）与 Target（S2）2010–2020 年复权收盘价：前半段（2010–2015）以最小二乘校准，后半段（2015–2020）检验。校准参数为</p>
+<p>$$
+\mu_{1} = 0.09696, \quad \mu_{2} = 0.14347, \quad \sigma_{11} = 0.19082, \quad \sigma_{12} = \sigma_{21} = 0.04036, \quad \sigma_{22} = 0.13988
+$$</p>
+<p>取 K = 0.001、$\rho = 0.5$，得</p>
+<p>$$
+k_{1} = 0.85527, \quad k_{2} = 1.28061
+$$</p>
+<p>参数敏感性（原文 Tables 1–7 的方向）：$\mu_{1}$ 升则 $k_{1}$、$k_{2}$ 同降（开仓区扩大）；$\mu_{2}$ 升则两者同升（平仓区扩大、鼓励早退）；$\sigma_{11}$、$\sigma_{22}$ 升则 $k_{1}$ 降、$k_{2}$ 升（不行动带变宽）；交叉项 $\sigma_{12} = \sigma_{21}$ 升（相关性强）则 $k_{1}$ 升、$k_{2}$ 降（带变窄、机会变多）；$\rho$ 升则 $k_{1}$ 升、$k_{2}$ 降（不愿久持）；K 升则 $k_{1}$ 降、$k_{2}$ 升（成本抑制交易）。学位论文第 2 章还给出了完整的回测协议与结果：以 2015–2020 年数据回测，初始资金 10 万美元，触发时以一半资金买 WMT、等额卖空 TGT，每笔配对交易收 5 美元佣金，期末账户 179,253 美元，总收益 +79.25%（五年、共六笔交易）。交换两股角色（S1 = TGT、S2 = WMT）时阈值取倒数对</p>
+<p>$$
+\left( \tilde{k}_{1}, \tilde{k}_{2} \right) = \left( \frac{1}{k_{2}}, \frac{1}{k_{1}} \right) = \left( 0.78087, 1.16922 \right)
+$$</p>
+<p>两个方向的交易互不重叠，可以并行执行而不重复占用资金——这是"价格比阈值"结构自带的一个组合性质。</p>
 <h3>2. GBM 可逆持仓（同一篇的第二种情形）</h3>
-<p>第二种情形把初始仓位放宽到多头、空仓、空头三态，即所谓可逆持仓：交易者进场时手里可能已经有一笔反向头寸，最优规则必须同时回答"已有空头时何时平、何时反手"。方法仍是同一套 HJB 阈值曲线框架，只是状态多了一格，边界也随之成对出现。</p>
-<p>数值例用 Walmart（WMT）与 Target（TGT）2010–2020 年收盘价，两个交易方向各给出一组阈值，记为 (k1, k2) 与 (ke1, ke2)。这里要再次强调出处纪律：这一格出自 arXiv:2310.15803 的第二种情形与 Das 博士论文第 3 章，<strong>不是一篇独立的期刊论文</strong>；把它列为"四格"之一，是按模型情形计数，不是按篇目计数。</p>
-<h3>3. 均值回归价差 + 两态切换（NACO 2024）</h3>
-<p>第三格换了价格动态：标的不再是两只股票各自的 GBM，而是直接对价差建模，价差服从均值回归扩散，结构级地写即 Ornstein–Uhlenbeck 型过程</p>
+<p><strong>增量只有一处：初始头寸多一格。</strong> 价格动态、成本与贴现全部同上节，但净头寸可以是多头（i = 1）、空仓（i = 0）或空头（i = −1）。持空头 Z 者只需选一个买回平仓的停时 $\tau_{0}$；空仓者先选开仓停时 $\tau_{1}$ 与开仓方向 $u \in \lbrace -1, 1 \rbrace$（u = 1 做多 Z、u = −1 做空 Z），再选平仓停时 $\tau_{2} \ge \tau_{1}$。新增的回报函数为</p>
 <p>$$
-dx_{t} = \kappa \left( \theta - x_{t} \right) dt + \sigma \, dW_{t}
+J_{-1} (x_{1}, x_{2}, \tau_{0}) = E \left\lbrack - e^{- \rho \tau_{0}} \left( \beta_{b} X^{1}_{\tau_{0}} - \beta_{s} X^{2}_{\tau_{0}} \right) 1_{\lbrace \tau_{0} &lt; \infty \rbrace} \right\rbrack
 $$</p>
-<p>并叠加一个两态 Markov 链驱动的市场状态切换：每个状态下均值回归的参数可以不同。交易问题相应地写成 HJB 拟变分不等式（QVI），结构级示意为</p>
+<p>空仓的回报按方向分两支：u = 1 时与上节 $J_{0}$ 相同；u = −1 时先收卖空所得、后付买回成本：</p>
 <p>$$
-\min\lbrace \rho v - \mathcal{L} v, \ v - \mathcal{M} v \rbrace = 0
+J_{0} \big| _{u = -1} = E \left\lbrack e^{- \rho \tau_{1}} \left( \beta_{s} X^{1}_{\tau_{1}} - \beta_{b} X^{2}_{\tau_{1}} \right) 1_{\lbrace \tau_{1} &lt; \infty \rbrace} - e^{- \rho \tau_{2}} \left( \beta_{b} X^{1}_{\tau_{2}} - \beta_{s} X^{2}_{\tau_{2}} \right) 1_{\lbrace \tau_{2} &lt; \infty \rbrace} \right\rbrack
 $$</p>
-<p>其中 $\mathcal{L}$ 是当前状态下价差扩散的生成元，$\mathcal{M}$ 是开仓或平仓的干预算子；两个状态各有一份这样的不等式，经 Markov 切换项耦合。最优策略由四个阈值刻画。本次核验把数值例与期刊 Table 1 逐个对照，摘录到的三个阈值为</p>
+<p>值函数的界（原文 Lemma 2）：$\beta_{s} x_{1} - \beta_{b} x_{2} \le V_{1} \le x_{1}$、$\beta_{s} x_{2} - \beta_{b} x_{1} \le V_{-1} \le x_{2}$、$0 \le V_{0} \le 4 x_{1} + 4 x_{2}$。</p>
+<p><strong>HJB 方程组。</strong> 三个值函数耦合为（降维后、记 $\mathcal{L}$ 同上节）：</p>
 <p>$$
-x_{1} = -0.282615, \quad x_{3} = 0.295314, \quad x_{4} = 0.498290
+\min \lbrace \left( \rho - \mathcal{L} \right) w_{1} (y), \ w_{1} (y) - \beta_{s} + \beta_{b} y \rbrace = 0
 $$</p>
-<p>与期刊发表值一致。还有一个容易误读的术语需要澄清：这篇没有价格跳跃，文中所谓 boundary jump 指的是<strong>市场状态切换时最优交易边界随之跳变</strong>——同一个价差水平，在状态 1 里可能还不到开仓线，切到状态 2 就已经越线了，边界是状态相依的分段函数而非一条固定直线。</p>
-<h3>4. GBM + 两态切换（PAFA 2024）</h3>
-<p>第四格把前两格的要素叠满：两只股票各服从 GBM，同时市场在两个状态间按 Markov 链切换，两个状态下漂移、波动整套参数都可以不同；交易仍是一轮往返，买入后卖出。方法与前三格不同：不用数值解 HJB，而是走 smooth-fit 路线——先猜测最优边界的阈值曲线形态，把值函数在每个区域写成 Euler 方程通解的组合，再用边界处的光滑衔接条件把待定系数与阈值一起解出来，阈值曲线最终由一个<strong>代数方程组</strong>确定；论文同时给出最优性的充分条件，把"猜出来的解确实最优"这一步补齐（以上为结构级概述，证明未逐条核验）。</p>
-<p>数值例（学位论文版 §2.6）按四个阈值 k1、k2、k3、k4 的相对次序分成六种情形逐一展示，每种情形都给出值函数与切换区域，并声称已验证全部变分不等式成立；例如买入规则出现 k4 &lt; k3 这类次序的情形，就由其 Theorem 4 处理。六种情形的完整参数与阈值见下一节——那是本文摘录的重点，也是这条线留给数值工作者的一份现成的复现清单。</p>
-<h2>五、PAFA 六个数值例全表与两处存疑</h2>
-<p>六例的共同参数：佣金 K = 0.001（买入、卖出价格系数相应为 $\beta_{b} = 1 + K$、$\beta_{s} = 1 - K$），贴现率 ρ = 0.50。下表按学位论文版 §2.6 原样摘录：μ 列依次为 μ1(1)、μ2(1)、μ1(2)、μ2(2)（括号内为市场状态），σ(1)、σ(2) 为两状态下的波动率矩阵，阈值列依次为 k1、k2、k3、k4。<strong>期刊版数字未核</strong>，引用时请连同这一限定。</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{L} \right) w_{-1} (y), \ w_{-1} (y) + \beta_{b} - \beta_{s} y \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{L} \right) w_{0} (y), \ w_{0} (y) - w_{1} (y) + \beta_{b} - \beta_{s} y, \ w_{0} (y) - w_{-1} (y) - \beta_{s} + \beta_{b} y \rbrace = 0
+$$</p>
+<p>前两式仍可独立先解（分别是"持多头何时平"与"持空头何时平"），第三式以两者为双障碍。</p>
+<p><strong>四个阈值的预期与构造。</strong> 先验地看，交易规则应当由四个阈值刻画：$k_{1}$ 是空仓者做空 Z 的触发线（y 足够小、S1 相对贵时卖 S1 买 S2），$k_{2}$ 是多头持有者的平仓线，$k_{3}$ 是空头持有者的买回线，$k_{4}$ 是空仓者做多 Z 的触发线。持仓者比空仓者更急于离场（持仓要担借券与占资的风险），故预期次序为</p>
+<p>$$
+k_{1} \le k_{2} \le k_{3} \le k_{4}
+$$</p>
+<p>求解仍从两个单边问题开始。$w_{1}$ 的解与上节完全相同，$k_{1}$ 仍是闭式</p>
+<p>$$
+k_{1} = \frac{\beta_{s}}{\beta_{b}} \cdot \frac{- \delta_{2}}{1 - \delta_{2}}, \quad w_{1} (y) = \beta_{s} - \beta_{b} y \ (y \le k_{1}), \quad w_{1} (y) = C_{2} y^{\delta_{2}} \ (y \ge k_{1})
+$$</p>
+<p>对称地，$w_{-1}$ 在 $y \ge k_{4}$ 处取得买回所得 $\beta_{s} y - \beta_{b}$，在 $y \le k_{4}$ 处等待、解为 $C_{1} y^{\delta_{1}}$；在 $k_{4}$ 处 smooth fit</p>
+<p>$$
+C_{1} k_{4}^{\delta_{1}} = \beta_{s} k_{4} - \beta_{b}, \quad C_{1} \delta_{1} k_{4}^{\delta_{1} - 1} = \beta_{s}
+$$</p>
+<p>给出另一个闭式阈值</p>
+<p>$$
+k_{4} = \frac{\delta_{1}}{\delta_{1} - 1} \cdot \frac{\beta_{b}}{\beta_{s}}, \quad C_{1} = \frac{\beta_{s}}{\delta_{1} k_{4}^{\delta_{1} - 1}}
+$$</p>
+<p>中间的 $w_{0}$ 在 $\lbrack k_{2}, k_{3} \rbrack$ 上是通解 $B_{1} y^{\delta_{1}} + B_{2} y^{\delta_{2}}$，两侧分别衔接"已做空待平"与"已做多待平"的分支。在 $k_{2}$ 处的两条 smooth-fit 方程为</p>
+<p>$$
+\left( B_{1} - C_{1} \right) k_{2}^{\delta_{1}} + B_{2} k_{2}^{\delta_{2}} = \beta_{s} - \beta_{b} k_{2}, \quad \left( B_{1} - C_{1} \right) \delta_{1} k_{2}^{\delta_{1} - 1} + B_{2} \delta_{2} k_{2}^{\delta_{2} - 1} = - \beta_{b}
+$$</p>
+<p>在 $k_{3}$ 处对称地有两条；由这四条方程可以把系数显式解出，例如</p>
+<p>$$
+B_{2} = \frac{\beta_{s} \delta_{1} k_{2}^{- \delta_{2}} - \beta_{b} \left( \delta_{1} - 1 \right) k_{2}^{1 - \delta_{2}}}{\delta_{1} - \delta_{2}}, \quad B_{1} - C_{1} = \frac{\beta_{s} \left( - \delta_{2} \right) k_{2}^{- \delta_{1}} - \beta_{b} \left( 1 - \delta_{2} \right) k_{2}^{1 - \delta_{1}}}{\delta_{1} - \delta_{2}}
+$$</p>
+<p>在 $k_{3}$ 处有对称的一对公式。消去 $B_{1}$、$B_{2}$ 后得到关于 $(k_{2}, k_{3})$ 的两个方程（原文式 (35)、(36)，记 $\gamma = \beta_{b} / \beta_{s}$，方程两边分别是衔接矩阵作用后的系数表达式与 $C_{1}$、$C_{2}$ 的对应组合）。关键结论是：$(k_{2}, k_{3}) = (k_{1}, k_{4})$ 是该方程组的一组解，且代回后 $B_{1} = C_{1}$、$B_{2} = C_{2}$——<strong>四阈值在构造出的解里退化为两个</strong>。重新记</p>
+<p>$$
+k_{1}^{\ast} = k_{1} = k_{2}, \quad k_{2}^{\ast} = k_{3} = k_{4}
+$$</p>
+<p>则 $w_{0}$ 的三段解为</p>
+<p>$$
+w_{0} (y) = C_{1} y^{\delta_{1}} + \beta_{s} - \beta_{b} y, \quad 0 \le y \le k_{1}^{\ast}
+$$</p>
+<p>$$
+w_{0} (y) = C_{1} y^{\delta_{1}} + C_{2} y^{\delta_{2}}, \quad k_{1}^{\ast} \le y \le k_{2}^{\ast}
+$$</p>
+<p>$$
+w_{0} (y) = C_{2} y^{\delta_{2}} - \beta_{b} + \beta_{s} y, \quad y \ge k_{2}^{\ast}
+$$</p>
+<p>第一段是"立即做空 Z 并持有空头价值"，第三段是"立即做多 Z 并持有多头价值"，中段是纯等待。原文 Theorem 2 断言这组函数满足 HJB 方程组（逐区域验证变分不等式），Theorem 3 给出验证与最优停时：记 $\Gamma_{1} = (0, k_{1}^{\ast} \rbrack$、$\Gamma_{2} = (k_{1}^{\ast}, k_{2}^{\ast} \rbrack$、$\Gamma_{3} = (k_{2}^{\ast}, \infty)$，则</p>
+<ul>
+<li>初始空头（i = −1）：$\tau_{0}^{\ast}$ 为首达 $\Gamma_{3}$ 之时（买回平仓）；</li>
+<li>初始多头（i = 1）：$\tau_{0}^{\ast}$ 为首达 $\Gamma_{1}$ 之时（卖出平仓）；</li>
+<li>初始空仓（i = 0）：$\tau_{1}^{\ast}$ 为首次走出 $\Gamma_{2}$ 之时；若走出时落入 $\Gamma_{1}$，取 $u^{\ast} = -1$ 做空 Z，再等首达 $\Gamma_{3}$ 时平仓；若落入 $\Gamma_{3}$，取 $u^{\ast} = 1$ 做多 Z，再等首达 $\Gamma_{1}$ 时平仓。</li>
+</ul>
+<p>退化成两阈值有直接的策略含义：空仓者与持仓者共用同一对触发线，不存在"持仓者专属的提前离场线"。形式上四阈值框架仍在（原文先按 $k_{1} \le k_{2} \le k_{3} \le k_{4}$ 组织问题），但最优解把中间两条并掉了——这一点在引用本格时最容易说错，特此写明。</p>
+<p><strong>数值例。</strong> 同一组 WMT/TGT 校准参数下，得</p>
+<p>$$
+k_{1}^{\ast} = 0.85527, \quad k_{2}^{\ast} = 1.32175
+$$</p>
+<p>与第一格对照：平仓侧阈值 $k_{1}^{\ast} = k_{1}$ 不变，开仓侧阈值由 1.28061 抬高到 1.32175，不行动带变宽。本文的一个解读是：空仓者现在多了一个反方向的机会（y 跌下去还可以做空），等待的期权价值更高，于是做多入场要求更大的偏离；原文未作此解释，此处仅记为本站解读。学位论文第 3 章的回测（同为 2015–2020、10 万美元、等额对半、每笔 5 美元）期末账户 181,351 美元，总收益 +81.35%，同样是六笔交易；交换角色后的阈值 $(\tilde{k}_{1}^{\ast}, \tilde{k}_{2}^{\ast}) = (1 / k_{2}^{\ast}, 1 / k_{1}^{\ast}) = (0.75656, 1.16922)$ 给出完全相同的交易序列，无需另行考虑。</p>
+<h3>3. 均值回归价差加两态切换（NACO 2024）</h3>
+<p><strong>模型：直接对价差建模。</strong> 与前两格不同，本格的状态变量是价差本身：$Z_{t} = X^{1}_{t} - K_{0} X^{2}_{t}$，其中 $K_{0}$ 是对冲股数（注意：与交易成本 K 不是一回事）。价差服从带状态切换的 Ornstein–Uhlenbeck 过程</p>
+<p>$$
+dZ_{t} = \theta \left( \alpha_{t} \right) \left\lbrack \mu \left( \alpha_{t} \right) - Z_{t} \right\rbrack dt + \sigma \left( \alpha_{t} \right) dW_{t}
+$$</p>
+<p>$\alpha_{t} \in \lbrace 1, 2 \rbrace$ 是连续时间 Markov 链，$\theta$、$\mu$、$\sigma$ 都是状态的函数。链的生成元 Q 的两行分别是 $(- \lambda, \lambda)$ 与 $(0, 0)$：状态 1 以强度 $\lambda$ 跳到状态 2，状态 2 是吸收态。闭式解正是在状态 2 为吸收态这一特例下取得的。原文 Remark 4.2.1 给出的理由是时间尺度分离：配对交易是短期行为，状态切换是长期结构变化，交易者据当前状态定策略、状态变了再换一套；状态 1 的阈值公式里仍通过耦合项含着状态 2 的解，所以"吸收"只简化了链的结构，没有简化掉切换的影响。实盘含义第八节再谈。</p>
+<p><strong>问题：可重复往返。</strong> 持有 i 股 Z（i = 0 空仓、i = 1 多头），交易是停时序列 $\lbrace \tau^{b}_{n} \rbrace$（买入时）与 $\lbrace \tau^{s}_{n} \rbrace$（卖出时），交替出现。成本是每笔固定金额 K：买入付 $Z + K$，卖出收 $Z - K$。回报为无穷序列的贴现和</p>
+<p>$$
+J_{0} (x, \alpha, \Lambda_{0}) = E \left\lbrack \sum_{n = 1}^{\infty} \left( e^{- \rho \tau^{s}_{n}} \left( Z_{\tau^{s}_{n}} - K \right) - e^{- \rho \tau^{b}_{n}} \left( Z_{\tau^{b}_{n}} + K \right) \right) 1_{\lbrace \tau^{b}_{n} &lt; \infty \rbrace} \right\rbrack
+$$</p>
+<p>$J_{1}$ 的形式相同，只是序列以一次卖出开头。值函数 $V_{i} (x, \alpha) = \sup J_{i}$ 满足界</p>
+<p>$$
+V_{0} (x, \alpha) \ge V_{1} (x, \alpha) - x - K, \quad V_{1} (x, \alpha) \ge V_{0} (x, \alpha) + x - K, \quad 0 \le V_{i} (x, \alpha) \le C_{1} |x| + C_{2}
+$$</p>
+<p>前两条是"立即交易"给出的障碍关系：空仓者的价值至少等于"现在买入"后的多头价值减买入价，多头反之。这正是下面拟变分不等式里障碍项的来源。</p>
+<p><strong>HJB 方程组。</strong> 两个状态下的生成元分别为</p>
+<p>$$
+\mathcal{A}_{1} v (x, 1) = \frac{\sigma_{1}^{2}}{2} v^{\prime \prime} (x, 1) + \theta_{1} \left( \mu_{1} - x \right) v^{\prime} (x, 1) + \lambda \left\lbrack v (x, 2) - v (x, 1) \right\rbrack
+$$</p>
+<p>$$
+\mathcal{A}_{2} v (x, 2) = \frac{\sigma_{2}^{2}}{2} v^{\prime \prime} (x, 2) + \theta_{2} \left( \mu_{2} - x \right) v^{\prime} (x, 2)
+$$</p>
+<p>记 $u_{j} (x) = v_{j} (x, 1)$、$w_{j} (x) = v_{j} (x, 2)$（j = 0, 1），方程组是四个 min 型方程：</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{A}_{1} \right) u_{0} (x), \ u_{0} (x) - u_{1} (x) + x + K \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{A}_{1} \right) u_{1} (x), \ u_{1} (x) - u_{0} (x) - x + K \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{A}_{2} \right) w_{0} (x), \ w_{0} (x) - w_{1} (x) + x + K \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{A}_{2} \right) w_{1} (x), \ w_{1} (x) - w_{0} (x) - x + K \rbrace = 0
+$$</p>
+<p>由于状态 2 吸收，$w$ 的两式不含耦合项，可以先独立解出；$u$ 的两式再通过生成元里的 $\lambda (w_{j} - u_{j})$ 项耦合进来。求解次序因此是：先状态 2，后状态 1。</p>
+<p><strong>阈值结构与基本解。</strong> 猜测每个状态下都是一对阈值：状态 1 下 $Z \le x_{1}$ 买入、$Z \ge x_{2}$ 卖出；状态 2 下 $Z \le x_{3}$ 买入、$Z \ge x_{4}$ 卖出（$x_{1} &lt; x_{2}$、$x_{3} &lt; x_{4}$）。OU 算子的齐次方程 $(\rho - \mathcal{A}_{2}) f = 0$ 没有初等闭式解，其两个基本解由积分表示给出：记</p>
+<p>$$
+\kappa_{2} = \frac{\sqrt{2 \theta_{2}}}{\sigma_{2}}, \quad \beta_{2} = \frac{\rho}{\theta_{2}}, \quad \eta_{2} (t) = t^{\beta_{2} - 1} e^{- t^{2} / 2}
+$$</p>
+<p>则</p>
+<p>$$
+\psi_{1} (x) = \int_{0}^{\infty} \eta_{2} (t) e^{- \kappa_{2} \left( \mu_{2} - x \right) t} dt, \quad \psi_{2} (x) = \int_{0}^{\infty} \eta_{2} (t) e^{\kappa_{2} \left( \mu_{2} - x \right) t} dt
+$$</p>
+<p>$\psi_{1}$ 在 $x \to - \infty$ 时趋于 0、$\psi_{2}$ 在 $x \to + \infty$ 时趋于 0，增长条件据此在每个半直线上只留一个。状态 2 的解为</p>
+<p>$$
+w_{0} (x) = A_{1} \psi_{1} (x) - x - K \ (x &lt; x_{3}), \quad w_{0} (x) = A_{2} \psi_{2} (x) \ (x \ge x_{3})
+$$</p>
+<p>$$
+w_{1} (x) = A_{1} \psi_{1} (x) \ (x &lt; x_{4}), \quad w_{1} (x) = A_{2} \psi_{2} (x) + x - K \ (x \ge x_{4})
+$$</p>
+<p>在 $x_{3}$ 与 $x_{4}$ 处各有两条 smooth-fit 方程，例如 $x_{3}$ 处：</p>
+<p>$$
+A_{1} \psi_{1} (x_{3}) - x_{3} - K = A_{2} \psi_{2} (x_{3}), \quad A_{1} \psi_{1}^{\prime} (x_{3}) - 1 = A_{2} \psi_{2}^{\prime} (x_{3})
+$$</p>
+<p>$x_{4}$ 处对称。把 $x_{3}$ 处与 $x_{4}$ 处的方程分别写成以 $(A_{1}, -A_{2})$ 为未知量的 2×2 线性系统并消去系数，得到 $(x_{3}, x_{4})$ 必须满足的相容条件（原文式 (4.5)，以矩阵求逆形式写出）；解出 $(x_{3}, x_{4})$ 后 $A_{1}$、$A_{2}$ 随之确定。</p>
+<p><strong>状态 1：非齐次方程与 Lemma 3 的核。</strong> 状态 1 的等待区方程是非齐次的：</p>
+<p>$$
+\frac{\sigma_{1}^{2}}{2} u_{j}^{\prime \prime} (x) + \theta_{1} \left( \mu_{1} - x \right) u_{j}^{\prime} (x) - \left( \rho + \lambda \right) u_{j} (x) = - \lambda w_{j} (x), \quad j = 0, 1
+$$</p>
+<p>原文 Lemma 3 给出这类方程的通解：齐次部分的基本解 $\phi_{1}$、$\phi_{2}$ 与 $\psi$ 同型，只是参数换成 $\kappa_{1} = \sqrt{2 \theta_{1}} / \sigma_{1}$、$\beta_{1} = (\rho + \lambda) / \theta_{1}$；特解是一个卷积型积分</p>
+<p>$$
+\gamma_{j} (x) = \frac{\lambda}{\sigma_{1} \sqrt{\pi \theta_{1}}} \int_{- \infty}^{\infty} w_{j} (y) \mathcal{K} (x, y, \mu_{1}) dy
+$$</p>
+<p>其中核函数为（原文 Lemma 3，经本站逐字核对）</p>
+<p>$$
+\mathcal{K} (x, y, \mu) = \int_{0}^{1} u^{\frac{\rho + \lambda}{\theta} - 1} \left( 1 - u^{2} \right)^{- \frac{1}{2}} \exp \lbrace - \frac{\theta}{\sigma^{2}} \cdot \frac{ \left\lbrack (x - \mu) u + (\mu - y) \right\rbrack^{2}}{1 - u^{2}} \rbrace du
+$$</p>
+<p>于是状态 1 的解为</p>
+<p>$$
+u_{0} (x) = B_{1} \phi_{1} (x) - x - K + \gamma_{0} (x) \ (x &lt; x_{1}), \quad u_{0} (x) = B_{2} \phi_{2} (x) + \gamma_{0} (x) \ (x \ge x_{1})
+$$</p>
+<p>$$
+u_{1} (x) = B_{1} \phi_{1} (x) + \gamma_{1} (x) \ (x &lt; x_{2}), \quad u_{1} (x) = B_{2} \phi_{2} (x) + x - K + \gamma_{1} (x) \ (x \ge x_{2})
+$$</p>
+<p>在 $x_{1}$、$x_{2}$ 处同样是每点两条 smooth-fit 方程（例如 $x_{1}$ 处：$B_{1} \phi_{1} (x_{1}) - x_{1} - K + \gamma_{0} (x_{1}) = B_{2} \phi_{2} (x_{1}) + \gamma_{0} (x_{1})$ 及其导数式），消去 $(B_{1}, B_{2})$ 后得到决定 $(x_{1}, x_{2})$ 的相容条件（原文式 (4.7)）。</p>
+<p><strong>充分条件与验证。</strong> 上面只是"构造"；原文 Theorem 4.4.1 给出一组充分条件，保证构造出的函数确实满足全部变分不等式。状态 2 侧的两条是阈值位置条件：</p>
+<p>$$
+x_{3} \le \frac{\theta_{2} \mu_{2} - \rho K}{\rho + \theta_{2}}, \quad x_{4} \ge \frac{\theta_{2} \mu_{2} + \rho K}{\rho + \theta_{2}}
+$$</p>
+<p>注意右端正是"以 $\mu_{2}$ 为中心、按 $\rho K / (\rho + \theta_{2})$ 张开"的区间：买入线必须低于下端、卖出线必须高于上端，交易带要宽于纯成本带。等待区内的障碍条件为</p>
+<p>$$
+\left| A_{1} \psi_{1} (x) - A_{2} \psi_{2} (x) - x \right| \le K, \quad x \in (x_{3}, x_{4})
+$$</p>
+<p>状态 1 侧有对应的 $x \in (x_{1}, x_{2})$ 上的障碍条件（原文式 (4.12)，左端是 $u_{1} - u_{0} - x$ 的显式表达），以及两个半直线上的耦合不等式（原文式 (4.11)、(4.13)），例如 $x &lt; x_{1}$ 上要求</p>
+<p>$$
+\lambda \left\lbrack w_{1} (x) - w_{0} (x) \right\rbrack + \theta_{1} \mu_{1} - \left( \rho + \lambda + \theta_{1} \right) x - \left( \rho + \lambda \right) K \ge 0
+$$</p>
+<p>全部满足后，验证定理（原文 Theorem 4.5.1）给出最优策略：记</p>
+<p>$$
+\mathcal{D}_{b} = \lbrace (x, 1) : x &gt; x_{1} \rbrace \cup \lbrace (x, 2) : x &gt; x_{3} \rbrace, \quad \mathcal{D}_{s} = \lbrace (x, 1) : x &lt; x_{2} \rbrace \cup \lbrace (x, 2) : x &lt; x_{4} \rbrace
+$$</p>
+<p>则最优买入时是价差首次走出 $\mathcal{D}_{b}$ 之时，最优卖出时是首次走出 $\mathcal{D}_{s}$ 之时，两者交替。用阈值读：当前状态是 1 就用 $(x_{1}, x_{2})$ 这对线，状态切到 2 就换用 $(x_{3}, x_{4})$。<strong>这里要澄清一个容易误读的点</strong>：切换时跳变的是"当前适用的阈值对"，不是价格本身——$Z_{t}$ 的样本路径连续，没有跳跃；所谓"边界跳变"只是规则手册翻了一页。</p>
+<p><strong>数值例。</strong> 学位论文第 4.6 节的参数为 $\mu_{1} = 0$、$\mu_{2} = 0.5$、$\theta_{1} = \theta_{2} = 1$、$\sigma_{1} = \sigma_{2} = 0.5$、$\lambda = 3$、$\rho = 0.1$、$K = 0.003$。求解顺序与理论一致：先对相容条件 (4.5) 用 Newton 法解出 $x_{3} = 0.295314$、$x_{4} = 0.498290$，再解 (4.7) 得基准情形</p>
+<p>$$
+x_{1} = -0.118156, \quad x_{2} = 0.132020
+$$</p>
+<p>敏感性方面（学位论文 Tables 4.1–4.8）：$\mu_{1}$ 平移则状态 1 的带整体平移（$\mu_{1} = -0.2$ 时 $x_{1} = -0.282615$、$x_{2} = -0.032631$，状态 2 的阈值不变）；$\theta$ 升则带变窄（回归越快、等待越便宜）；$\sigma$ 升则带变宽；成本 K 的影响见下表（Table 4.7）：</p>
 <table>
 <thead>
 <tr>
-<th>例</th>
-<th>标称次序</th>
-<th>μ1(1), μ2(1), μ1(2), μ2(2)</th>
-<th>σ(1)</th>
-<th>σ(2)</th>
-<th>λ1, λ2</th>
-<th>k1, k2, k3, k4</th>
+<th>K</th>
+<th>$x_{1}$</th>
+<th>$x_{2}$</th>
+<th>$x_{3}$</th>
+<th>$x_{4}$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.001</td>
+<td>−0.083112</td>
+<td>0.087305</td>
+<td>0.327876</td>
+<td>0.468124</td>
+</tr>
+<tr>
+<td>0.003</td>
+<td>−0.118156</td>
+<td>0.132020</td>
+<td>0.295314</td>
+<td>0.498290</td>
+</tr>
+<tr>
+<td>0.005</td>
+<td>−0.138306</td>
+<td>0.162345</td>
+<td>0.275191</td>
+<td>0.516505</td>
+</tr>
+</tbody>
+</table>
+<p>K 增大时两个状态的带都变宽——成本直接吃掉小偏离上的利润，阈值必须退得更远。另外，当 $\lambda \to \infty$（切换极快）时 $(x_{1}, x_{2})$ 趋近 $(x_{3}, x_{4})$：状态 1 的有效期太短，其阈值被状态 2 的"归宿"拉过去（该极限在另一组参数 $\mu_{1} = 0.5$、$\mu_{2} = 0$ 下数值演示，原文 Table 4.8）。</p>
+<h3>4. GBM 加两态切换（PAFA 2024）</h3>
+<p><strong>模型。</strong> 两只股票仍是 GBM，但漂移与波动都随市场状态切换：</p>
+<p>$$
+dX^{1}_{t} = X^{1}_{t} \left\lbrack \mu_{1} \left( \alpha_{t} \right) dt + \sigma_{11} \left( \alpha_{t} \right) dW^{1}_{t} + \sigma_{12} \left( \alpha_{t} \right) dW^{2}_{t} \right\rbrack
+$$</p>
+<p>$$
+dX^{2}_{t} = X^{2}_{t} \left\lbrack \mu_{2} \left( \alpha_{t} \right) dt + \sigma_{21} \left( \alpha_{t} \right) dW^{1}_{t} + \sigma_{22} \left( \alpha_{t} \right) dW^{2}_{t} \right\rbrack
+$$</p>
+<p>$\alpha_{t} \in \lbrace 1, 2 \rbrace$ 是双向切换的连续时间 Markov 链：状态 1 以强度 $\lambda_{1}$ 跳到状态 2，状态 2 以强度 $\lambda_{2}$ 跳回状态 1（生成元两行分别为 $(- \lambda_{1}, \lambda_{1})$ 与 $(\lambda_{2}, - \lambda_{2})$）——与 NACO 篇的吸收态设定不同，这里两个状态都可进可出。假设 (A1)：$\rho &gt; \mu_{j} (\alpha)$ 对一切状态与 j 成立。交易结构与第一格相同：一轮往返，初始多头（i = 1，只需卖出）或空仓（i = 0，先买后卖），成本仍是比例佣金 $\beta_{b} = 1 + K$、$\beta_{s} = 1 - K$，回报函数与第一格的 $J_{0}$、$J_{1}$ 同形，只是期望还要对链的路径取。值函数记为 $v_{i} (x_{1}, x_{2}, \alpha)$。</p>
+<p><strong>HJB 方程组。</strong> 每个状态一份生成元 $\mathcal{A}_{\alpha}$（与第一格同形、参数换成该状态的），方程组有四个方程。以 $v_{0}$ 在状态 1 下的方程为例：</p>
+<p>$$
+\min \lbrace \left( \rho - \mathcal{A}_{1} \right) v_{0} (x_{1}, x_{2}, 1) - \lambda_{1} \left\lbrack v_{0} (x_{1}, x_{2}, 2) - v_{0} (x_{1}, x_{2}, 1) \right\rbrack, \ v_{0} (x_{1}, x_{2}, 1) - v_{1} (x_{1}, x_{2}, 1) + \beta_{b} x_{1} - \beta_{s} x_{2} \rbrace = 0
+$$</p>
+<p>其余三式同理：状态 2 的耦合项换成 $- \lambda_{2} \lbrack v (\cdot, 1) - v (\cdot, 2) \rbrack$；$v_{1}$ 的两式障碍项换成 $v_{1} - \beta_{s} x_{1} + \beta_{b} x_{2}$。耦合项的含义是：等待期间状态可能切换，当前状态的价值里要计入"跳到另一状态后的价值差"乘以跳强度。</p>
+<p><strong>降维与四次特征方程。</strong> 齐次性仍在：$y = x_{2} / x_{1}$，并记 $u_{1} = v_{0} (\cdot, 1)$、$u_{2} = v_{0} (\cdot, 2)$、$u_{3} = v_{1} (\cdot, 1)$、$u_{4} = v_{1} (\cdot, 2)$，$u_{i} = x_{1} w_{i} (y)$。每个状态有自己的约化算子</p>
+<p>$$
+\mathcal{L}_{j} w (y) = \sigma_{j} y^{2} w^{\prime \prime} (y) + \left\lbrack \mu_{2} (j) - \mu_{1} (j) \right\rbrack y w^{\prime} (y) + \mu_{1} (j) w (y), \quad \sigma_{j} = \frac{a_{11} (j) - 2 a_{12} (j) + a_{22} (j)}{2}
+$$</p>
+<p>（$\sigma_{j}$ 扮演第一格里 $\lambda$ 的角色：状态 j 下价格比的相对波动强度。）降维后的耦合系统为</p>
+<p>$$
+\min \lbrace \left( \rho + \lambda_{1} - \mathcal{L}_{1} \right) w_{1} - \lambda_{1} w_{2}, \ w_{1} - w_{3} + \beta_{b} - \beta_{s} y \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho + \lambda_{2} - \mathcal{L}_{2} \right) w_{2} - \lambda_{2} w_{1}, \ w_{2} - w_{4} + \beta_{b} - \beta_{s} y \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho + \lambda_{1} - \mathcal{L}_{1} \right) w_{3} - \lambda_{1} w_{4}, \ w_{3} + \beta_{b} y - \beta_{s} \rbrace = 0
+$$</p>
+<p>$$
+\min \lbrace \left( \rho + \lambda_{2} - \mathcal{L}_{2} \right) w_{4} - \lambda_{2} w_{3}, \ w_{4} + \beta_{b} y - \beta_{s} \rbrace = 0
+$$</p>
+<p>等待区内试探 $w = y^{\delta}$，记每个状态的 Euler 符号</p>
+<p>$$
+A_{j} (\delta) = \sigma_{j} \delta (\delta - 1) + \left\lbrack \mu_{2} (j) - \mu_{1} (j) \right\rbrack \delta + \mu_{1} (j), \quad j = 1, 2
+$$</p>
+<p>耦合的 2×2 系统有非平凡解的条件给出四次特征方程</p>
+<p>$$
+P (\delta) := \left\lbrack \rho + \lambda_{1} - A_{1} (\delta) \right\rbrack \left\lbrack \rho + \lambda_{2} - A_{2} (\delta) \right\rbrack - \lambda_{1} \lambda_{2} = 0
+$$</p>
+<p>原文证明它有四个互不相同的实根，次序为</p>
+<p>$$
+\delta_{4} &lt; \delta_{3} &lt; 0 &lt; 1 &lt; \delta_{2} &lt; \delta_{1}
+$$</p>
+<p>作为对照，单状态问题 $\rho + \lambda_{1} - A_{1} (\delta) = 0$ 的两根记为 $\zeta_{1} &gt; 1$、$\zeta_{2} &lt; 0$，$\rho + \lambda_{2} - A_{2} (\delta) = 0$ 的两根记为 $\nu_{1} &gt; 1$、$\nu_{2} &lt; 0$，例如</p>
+<p>$$
+\zeta_{1} = \frac{1}{2} + \frac{\mu_{1} (1) - \mu_{2} (1)}{2 \sigma_{1}} + \sqrt{ \left( \frac{1}{2} + \frac{\mu_{1} (1) - \mu_{2} (1)}{2 \sigma_{1}} \right)^{2} + \frac{\rho + \lambda_{1} - \mu_{1} (1)}{\sigma_{1}} }
+$$</p>
+<p>$\zeta_{2}$ 取负号，$\nu$ 的公式把状态参数换成状态 2 的。原文给出耦合根与单状态根之间的交错关系（如 $\delta_{1}$ 位于 $\max \lbrace \zeta_{1}, \nu_{1} \rbrace$ 与 $\zeta_{1} + \nu_{1} - 1$ 之间等），其作用是后面各区域里筛解时判定每个幂次该出现在哪一侧。耦合系统的通解带一组比例系数：若 $w_{1} = \sum_{j = 1}^{4} c_{1 j} y^{\delta_{j}}$，则</p>
+<p>$$
+w_{2} = \sum_{j = 1}^{4} \eta_{j} c_{1 j} y^{\delta_{j}}, \quad \eta_{j} = \frac{\rho + \lambda_{1} - A_{1} (\delta_{j})}{\lambda_{1}} = \frac{\lambda_{2}}{\rho + \lambda_{2} - A_{2} (\delta_{j})}
+$$</p>
+<p>$w_{3}$、$w_{4}$ 同理（系数记 $d_{1 j}$）。$\eta_{j}$ 是切换耦合的"混合比"：同一幂次在两个状态下的振幅之比。</p>
+<p><strong>先解卖出问题。</strong> 与第一格相同的次序：$w_{3}$、$w_{4}$ 不依赖 $w_{1}$、$w_{2}$，先解。注意本篇的阈值记号与第一格不同：$k_{1}$、$k_{2}$ 是两个状态下的<strong>买入线</strong>，$k_{3}$、$k_{4}$ 是两个状态下的<strong>卖出线</strong>——持多头时，状态 j 下 $y \le k_{j + 2}$ 即卖出；空仓时，状态 j 下 $y \ge k_{j}$ 即买入。先设 $k_{3} &lt; k_{4}$，卖出问题分三区：$\Gamma_{1} = (0, k_{3})$、$\Gamma_{2} = (k_{3}, k_{4})$、$\Gamma_{3} = \lbrack k_{4}, \infty)$。在 $\Gamma_{1}$ 内两个状态下都立即卖出；在 $\Gamma_{2}$ 内状态 1 卖出、状态 2 等待，$w_{3}$ 满足非齐次 Euler 方程 $(\rho + \lambda_{1} - \mathcal{L}_{1}) w_{3} = \lambda_{1} (\beta_{s} - \beta_{b} y)$，其特解为一次函数 $a_{1} - a_{2} y$，其中</p>
+<p>$$
+a_{1} = \frac{\lambda_{1} \beta_{s}}{\rho + \lambda_{1} - \mu_{1} (1)}, \quad a_{2} = \frac{\lambda_{1} \beta_{b}}{\rho + \lambda_{1} - \mu_{2} (1)}
+$$</p>
+<p>于是</p>
+<p>$$
+w_{3} (y) = \beta_{s} - \beta_{b} y \ (y \in \Gamma_{1}), \quad w_{3} (y) = E_{1} y^{\zeta_{1}} + E_{2} y^{\zeta_{2}} + a_{1} - a_{2} y \ (y \in \Gamma_{2}), \quad w_{3} (y) = C_{3} y^{\delta_{3}} + C_{4} y^{\delta_{4}} \ (y \in \Gamma_{3})
+$$</p>
+<p>$$
+w_{4} (y) = \beta_{s} - \beta_{b} y \ (0 \le y \le k_{4}), \quad w_{4} (y) = C_{3} \eta_{3} y^{\delta_{3}} + C_{4} \eta_{4} y^{\delta_{4}} \ (y \ge k_{4})
+$$</p>
+<p>（$C_{3}$、$C_{4}$ 在学位论文版的记号中写作 $d_{13}$、$d_{14}$。）在 $k_{3}$、$k_{4}$ 处对 $(w_{3}, w_{4})$ 做 smooth fit：$k_{3}$ 处 $w_{3}$ 的值与导数衔接给出关于 $(E_{1}, E_{2})$ 的 2×2 系统，$k_{4}$ 处 $w_{3}$、$w_{4}$ 的衔接给出关于 $(C_{3}, C_{4})$ 的 2×2 系统；把两组系统写成衔接矩阵方程（原文式 (2.33)）并消去四个系数，阈值可以解出分数形式</p>
+<p>$$
+k_{3} = \frac{A_{1} (\zeta_{1} - 1) + B_{1} (\zeta_{2} - 1)}{A_{1} \zeta_{1} + B_{1} \zeta_{2}} \cdot \frac{\beta_{s}}{\beta_{b}}, \quad k_{4} = \frac{A_{2} (\zeta_{1} - 1) + B_{2} (\zeta_{2} - 1)}{A_{2} \zeta_{1} + B_{2} \zeta_{2}} \cdot \frac{\beta_{s}}{\beta_{b}}
+$$</p>
+<p>其中 $A_{1}$、$B_{1}$、$A_{2}$、$B_{2}$ 是原文给出的、由 $(\delta_{j}, \eta_{j}, a_{1}, a_{2}, \beta_{s}, \beta_{b})$ 组成的已知组合；再令 $r = k_{4} / k_{3}$，两式相除得到只含 r 的单个方程（原文式 (2.36)），原文称将证明它有唯一解 r &gt; 1。卖出问题的充分条件（原文式 (2.37)）包括：$\Gamma_{2}$ 内 $w_{4}$ 严格大于卖出所得、$\Gamma_{3}$ 内 $w_{3}$、$w_{4}$ 严格大于卖出所得、以及 $\Gamma_{3}$ 内 $(\rho + \lambda_{j} - \mathcal{L}_{j}) w \ge$ 对应耦合项等区域不等式。若 $k_{4} &lt; k_{3}$，结构镜像，阈值由原文式 (2.38)、(2.39) 的对应分数式给出。</p>
+<p><strong>再解买入问题：以 Case I 为例。</strong> 卖出阈值与 $(w_{3}, w_{4})$ 定下之后，买入问题在每个阈值次序下分别求解。Case I 的次序是 $k_{3} &lt; k_{1} &lt; k_{4} &lt; k_{2}$，$w_{1}$、$w_{2}$ 分四段：在 $(0, k_{1})$ 上是耦合通解 $w_{1} = C_{1} y^{\delta_{1}} + C_{2} y^{\delta_{2}}$、$w_{2} = C_{1} \eta_{1} y^{\delta_{1}} + C_{2} \eta_{2} y^{\delta_{2}}$（只保留在 0 附近有界的幂次）；在 $\lbrack k_{1}, k_{4})$ 上 $w_{1} = w_{3} - \beta_{b} + \beta_{s} y$（已买入、转入多头价值减买入成本），$w_{2}$ 满足以 $w_{1}$ 为耦合源的非齐次方程，解为 $B_{1} y^{\nu_{1}} + B_{2} y^{\nu_{2}}$ 加一个由 $w_{3}$ 在 $\Gamma_{2}$ 的解式构造的特解 $w_{2, p 1} (y)$；在 $\lbrack k_{4}, k_{2} \rbrack$ 上 $w_{2} = D_{1} y^{\nu_{1}} + D_{2} y^{\nu_{2}} + w_{2, p 2} (y)$，其中特解改由卖出解在 $\Gamma_{3}$ 的 $C_{3}$、$C_{4}$ 项构造；在 $(k_{2}, \infty)$ 上 $w_{2} = w_{4} - \beta_{b} + \beta_{s} y$。两个特解的原文形式为</p>
+<p>$$
+w_{2, p 1} (y) = - \frac{\lambda_{2}}{\lambda_{1}} \left( E_{1} y^{\zeta_{1}} + E_{2} y^{\zeta_{2}} \right) + \frac{\lambda_{2} \left( \lambda_{1} a_{1} + \beta_{b} \right)}{\lambda_{1} \left( \rho + \lambda_{2} - \mu_{1} (2) \right)} - \frac{\lambda_{2} \left( \lambda_{1} a_{2} - \beta_{s} \right)}{\lambda_{1} \left( \rho + \lambda_{2} - \mu_{2} (2) \right)} y
+$$</p>
+<p>$$
+w_{2, p 2} (y) = \frac{\lambda_{2} C_{3} (\eta_{3} - 1)}{\rho + \lambda_{2} - A_{2} (\delta_{3})} y^{\delta_{3}} + \frac{\lambda_{2} C_{4} (\eta_{4} - 1)}{\rho + \lambda_{2} - A_{2} (\delta_{4})} y^{\delta_{4}} - \frac{\lambda_{2} \beta_{b}}{\lambda_{1} \left( \rho + \lambda_{2} - \mu_{1} (2) \right)} + \frac{\lambda_{2} \beta_{s}}{\lambda_{1} \left( \rho + \lambda_{2} - \mu_{2} (2) \right)} y
+$$</p>
+<p>在 $k_{1}$ 处对 $w_{1}$、$w_{2}$ 各做值与导数衔接（四条方程）、在 $k_{4}$ 处对 $w_{2}$ 做衔接（两条）、在 $k_{2}$ 处对 $w_{2}$ 做衔接（两条），共八条方程决定六个系数 $(B_{1}, B_{2}, C_{1}, C_{2}, D_{1}, D_{2})$ 与两个阈值 $(k_{1}, k_{2})$；消去六个系数后得到原文式 (2.14) 的 2×2 矩阵方程——两个方程、两个未知阈值。充分条件（原文式 (2.15)）是各区域内的一组严格不等式，另有从结构直接读出的必要界：对 j = 1, 2 都要有</p>
+<p>$$
+k_{2} \ge \frac{\left( \rho - \mu_{1} (j) \right) \beta_{b}}{\left( \rho - \mu_{2} (j) \right) \beta_{s}}
+$$</p>
+<p>其余五种次序（Case II–VI）的结构与方程编号见第六节的说明，构造方法完全平行：卖出问题先行，买入问题按次序分段、衔接、消元。</p>
+<p><strong>验证定理与最优策略。</strong> 原文 Theorems 1–4 把策略写成区域首出时。持多头时定义持有区域</p>
+<p>$$
+D_{S} = \lbrace (x_{1}, x_{2}, 1) : x_{2} &gt; k_{3} x_{1} \rbrace \cup \lbrace (x_{1}, x_{2}, 2) : x_{2} &gt; k_{4} x_{1} \rbrace
+$$</p>
+<p>最优卖出时 $\tau_{0}^{\ast}$ 是 $(X^{1}_{t}, X^{2}_{t}, \alpha_{t})$ 首次走出 $D_{S}$ 之时。空仓时定义等待区域</p>
+<p>$$
+D_{B} = \lbrace (x_{1}, x_{2}, 1) : x_{2} &lt; k_{1} x_{1} \rbrace \cup \lbrace (x_{1}, x_{2}, 2) : x_{2} &lt; k_{2} x_{1} \rbrace
+$$</p>
+<p>最优往返是：$\tau_{1}^{\ast}$ 为首次走出 $D_{B}$（买入），$\tau_{2}^{\ast}$ 为其后首次走出 $D_{S}$（卖出）。用价格比与当前状态读，就是一张 2 状态 × 2 动作的规则表：状态 j 下 $y \ge k_{j}$ 买入、$y \le k_{j + 2}$ 卖出。证明的骨架与前几格相同：对候选值函数用 Dynkin 公式展开贴现过程，变分不等式保证任意容许策略下它是上鞅、在候选停时下是鞅，Fatou 引理处理无穷远处尾项（细节本文不复述）。</p>
+<h2>六、PAFA 六例全表与两处存疑</h2>
+<p>PAFA 篇 §2.6 的数值例共六种情形，统一取 K = 0.001（$\beta_{b} = 1.001$，$\beta_{s} = 0.999$）、$\rho = 0.50$。六例的阈值与本文第五节第 4 格的记号对应：$k_{1}$、$k_{2}$ 为两状态买入阈值，$k_{3}$、$k_{4}$ 为两状态卖出阈值（均为价格比 $y = x_{2} / x_{1}$ 上的数）。</p>
+<table>
+<thead>
+<tr>
+<th>情形</th>
+<th>阈值次序</th>
+<th>$k_{1}$</th>
+<th>$k_{2}$</th>
+<th>$k_{3}$</th>
+<th>$k_{4}$</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>CASE1</td>
-<td>k3&lt;k1&lt;k4&lt;k2</td>
-<td>0.30, 0.27, -0.43, -0.66</td>
-<td>[0.44, 0.27; 0.31, 0.60]</td>
-<td>[0.19, 0.65; 0.28, 0.15]</td>
-<td>6.0, 10.0</td>
-<td>0.597020, 0.690976, 0.578407, 0.601707</td>
+<td>$k_{3}&lt;k_{1}&lt;k_{4}&lt;k_{2}$</td>
+<td>1.040663</td>
+<td>1.280619</td>
+<td>0.856279</td>
+<td>1.169221</td>
 </tr>
 <tr>
 <td>CASE2</td>
-<td>k3&lt;k4&lt;k1&lt;k2</td>
-<td>-0.26, -0.56, -0.40, 0.22</td>
-<td>[0.37, 0.46; 0.59, 0.59]</td>
-<td>[0.47, 0.31; 0.28, 0.68]</td>
-<td>6.0, 10.0</td>
-<td>0.929500, 0.962000, 0.678861, 0.810852</td>
+<td>$k_{3}&lt;k_{4}&lt;k_{1}&lt;k_{2}$</td>
+<td>1.280619</td>
+<td>1.040663</td>
+<td>1.169221</td>
+<td>0.856279</td>
 </tr>
 <tr>
 <td>CASE3</td>
-<td>k3&lt;k4&lt;k2&lt;k1</td>
-<td>0.20, 0.25, -0.30, -0.35</td>
-<td>[0.30, 0.10; 0.10, 0.35]</td>
-<td>[0.40, 0.20; 0.20, 0.45]</td>
-<td>6.0, 10.0</td>
-<td>1.379000, 1.212000, 0.723277, 0.737941</td>
+<td>$k_{3}&lt;k_{4}&lt;k_{2}&lt;k_{1}$</td>
+<td>1.205674</td>
+<td>1.168678</td>
+<td>1.167501</td>
+<td>0.949499</td>
 </tr>
 <tr>
 <td>CASE4</td>
-<td>k4&lt;k2&lt;k3&lt;k1（标称，存疑）</td>
-<td>0.839, 0.61, -0.70, -0.50</td>
-<td>[0.31, 0.27; 0.31, 0.60]</td>
-<td>[0.19, 0.65; 0.28, 0.25]</td>
-<td>3.0, 10.0</td>
-<td>0.813147, 0.607323, 0.187446, 0.051505</td>
+<td>$k_{4}&lt;k_{2}&lt;k_{3}&lt;k_{1}$</td>
+<td>0.963501</td>
+<td>0.827001</td>
+<td>1.040663</td>
+<td>1.280619</td>
 </tr>
 <tr>
 <td>CASE5</td>
-<td>k4&lt;k3&lt;k2&lt;k1</td>
-<td>0.55, 0.44, -0.35, -0.65</td>
-<td>[0.40, 0.22; 0.30, 0.90]</td>
-<td>[0.65, 0.05; 0.28, 0.50]</td>
-<td>3.0, 9.0</td>
-<td>0.810635, 0.492463, 0.044080, 0.038756</td>
+<td>$k_{4}&lt;k_{3}&lt;k_{1}&lt;k_{2}$</td>
+<td>0.856279</td>
+<td>1.169221</td>
+<td>1.040663</td>
+<td>1.280619</td>
 </tr>
 <tr>
 <td>CASE6</td>
-<td>k4&lt;k3&lt;k1&lt;k2</td>
-<td>-0.26, -0.56, -0.40, 0.22（与 CASE2 全同）</td>
-<td>[0.37, 0.46; 0.59, 0.59]（同 CASE2）</td>
-<td>[0.47, 0.31; 0.28, 0.68]（同 CASE2）</td>
-<td>6.0, 10.0</td>
-<td>0.105684, 0.258372, 0.088878, 0.051627</td>
+<td>$k_{4}&lt;k_{3}&lt;k_{2}&lt;k_{1}$</td>
+<td>1.280619</td>
+<td>1.040663</td>
+<td>1.169221</td>
+<td>0.856279</td>
 </tr>
 </tbody>
 </table>
-<p><strong>存疑 a：CASE4 的标称次序与自身数值矛盾，本表中最不可靠的一行。</strong> 它标称的次序是 k4&lt;k2&lt;k3&lt;k1，但所列数值的实际排序是 k4 (0.051505) &lt; k3 (0.187446) &lt; k2 (0.607323) &lt; k1 (0.813147)，那是 CASE5 的次序；更值得警惕的是，其后给出的 B1…E2 系数与 CASE1 的逐字相同（例如 B1 = -1082.994378），疑为复制粘贴残留。因此 <strong>CASE4 的阈值数字不宜直接引用</strong>，需要期刊版核对后才能定案，本文只照录并标注存疑。</p>
-<p><strong>存疑 b：CASE2 与 CASE6 参数全同、阈值不同，只能并列为"同参数、不同根"。</strong> 两例的 μ、σ、λ1 = 6.0、λ2 = 10.0 连同共同的 K、ρ 逐字相同，阈值四元组却完全不同：CASE2 为 (0.929500, 0.962000, 0.678861, 0.810852)，CASE6 为 (0.105684, 0.258372, 0.088878, 0.051627)。一种可能的解释是：同一次序族的代数方程组在不同次序假设下有多组根，两例各取了一组；另一种可能只是誊录问题。本次核验无法裁决，本文如实并列两组数，不取舍。</p>
-<p>其余四例的标称次序与数值自洽，本次核验逐一验算无误：CASE1 为 0.578407 &lt; 0.597020 &lt; 0.601707 &lt; 0.690976，CASE2 为 0.678861 &lt; 0.810852 &lt; 0.929500 &lt; 0.962000，CASE3 为 0.723277 &lt; 0.737941 &lt; 1.212000 &lt; 1.379000，CASE5 为 0.038756 &lt; 0.044080 &lt; 0.492463 &lt; 0.810635，CASE6 为 0.051627 &lt; 0.088878 &lt; 0.105684 &lt; 0.258372（各按其标称次序排列）。</p>
-<h2>六、一个必须分清的归属：DGM 复现的 k1、k2 不是这四篇的</h2>
-<p>本站此前的 DGM 复现工作中有一组广为人知的边界值 k1 = 1.0380、k2 = 1.2831。整理四篇对照时一度出现一个问题：这组数对应四篇里的哪一篇？核验后的答案是：<strong>哪一篇都不是</strong>。这组数复现的是 Tie, Zhang &amp; Zhang (2017, JOTA) 第 6 节 Target/Walmart 校准——原文报告 k1 = 1.039、k2 = 1.282，复现值与之相对误差约 0.1%，在三位小数舍入范围内。它验证的是 2017 篇，不是 2023–2024 这四篇；把张冠李戴的数字写进对照表，比缺一个数字糟糕得多。</p>
-<p>这四篇自己的解析对照点是现成的：PAFA 篇的阈值由代数方程组确定（上一节六例），NACO 篇的四阈值有期刊发表数值（第三节摘录的三个已逐个对上）。后续数值工作要校验 HJB-DGM 的求解精度，应当拿这两组数去比。</p>
-<h2>七、对本项目配对交易研究线（M3）的三点含义</h2>
-<ol>
-<li><strong>解析校验点有了。</strong> PAFA 篇阈值由代数方程组给出、NACO 篇四阈值有发表数值，HJB-DGM 数值解从此可以拿这两组外部解析结果做对照，不只和自己的另一种实现互比。校验点的可信度直接决定数值结论的可信度，这是四篇里对本项目最直接的用处。</li>
-<li><strong>模型四格已齐，状态切换是两臂共同的缺口。</strong> M3 现行三臂里，经典 RV/OU 臂对应四格中的均值回归格，HJB-DGM 臂对应 GBM 格；两态状态切换是两个臂目前都没有的维度。四篇把切换情形的解析结构（QVI 耦合、边界跳变、六种阈值次序）全部铺好了，它是后续自然的扩展方向——但这不构成现在改动三臂设计的理由，现行对照先按原计划跑完。</li>
-<li><strong>PAFA 六种情形是一份现成的 DGM 复现清单。</strong> 逐情形复现值函数与切换区域，比单组参数的复现更有说服力：六种次序对应六种区域拓扑，数值方法在哪种拓扑下先露馅，一跑便知。而 CASE4 的存疑与 CASE2/CASE6 的同参数不同根，恰好可以由复现反过来检验——数值上把方程组独立解一遍，哪组根能通过变分不等式验证，哪组就站得住；把存疑公开写出来，正是为了让这一步检验有人去做。</li>
-</ol>
-<h2>八、核验范围与限度</h2>
+<p>六种次序的来源：两个卖出阈值的大小关系（$k_{3} &lt; k_{4}$ 或 $k_{4} &lt; k_{3}$）决定卖出问题先按哪一族构造，买入对 $(k_{1}, k_{2})$ 再相对卖出对有三种交错方式，2 × 3 = 6。前三例属 $k_{3} &lt; k_{4}$ 族（Case I、II、III，买入方程组依次为原文式 (2.14)、(2.17)、(2.20)），后三例属 $k_{4} &lt; k_{3}$ 族（Case IV、V、VI，买入方程组依次为式 (2.25)、(2.30)、(2.31)）；每例的参数组（两状态的 $\mu$、$\sigma$ 与 $\lambda_{1}$、$\lambda_{2}$）不同，原文 §2.6 逐例给全，本文不逐例转录参数。</p>
+<p><strong>存疑一：CASE4 的次序标注与数字自相矛盾。</strong> CASE4 标注的次序是 $k_{4} &lt; k_{2} &lt; k_{3} &lt; k_{1}$，但按表中数字实际有 $k_{2} = 0.827001 &lt; k_{1} = 0.963501 &lt; k_{3} = 1.040663 &lt; k_{4} = 1.280619$，即 $k_{2} &lt; k_{1} &lt; k_{3} &lt; k_{4}$，与标注不符。且 CASE4 的系数表（$B_{1} \dots E_{2}$ 共十个系数）与 CASE1 逐字相同（如 $B_{1} = -1082.994378$），高度像编辑时复制未改。引用 CASE4 前应与期刊版核对——这是本文明确标注的第一处存疑，不建议直接引用 CASE4 的任何数字。</p>
+<p><strong>存疑二：CASE2 与 CASE6 是同一组参数的两个根。</strong> 两例的市场参数完全相同，只有 $\lambda_{1}$、$\lambda_{2}$ 互换，阈值四元组也完全相同，只是 $(k_{1}, k_{2})$ 与 $(k_{3}, k_{4})$ 的归属对调。学位论文原文未对此作解释。一个可能的读法是：交换两状态的标签，同一组阈值在两种次序分类下各出现一次——但这只是本站的猜测性解读，原文无此说明，引用时应说明两例的这一关系，不宜把六例当作六组独立数值结果计数。</p>
+<p>另注意 CASE1 与 CASE5 的关系：CASE5 的 $(k_{3}, k_{4}) = (1.040663, 1.280619)$ 恰好等于 CASE1 的 $(k_{1}, k_{2})$，且 CASE5 的次序 $k_{4} &lt; k_{3} &lt; k_{1} &lt; k_{2}$ 与其数字相符（0.856279 &lt; 1.040663 &lt; 1.169221 &lt; 1.280619），不属存疑，只是阈值集合在情形间复现。</p>
+<h2>七、DGM 数值例中 k1、k2 的归属澄清</h2>
+<p>本站 M3 论文工程在复现深度伽辽金（DGM）数值方法时遇到一处归属问题，顺带在此澄清，因为它与第一格直接相关。某篇以 DGM 数值求解切换最优控制问题为主题的预印本，其数值例中出现 $k_{1} = 1.0380$、$k_{2} = 1.2831$ 一对阈值。该预印本是用户本人另一篇在备论文（OU 价差加多状态 regime switching 的 QVI 问题），与本文四篇是两条独立的工作线。经核对，这对数值并非该预印本自创：它们出自 Tie, Zhang &amp; Zhang (2017, JOTA) §6 的数值例——该例取 $\mu_{1} = 0.05$、$\mu_{2} = 0.10$，波动率矩阵两行分别为 (0.15, 0.05) 与 (0.10, 0.20)，K = 0.001、$\rho = 0.5$，闭式解给出 $k_{1} = 1.0380$、$k_{2} = 1.2831$（该文 Table 1）。预印本引用这对数作为其数值方法的对照基准，归属上应标 JOTA 2017，不应标为预印本的结果。顺带对照：本文第一格 arXiv 篇 §6 的 WMT/TGT 例是另一组参数（真实数据校准），其 $k_{1} = 0.85527$、$k_{2} = 1.28061$ 与 JOTA 例数值接近纯属不同例子的巧合，引用时勿混。</p>
+<h2>八、从理论到策略：把四篇落成可执行的配对交易</h2>
+<p>本节是本站基于四篇原文的合成讨论，不是任何一篇论文的主张。四篇给的是四种市场结构下的最优停时规则；要落成策略，需要补上四篇没有做的四件事：选格、校准、执行、风控。下面逐件说。</p>
+<h3>8.1 选格：先诊断价差，再选模型</h3>
+<p>四格是互斥的市场假设，选错格比参数估错更致命。诊断顺序建议如下：</p>
 <ul>
-<li>本次研读核对了：四篇的摘要、引言与目录；NACO 篇数值例与期刊 Table 1 的三个阈值；PAFA 学位论文版 §2.4 的六种情形结构与 §2.6 的全部参数、阈值与次序自洽性。</li>
-<li><strong>未做到的</strong>：四篇的证明过程未逐条核验，文中涉及证明与方法思路处均为结构级概述；PAFA 的数字未与期刊版核对（期刊 PDF 订阅制，未能取得）；CASE4 与 CASE2/CASE6 两处存疑未做裁决，只照录并标注。</li>
-<li>第二格（可逆持仓）的出处以 arXiv:2310.15803 与 Das 博士论文第 3 章为据；本文未就其是否存在期刊版本作任何断言。</li>
-<li>本篇为研究记录，不构成投资建议。</li>
+<li><strong>价差是否均值回归？</strong> 对候选配对的价差（或对数价格比）做平稳性检验（如 ADF 检验）并估计回归半衰期。有明确的均值回归证据 → 走 OU 格（第 3 格 NACO）；没有 → 走 GBM 格（第 1、2 格）。GBM 格不需要回归假设，它的阈值来自漂移与波动的相对大小，逻辑是"相对价格走极端时反向开仓"，与经典配对交易的"回归"逻辑不同，混用会误读信号。</li>
+<li><strong>市场状态是否切换？</strong> 波动率或漂移是否有明显的两段式结构（如高低波状态的驻留时间远长于日频噪声）？有 → 在所选格上加切换（第 3、4 格）；没有 → 用无切换版本，少估一组参数。NACO 篇的 Remark 4.2.1 给了一个实用的时间尺度判据：切换的驻留期以月计、交易以日计时，才值得装切换结构。</li>
+<li><strong>是否需要双向？</strong> 只做多价差（或只做多 Z）用第 1 格；两个方向都做用第 2 格——但注意第 2 格的解告诉我们：双向并不带来额外的阈值对，两个方向共用 $(k_{1}^{\ast}, k_{2}^{\ast})$。</li>
+</ul>
+<h3>8.2 校准：四篇的参数从哪里来</h3>
+<ul>
+<li><strong>GBM 格（第 1、2 格）。</strong> 漂移与波动用对数价格增量估计：原文 WMT/TGT 例的做法是取样本前半段以最小二乘校准、后半段留作检验，这个"前校准、后回测"的切分应原样保留。需要估的是 $\mu_{1}$、$\mu_{2}$ 与波动率矩阵的四个 $\sigma_{ij}$（由两只股票收益的协方差结构反解）。校准后按第五节的公式链算 $\lambda \to \delta_{1}, \delta_{2} \to k_{1}$（闭式）$\to$ 解 $f (k_{2}) = 0$ 的较大根。注意 $\rho$ 不是市场量：它是交易者自己的贴现率（资金成本与耐心程度），原文例取 0.5，敏感性表显示 $\rho$ 越大带越窄——实盘里应按自己的资金成本设定，不要"校准"它。</li>
+<li><strong>OU 格（第 3 格）。</strong> 先定对冲股数 $K_{0}$：四篇里 $K_{0}$ 是外生给定的，实盘中通常由协整回归（Engle–Granger 两步法）的斜率给出，这一步是合成、非原文。再对价差序列做离散回归 $Z_{t + \Delta} = a + b Z_{t} + \varepsilon_{t}$，与 OU 过程的精确离散化对照得（合成公式）</li>
+</ul>
+<p>$$
+\kappa = - \frac{\ln b}{\Delta}, \quad \mu = \frac{a}{1 - b}, \quad \sigma = \mathrm{sd} (\varepsilon) \sqrt{ \frac{2 \kappa}{1 - b^{2}} }
+$$</p>
+<p>其中 $\kappa$ 对应原文的 $\theta$。$b \ge 1$ 时价差非平稳，整格失效（见 8.4）。</p>
+<ul>
+<li><strong>切换参数。</strong> 强度与驻留期互为倒数：状态 j 的平均驻留期是 $1 / \lambda_{j}$。估计路线（合成）：先用波动率或漂移的阈值规则对历史做状态分类（或用 Hamilton 滤波得到状态的滤过概率），在每个状态内分别估该状态的 $(\mu, \sigma)$ 或 $(\theta, \mu, \sigma)$，再用平均驻留期反推 $\lambda_{j}$。NACO 篇的吸收态设定在实盘里只能当近似：真实市场会切回来，实务上是每识别到一次状态变化就按新状态的阈值对继续交易——这与原文"状态变了换一套阈值"的 Remark 读法一致，但原文的闭式解严格来说只覆盖"至多切换一次"的世界，这一点要在策略文档里写明。</li>
+</ul>
+<h3>8.3 信号与状态机：阈值怎么算、怎么用</h3>
+<p>四篇的信号生成是同构的：校准参数 → 代入公式 → 得阈值 → 价格（比）触线即行动。差别只在阈值的求解方式：</p>
+<table>
+<thead>
+<tr>
+<th>模型格</th>
+<th>阈值求解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GBM 往返（格 1）</td>
+<td>$k_{1}$ 闭式；$k_{2}$ 解一元方程 $f (k_{2}) = 0$ 取较大根</td>
+</tr>
+<tr>
+<td>GBM 可逆（格 2）</td>
+<td>$k_{1}^{\ast}$、$k_{2}^{\ast}$ 都是闭式（$k_{1}$ 与 $k_{4}$ 的公式）</td>
+</tr>
+<tr>
+<td>OU + 切换（格 3）</td>
+<td>先对相容条件 (4.5) 用 Newton 法解 $(x_{3}, x_{4})$，再解 (4.7) 得 $(x_{1}, x_{2})$（学位论文 §4.6 的做法）</td>
+</tr>
+<tr>
+<td>GBM + 切换（格 4）</td>
+<td>卖出侧解 (2.36) 的 r 方程得 $(k_{3}, k_{4})$；买入侧按实现的次序解对应的 2×2 方程组（如 Case I 的 (2.14)）</td>
+</tr>
+</tbody>
+</table>
+<p>策略的状态机因此是"持仓状态 × 市场状态"的笛卡尔积：GBM 格是（空仓/多头/空头）三态，切换格再乘以（状态 1/状态 2）。迟滞（hysteresis）是内生的：开仓线与平仓线分离，价格在带内来回不触发任何动作，这是四篇相对于"单阈值进出"规则最核心的结构优势——它把交易次数自动压到与成本相称的水平。切换格还有一条实务规则：状态识别有滞后（滤过概率跨过 0.5 才确认切换），误判期间会用错阈值对，应对办法是确认切换前设一个概率缓冲带，或要求新状态的信号在旧阈值下也不矛盾才执行——这两条都是合成建议，原文未讨论状态误判。</p>
+<h3>8.4 执行与成本：K 怎么进入阈值</h3>
+<p>四篇共同的定量信息是：<strong>成本不改变策略的形状，只改变带的宽度</strong>。GBM 格里 K 通过 $\beta_{s} / \beta_{b}$ 进入 $k_{1}$ 的闭式、通过 $f$ 方程进入 $k_{2}$，方向是 K 升则带变宽（第一格 Tables 6–7）；NACO 格里有现成的数字（第五节第 3 格的表）：K 从 0.001 升到 0.005，状态 2 的带宽从 0.140248 扩到 0.241314。实盘含义有三条：</p>
+<ul>
+<li><strong>用有效成本，不要用名义佣金。</strong> 模型里的 K 应装下佣金 + 滑点 + 卖空借券费（按持有期折算）。先估有效 K、再算阈值，顺序不能反；用名义佣金算出的带在实盘里会被滑点吃穿。</li>
+<li><strong>往返核算以原文的现金流为准。</strong> GBM 格一轮往返的贴现损益就是 $J_{0}$ 的被期望式：平仓所得减开仓成本，两腿的 $\beta$ 不可约掉——近似成"价差变动减 2K"只在两腿价格接近时成立。NACO 格里一轮往返的毛利是卖出价减买入价，净利再减 2K，所以入场前可以先验一条：当前带宽 $(x_{2} - x_{1})$ 必须显著大于 2K，否则这格参数下根本没有可交易的偏离（基准例里带宽 0.250176 对 2K = 0.006，非常宽裕；成本升到使带宽与 2K 同量级时策略自动死亡）。</li>
+<li><strong>下单方式。</strong> 理论在首达时以当时的价格成交；实盘最接近的近似是把阈值挂成限价单（在触发线处等成交），或用穿越触发的市价单接受滑点。前者可能不成交（价格触线即回），后者多付滑点——两者的差应回填进有效 K 重新算阈值，而不是事后抱怨。</li>
+</ul>
+<h3>8.5 风控：理论没有覆盖什么</h3>
+<p>四篇的最优性都建立在"模型为真"之上，以下风险在模型外，策略层必须自己补：</p>
+<ul>
+<li><strong>价差结构断裂（OU 格的死穴）。</strong> $\theta \to 0$ 时回归消失，阈值带在公式上仍可算（带会变宽），但等待的时间趋于无穷。防线是定期重估 b 与半衰期，b 的置信区间碰到 1 就停用该配对——这是停机规则，不是模型内的量。</li>
+<li><strong>GBM 格的漂移风险。</strong> GBM 格的阈值对 $\mu_{1} - \mu_{2}$ 敏感，而漂移恰恰是统计上最难估准的量（原文敏感性表：$\mu$ 移动，整对阈值同向平移）。实务上应把 $\mu$ 的估计误差做成阈值带的稳健区间：用 $\mu$ 置信区间的两端各算一对阈值，只在两对阈值都给出同一动作时才执行（合成建议）。</li>
+<li><strong>状态误判（切换格）。</strong> 用错状态等于用错整套阈值；且 NACO 格的吸收态近似在真实双向切换下没有理论保证。防线见 8.3 的概率缓冲，外加：切换确认后的一段时间内禁止开新仓，只许平仓。</li>
+<li><strong>流动性、停牌与退市。</strong> 四篇都假设连续交易、任意时刻可成交。A 股语境下还要叠加涨跌停与 T+1：触发线在涨跌停板上无法成交、开仓当日不能平仓，这些都会把实际成交价推离触发价——等效于放大 K 与滑点，应在有效 K 里预留，或直接避开流动性差的配对。</li>
+<li><strong>仓位：模型的 bang-bang 与实务的折中。</strong> 四篇的解都是全有全无：一股单位、触线全开、触线全平，没有"半仓"这个概念。学位论文的回测给了一个温和化的先例：触发时只动一半资金做一腿对冲组合（等额对半）。实务的通行折中（合成）是：把总资金切成若干配对与若干份，单个配对按其带宽与 $\sigma$ 定份数（带越宽、波动越大，份数越小），组合层面设同时持仓配对数上限与单日开仓数上限。仓位规则是外加的，不改变阈值本身——阈值只负责"何时"，份数负责"多少"，两者解耦是这套理论落地时最干净的接口。</li>
+</ul>
+<h3>8.6 四格策略速查表</h3>
+<table>
+<thead>
+<tr>
+<th>格</th>
+<th>状态变量</th>
+<th>阈值</th>
+<th>入场规则</th>
+<th>出场规则</th>
+<th>要校准的量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 GBM 往返</td>
+<td>价格比 $y = X^{2} / X^{1}$，持仓（空/多）</td>
+<td>$k_{1} &lt; k_{2}$</td>
+<td>空仓且 $y \ge k_{2}$：做多 Z</td>
+<td>多头且 $y \le k_{1}$：平仓</td>
+<td>$\mu_{1}, \mu_{2}, \sigma_{ij}$，K；$\rho$ 自设</td>
+</tr>
+<tr>
+<td>2 GBM 可逆</td>
+<td>同上，持仓（空/多/空头）</td>
+<td>$k_{1}^{\ast} &lt; k_{2}^{\ast}$</td>
+<td>空仓且 $y \ge k_{2}^{\ast}$ 做多 Z；$y \le k_{1}^{\ast}$ 做空 Z</td>
+<td>多头 $y \le k_{1}^{\ast}$ 平；空头 $y \ge k_{2}^{\ast}$ 平</td>
+<td>同格 1</td>
+</tr>
+<tr>
+<td>3 OU + 切换</td>
+<td>价差 Z，市场状态 $\alpha$</td>
+<td>状态 1：$(x_{1}, x_{2})$；状态 2：$(x_{3}, x_{4})$</td>
+<td>空仓且 $Z \le x_{1}$（状态 1）或 $Z \le x_{3}$（状态 2）：买入 Z</td>
+<td>多头且 $Z \ge x_{2}$（状态 1）或 $Z \ge x_{4}$（状态 2）：卖出；可重复</td>
+<td>$K_{0}$（协整），每状态 $(\theta, \mu, \sigma)$，$\lambda$，固定成本 K</td>
+</tr>
+<tr>
+<td>4 GBM + 切换</td>
+<td>价格比 y，市场状态 $\alpha$，持仓</td>
+<td>状态 j：买入线 $k_{j}$、卖出线 $k_{j + 2}$</td>
+<td>空仓且状态 j 下 $y \ge k_{j}$：买入 Z</td>
+<td>多头且状态 j 下 $y \le k_{j + 2}$：卖出</td>
+<td>每状态 $(\mu_{1}, \mu_{2}, \sigma_{ij})$，$\lambda_{1}, \lambda_{2}$，K；$\rho$ 自设</td>
+</tr>
+</tbody>
+</table>
+<h2>九、对本站 M3 论文工程的三点含义</h2>
+<p>本站正在推进的 M3 配对交易论文（三臂对照：经典 RV/OU、HJB-DGM 最优交易区、面板 Transformer，另设贝叶斯确认层）与这条线有三点直接关联：</p>
+<ol>
+<li><strong>OU 教师的同源性</strong>：M3 的 HJB 臂以 OU 价差的最优停时解为模仿学习的教师，其结构与第三格 NACO 篇同族（阈值带、成本进入带宽的方式一致），第三格的四阈值切换结构是教师从单状态走向状态切换时的现成参照。</li>
+<li><strong>GBM 格的定位</strong>：第一、二格表明，即便不假设均值回归，价格比阈值规则仍可从 HJB 严格导出——这为 M3 里"经典基线"的设定提供了比 z-score 启发式更硬的对照系：基线不只可以是 OU 的，也可以是 GBM 价格比的。</li>
+<li><strong>归属纪律</strong>：第七节的 $k_{1} = 1.0380$、$k_{2} = 1.2831$ 归属澄清说明，这条线内部的数值例会被后续工作反复引用为基准，引用时必须标到原始出处（JOTA 2017 §6），M3 的实验对照表同样按此纪律标注每个基准的来源。</li>
+</ol>
+<h2>十、核验范围与限度</h2>
+<p>本文的核验口径如下，引用时请连同限度一并考虑：</p>
+<ul>
+<li><strong>第一、二格</strong>：模型、HJB、闭式阈值、$f (k_{2}) = 0$ 的结构、验证与最优停时均按 arXiv:2310.15803 原文转录；WMT/TGT 校准参数与 $k_{1} = 0.85527$、$k_{2} = 1.28061$、$k_{2}^{\ast} = 1.32175$ 为原文数值，本文另对 $k_{1}$ 的闭式做过独立复算（由校准参数算得 0.85528，与原文一致到四位小数）。回测数字（+79.25%、+81.35% 等）只见于 Das 学位论文第 2、3 章，arXiv 版无回测，引用时已按学位论文标注。第二格中 $F_{1}$、$F_{2}$ 方程组的显式长式未逐字转录，只给出其来源（四条 smooth-fit 方程）与关键解 $(k_{2}, k_{3}) = (k_{1}, k_{4})$；$C_{2}$ 的闭式长式（原文式 (16)、(33)）亦未转录，只给出由 smooth-fit 直接解出的等价形式。</li>
+<li><strong>第三格</strong>：模型、方程组、阈值结构、充分条件与验证定理按 Das 学位论文第 4 章转录；Lemma 3 的核函数经本站对原文页面逐字核对。数值例（基准四阈值与敏感性表）出自学位论文 §4.6 与 Tables 4.1–4.8；此前本站已核验期刊版 Table 1 的三个数（$x_{1} = -0.282615$、$x_{3} = 0.295314$、$x_{4} = 0.498290$）与学位论文 $\mu_{1} = -0.2$ 一行一致，基准情形的 $(x_{1}, x_{2})$ 未在期刊版逐一核对。充分条件中式 (4.12) 的显式长式未转录，只注明其为 $u_{1} - u_{0} - x$ 在 $(x_{1}, x_{2})$ 上的界。</li>
+<li><strong>第四格</strong>：模型、四次特征方程、卖出问题的分数式阈值、Case I 的买入构造与验证定理按 Song 学位论文第 2 章转录；<strong>PAFA 期刊版（9(3): 783–810）未能取得，全节数字以学位论文版为准，未与期刊版核对</strong>。式 (2.34)、(2.35) 中系数 $A_{1}$、$B_{1}$、$A_{2}$、$B_{2}$ 的显式定义未转录（只注明其构成），式 (2.36) 与 (2.14) 等矩阵方程只给出结构与编号，未逐字展开；Case II–VI 只给出次序、方程编号与数值表，未逐一复述构造。第六节的两处存疑（CASE4、CASE2/CASE6）为本站基于学位论文版文本的发现，是否在期刊版中已更正未知。</li>
+<li><strong>证明</strong>：四篇的验证定理均为陈述其结论与证明骨架（Dynkin 公式、上下鞅夹逼、Fatou 引理），未逐行核验；原文标注"将证明"的个别论断（如式 (2.36) 解的唯一性）按原文口径转述。</li>
+<li><strong>第八节</strong>为本站合成：其中的 OU 离散化对照公式、协整定 $K_{0}$、Hamilton 滤波估 $\lambda$、有效成本、状态误判缓冲与仓位折中均非四篇原文内容，引用时不可归于四篇。</li>
+<li>第七节的 JOTA 2017 归属经本站核对该文 §6 与 Table 1；该预印本为用户本人工作，其与本文四篇的关系以本节所述为准。</li>
 </ul>
 <section id="drx-comments" class="comments"><h2 class="comments-h"><span class="lz">留言</span><span class="le">Comments</span></h2><div class="comments-list"></div><div class="comments-form"></div><p class="comments-note"><span class="lz">留言将公开展示，请友善发言；会员由管理员开通。</span><span class="le">Comments are public. Please be kind. Membership is activated by the admin.</span></p></section>
 <p class="meta"><span class="lz">2026-11-24 发布 · 类型：金融建模</span><span class="le">Published 2026-11-24 · Financial Modeling</span></p>
